@@ -4,7 +4,7 @@ This package is a plugin that allows the export of locked packages to various fo
 
 **Note**: For now, only the `requirements.txt` format is available.
 
-This plugin provides the same features as the existing `export` command of POetry which it will eventually replace.
+This plugin provides the same features as the existing `export` command of Poetry which it will eventually replace.
 
 
 ## Installation
