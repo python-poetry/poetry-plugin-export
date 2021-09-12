@@ -2,8 +2,8 @@ import urllib.parse
 
 from pathlib import Path
 from typing import TYPE_CHECKING
+from typing import List
 from typing import Optional
-from typing import Sequence
 from typing import Union
 
 
@@ -24,51 +24,102 @@ class Exporter:
 
     def __init__(self, poetry: "Poetry") -> None:
         self._poetry = poetry
+        self._without_groups: Optional[List[str]] = None
+        self._with_groups: Optional[List[str]] = None
+        self._only_groups: Optional[List[str]] = None
+        self._extras: Optional[List[str]] = None
+        self._with_hashes: bool = True
+        self._with_credentials: bool = False
 
-    def export(
-        self,
-        fmt: str,
-        cwd: Path,
-        output: Union["IO", str],
-        with_hashes: bool = True,
-        dev: bool = False,
-        extras: Optional[Union[bool, Sequence[str]]] = None,
-        with_credentials: bool = False,
-    ) -> None:
+    def without_groups(self, groups: List[str]) -> "Exporter":
+        self._without_groups = groups
+
+        return self
+
+    def with_groups(self, groups: List[str]) -> "Exporter":
+        self._with_groups = groups
+
+        return self
+
+    def only_groups(self, groups: List[str]) -> "Exporter":
+        self._only_groups = groups
+
+        return self
+
+    def with_extras(self, extras: List[str]) -> "Exporter":
+        self._extras = extras
+
+        return self
+
+    def with_hashes(self, with_hashes: bool = True) -> "Exporter":
+        self._with_hashes = with_hashes
+
+        return self
+
+    def with_credentials(self, with_credentials: bool = True) -> "Exporter":
+        self._with_credentials = with_credentials
+
+        return self
+
+    def export(self, fmt: str, cwd: Path, output: Union["IO", str]) -> None:
         if fmt not in self.ACCEPTED_FORMATS:
             raise ValueError(f"Invalid export format: {fmt}")
 
-        getattr(self, "_export_{}".format(fmt.replace(".", "_")))(
-            cwd,
-            output,
-            with_hashes=with_hashes,
-            dev=dev,
-            extras=extras,
-            with_credentials=with_credentials,
-        )
+        getattr(self, "_export_{}".format(fmt.replace(".", "_")))(cwd, output)
 
-    def _export_requirements_txt(
-        self,
-        cwd: Path,
-        output: Union["IO", str],
-        with_hashes: bool = True,
-        dev: bool = False,
-        extras: Optional[Union[bool, Sequence[str]]] = None,
-        with_credentials: bool = False,
-    ) -> None:
+    def _export_requirements_txt(self, cwd: Path, output: Union["IO", str]) -> None:
+        from cleo.io.null_io import NullIO
         from poetry.core.packages.utils.utils import path_to_url
+        from poetry.puzzle.solver import Solver
+        from poetry.repositories.pool import Pool
+        from poetry.repositories.repository import Repository
 
         indexes = set()
         content = ""
         dependency_lines = set()
 
+        if self._without_groups or self._with_groups or self._only_groups:
+            if self._with_groups:
+                # Default dependencies and opted-in optional dependencies
+                root = self._poetry.package.with_dependency_groups(self._with_groups)
+            elif self._without_groups:
+                # Default dependencies without selected groups
+                root = self._poetry.package.without_dependency_groups(
+                    self._without_groups
+                )
+            else:
+                # Only selected groups
+                root = self._poetry.package.with_dependency_groups(
+                    self._only_groups, only=True
+                )
+        else:
+            root = self._poetry.package.with_dependency_groups(["default"], only=True)
+
+        locked_repository = self._poetry.locker.locked_repository(True)
+
+        pool = Pool(ignore_repository_names=True)
+        pool.add_repository(locked_repository)
+
+        solver = Solver(root, pool, Repository(), locked_repository, NullIO())
+        # Everything is resolved at this point, so we no longer need
+        # to load deferred dependencies (i.e. VCS, URL and path dependencies)
+        solver.provider.load_deferred(False)
+
+        ops = solver.solve().calculate_operations()
+        packages = sorted([op.package for op in ops], key=lambda package: package.name)
+
         for dependency_package in self._poetry.locker.get_project_dependency_packages(
-            project_requires=self._poetry.package.all_requires, dev=dev, extras=extras
+            project_requires=root.all_requires,
+            dev=True,
+            extras=self._extras,
         ):
             line = ""
 
             dependency = dependency_package.dependency
             package = dependency_package.package
+
+            if package not in packages:
+                continue
 
             if package.develop:
                 line += "-e "
@@ -82,8 +133,8 @@ class Exporter:
             if is_direct_remote_reference:
                 line = requirement
             elif is_direct_local_reference:
-                dependency_uri = path_to_url(dependency.source_url)
-                line = f"{dependency.name} @ {dependency_uri}"
+                dependency_uri = path_to_url(package.source_url)
+                line = f"{package.name} @ {dependency_uri}"
             else:
                 line = f"{package.name}=={package.version}"
 
@@ -100,7 +151,7 @@ class Exporter:
             ):
                 indexes.add(package.source_url)
 
-            if package.files and with_hashes:
+            if package.files and self._with_hashes:
                 hashes = []
                 for f in package.files:
                     h = f["hash"]
@@ -142,14 +193,16 @@ class Exporter:
                 ):
                     url = (
                         repository.authenticated_url
-                        if with_credentials
+                        if self._with_credentials
                         else repository.url
                     )
                     indexes_header = f"--index-url {url}\n"
                     continue
 
                 url = (
-                    repository.authenticated_url if with_credentials else repository.url
+                    repository.authenticated_url
+                    if self._with_credentials
+                    else repository.url
                 )
                 parsed_url = urllib.parse.urlsplit(url)
                 if parsed_url.scheme == "http":
@@ -161,7 +214,7 @@ class Exporter:
         self._output(content, cwd, output)
 
     def _output(self, content: str, cwd: Path, output: Union["IO", str]) -> None:
-        decoded = content.decode()
+        decoded = content
         try:
             output.write(decoded)
         except AttributeError:

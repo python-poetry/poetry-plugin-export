@@ -2,6 +2,7 @@ from pathlib import Path
 
 import pytest
 
+from cleo.io.null_io import NullIO
 from cleo.testers.command_tester import CommandTester
 from poetry.installation import Installer
 from poetry.utils.env import MockEnv
@@ -27,6 +28,8 @@ def env(tmp_dir):
 @pytest.fixture
 def command_tester_factory(app, env):
     def _tester(command, poetry=None, installer=None, executor=None, environment=None):
+        app._load_plugins(NullIO())
+
         command = app.find(command)
         tester = CommandTester(command)
 

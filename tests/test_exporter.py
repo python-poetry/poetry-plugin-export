@@ -5,11 +5,13 @@ from pathlib import Path
 import pytest
 
 from poetry.core.packages.dependency import Dependency
+from poetry.core.packages.dependency_group import DependencyGroup
 from poetry.core.toml.file import TOMLFile
 from poetry.factory import Factory
 from poetry.packages.locker import Locker as BaseLocker
 from poetry.repositories.legacy_repository import LegacyRepository
-from poetry.utils.exporter import Exporter
+
+from poetry_export_plugin.exporter import Exporter
 
 
 class Locker(BaseLocker):
@@ -63,9 +65,15 @@ def set_package_requires(poetry, skip=None):
     skip = skip or set()
     packages = poetry.locker.locked_repository(with_dev_reqs=True).packages
     package = poetry.package.with_dependency_groups([], only=True)
+    dev_group = DependencyGroup("dev")
     for pkg in packages:
         if pkg.name not in skip:
-            package.add_dependency(pkg.to_dependency())
+            if pkg.category == "dev":
+                dev_group.add_dependency(pkg.to_dependency())
+            else:
+                package.add_dependency(pkg.to_dependency())
+
+    package.add_dependency_group(dev_group)
 
     poetry._package = package
 
@@ -494,8 +502,10 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
     poetry._package = package
 
     exporter = Exporter(poetry)
+    if dev:
+        exporter.with_groups(["dev"])
 
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt", dev=dev)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -534,6 +544,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
+    exporter.with_hashes(True)
 
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
@@ -581,10 +592,9 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
+    exporter.with_hashes(False)
 
-    exporter.export(
-        "requirements.txt", Path(tmp_dir), "requirements.txt", with_hashes=False
-    )
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -625,7 +635,17 @@ def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
             },
         }
     )
-    set_package_requires(poetry)
+    package = poetry.package.with_dependency_groups([], only=True)
+    package.add_dependency(
+        Factory.create_dependency(name="foo", constraint=dict(version="^1.2.3"))
+    )
+    package.add_dependency(
+        Factory.create_dependency(
+            name="bar", constraint=dict(version="^4.5.6"), groups=["dev"]
+        )
+    )
+
+    poetry._package = package
 
     exporter = Exporter(poetry)
 
@@ -670,11 +690,22 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
             },
         }
     )
-    set_package_requires(poetry)
+    package = poetry.package.with_dependency_groups([], only=True)
+    package.add_dependency(
+        Factory.create_dependency(name="foo", constraint=dict(version="^1.2.3"))
+    )
+    package.add_dependency(
+        Factory.create_dependency(
+            name="bar", constraint=dict(version="^4.5.6"), groups=["dev"]
+        )
+    )
+
+    poetry._package = package
 
     exporter = Exporter(poetry)
+    exporter.with_groups(["dev"])
 
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt", dev=True)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -703,7 +734,7 @@ def test_exporter_exports_requirements_txt_without_optional_packages(tmp_dir, po
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
+                    "category": "main",
                     "optional": True,
                     "python-versions": "*",
                 },
@@ -715,11 +746,26 @@ def test_exporter_exports_requirements_txt_without_optional_packages(tmp_dir, po
             },
         }
     )
-    set_package_requires(poetry)
+    package = poetry.package.with_dependency_groups([], only=True)
+    package.add_dependency(
+        Factory.create_dependency(name="foo", constraint=dict(version="^1.2.3"))
+    )
+    package.add_dependency(
+        Factory.create_dependency(
+            name="bar", constraint=dict(version="^4.5.6", optional=True)
+        )
+    )
+    package.extras["foo"] = [
+        Factory.create_dependency(
+            name="bar", constraint=dict(version="^4.5.6", optional=True)
+        )
+    ]
+
+    poetry._package = package
 
     exporter = Exporter(poetry)
 
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt", dev=True)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -736,8 +782,6 @@ foo==1.2.3 \\
     "extras,lines",
     [
         (None, ["foo==1.2.3"]),
-        (False, ["foo==1.2.3"]),
-        (True, ["bar==4.5.6", "foo==1.2.3", "spam==0.1.0"]),
         (["feature_bar"], ["bar==4.5.6", "foo==1.2.3", "spam==0.1.0"]),
     ],
 )
@@ -781,15 +825,11 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
+    exporter.with_hashes(False)
+    if extras:
+        exporter.with_extras(extras)
 
-    exporter.export(
-        "requirements.txt",
-        Path(tmp_dir),
-        "requirements.txt",
-        dev=True,
-        with_hashes=False,
-        extras=extras,
-    )
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -1257,7 +1297,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(tmp_dir, poetry)
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
+                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1278,7 +1318,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(tmp_dir, poetry)
 
     exporter = Exporter(poetry)
 
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt", dev=True)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -1310,7 +1350,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
+                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1330,7 +1370,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
     set_package_requires(poetry)
     exporter = Exporter(poetry)
 
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt", dev=True)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -1399,8 +1439,10 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
+    if dev:
+        exporter.with_groups(["dev"])
 
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt", dev=dev)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -1473,8 +1515,9 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
+    exporter.with_groups(["dev"])
 
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt", dev=True)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
@@ -1539,14 +1582,10 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
+    exporter.with_credentials()
+    exporter.with_groups(["dev"])
 
-    exporter.export(
-        "requirements.txt",
-        Path(tmp_dir),
-        "requirements.txt",
-        dev=True,
-        with_credentials=True,
-    )
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
