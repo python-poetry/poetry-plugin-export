@@ -1,11 +1,8 @@
 # Poetry export plugin
 
-This package is a plugin that allows the export of locked packages to various formats.
-
-**Note**: For now, only the `requirements.txt` format is available.
-
-This plugin provides the same features as the existing `export` command of Poetry which it will eventually replace.
-
+This package is a fork of [poetry/poetry-export-plugin](https://github.com/tailify/poetry-export-plugin) plugin
+that allows the export of locked packages with packages matching a regexp excluded from the output. The functionality
+frequently required to build Docker images or in monorepo builds.
 
 ## Installation
 

@@ -1,3 +1,4 @@
+import re
 import urllib.parse
 
 from pathlib import Path
@@ -25,6 +26,7 @@ class Exporter:
     def __init__(self, poetry: "Poetry") -> None:
         self._poetry = poetry
         self._without_groups: Optional[List[str]] = None
+        self._without_package_regexps: Optional[List[str]] = None
         self._with_groups: Optional[List[str]] = None
         self._only_groups: Optional[List[str]] = None
         self._extras: Optional[List[str]] = None
@@ -33,6 +35,11 @@ class Exporter:
 
     def without_groups(self, groups: List[str]) -> "Exporter":
         self._without_groups = groups
+
+        return self
+
+    def without_packages(self, regexps: List[str]) -> "Exporter":
+        self._without_package_regexps = regexps
 
         return self
 
@@ -106,7 +113,16 @@ class Exporter:
         solver.provider.load_deferred(False)
 
         ops = solver.solve().calculate_operations()
-        packages = sorted([op.package for op in ops], key=lambda package: package.name)
+        packages = [op.package for op in ops]
+
+        if self._without_package_regexps:
+            compiled_res = [re.compile(regexp) for regexp in self._without_package_regexps]
+            packages = filter(
+                lambda package: all([r.fullmatch(package.name) is None for r in compiled_res]),
+                packages
+            )
+
+        packages = sorted(packages, key=lambda package: package.name)
 
         for dependency_package in self._poetry.locker.get_project_dependency_packages(
             project_requires=root.all_requires,

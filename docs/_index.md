@@ -47,6 +47,14 @@ the `--without` option.
 poetry export --without test,docs
 ```
 
+Also, you can exclude packages from the export with one or more `--without-package`
+option providing a regular expression matching package names to exclude.
+
+```bash
+poetry export --without-package 'foo-.*' \
+              --without-packge 'bar-.*'
+```
+
 You can also select optional dependency groups with the `--with` option.
 
 ```bash

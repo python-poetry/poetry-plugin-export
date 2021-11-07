@@ -1,5 +1,9 @@
 # Change Log
 
+## [0.3.0] - 2021-11-07
+
+- Added support for output filtering. 
+
 ## [0.2.0] - 2021-09-13
 
 ### Added
