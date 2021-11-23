@@ -41,6 +41,13 @@ class ExportCommand(Command):
             multiple=True,
         ),
         option(
+            "without-package",
+            None,
+            "The regexp matching package names to exclude",
+            flag=False,
+            multiple=True,
+        ),
+        option(
             "dev",
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
@@ -63,6 +70,7 @@ class ExportCommand(Command):
             raise ValueError("Invalid export format: {}".format(fmt))
 
         excluded_groups = []
+        excluded_package_regexps = []
         included_groups = []
         only_groups = []
         if self.option("dev"):
@@ -98,6 +106,13 @@ class ExportCommand(Command):
         if self.option("default"):
             only_groups.append("default")
 
+        excluded_package_regexps.extend(
+            [
+                regexp.strip()
+                for regexp in self.option("without-package")
+            ]
+        )
+
         output = self.option("output")
 
         locker = self.poetry.locker
@@ -130,4 +145,5 @@ class ExportCommand(Command):
         exporter.with_extras(self.option("extras"))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
+        exporter.without_packages(excluded_package_regexps)
         exporter.export(fmt, self.poetry.file.parent, output or self.io)

@@ -1641,3 +1641,51 @@ foo==1.2.3
 """
 
     assert out == expected
+
+
+def test_exporter_exports_requirements_txt_without_packages(tmp_dir, poetry, capsys):
+    poetry.locker.mock_lock_data(
+        {
+            "package": [
+                {
+                    "name": "foo-asdb",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+                {
+                    "name": "foo-qwerty",
+                    "version": "1.2.4",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "hashes": {"foo-asdb": [], "foo-qwerty": [], "bar": []},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry)
+    exporter.without_packages(['foo-.*'])
+
+    exporter.export("requirements.txt", Path(tmp_dir), sys.stdout)
+
+    out, err = capsys.readouterr()
+    expected = """\
+bar==4.5.6
+"""
+
+    assert out == expected
