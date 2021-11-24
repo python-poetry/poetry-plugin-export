@@ -36,7 +36,8 @@ class ExportApplicationPlugin(ApplicationPlugin):
 
         # If you're checking this code out to get inspiration
         # for your own plugins: DON'T DO THIS!
-        del application.command_loader._factories["export"]
+        if "export" in application.command_loader._factories:
+            del application.command_loader._factories["export"]
 
         for command in COMMANDS:
             application.command_loader.register_factory(command, load_command(command))
