@@ -1,3 +1,4 @@
+import itertools
 import urllib.parse
 
 from pathlib import Path
@@ -108,15 +109,21 @@ class Exporter:
         ops = solver.solve().calculate_operations()
         packages = sorted([op.package for op in ops], key=lambda package: package.name)
 
-        for dependency_package in self._poetry.locker.get_project_dependency_packages(
-            project_requires=root.all_requires,
-            dev=True,
-            extras=self._extras,
+        for package, groups in itertools.groupby(
+            self._poetry.locker.get_project_dependency_packages(
+                project_requires=root.all_requires,
+                dev=True,
+                extras=self._extras,
+            ),
+            lambda dependency_package: dependency_package.package,
         ):
             line = ""
-
-            dependency = dependency_package.dependency
-            package = dependency_package.package
+            dependency_packages = list(groups)
+            dependency = dependency_packages[0].dependency
+            marker = dependency.marker
+            for dep_package in dependency_packages[1:]:
+                marker = marker.union(dep_package.dependency.marker)
+            dependency.marker = marker
 
             if package not in packages:
                 continue
