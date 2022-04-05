@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 
 from poetry.plugins.application_plugin import ApplicationPlugin
 
-from poetry_export_plugin.console.commands.export import ExportCommand
+from poetry_plugin_export.console.commands.export import ExportCommand
 
 
 if TYPE_CHECKING:
