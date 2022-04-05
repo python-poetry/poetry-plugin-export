@@ -15,15 +15,14 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.6"
-poetry = "^1.2.0a2"
+python = "^3.7"
+poetry = "^1.2.0b1dev0"
 
 [tool.poetry.dev-dependencies]
-black = { version = "^21.8b0", markers = "python_full_version >= '3.6.2' and python_version < '4.0' and implementation_name != 'pypy'" }
-isort = { version = "^5.9.3", python = "^3.6.1" }
-pre-commit = { version = "^2.6", python = "^3.6.1" }
-pytest = "^6.2.3"
+pre-commit = "^2.18"
+pytest = "^7.1"
 pytest-mock = "^3.6.1"
+poetry = {git = "https://github.com/abn/poetry.git", rev = "use-export-plugin"}
 
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_export_plugin.plugins:ExportApplicationPlugin"
