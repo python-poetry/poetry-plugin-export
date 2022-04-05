@@ -1,4 +1,6 @@
 from __future__ import annotations
 
+from poetry.utils._compat import metadata
 
-__version__ = "0.2.1"
+
+__version__ = metadata.version("poetry-plugin-export")
