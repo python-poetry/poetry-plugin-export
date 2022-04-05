@@ -73,7 +73,6 @@ class ExportCommand(InstallerCommand):
             )
 
         exporter = Exporter(self.poetry)
-        print(exporter, "<<<<<<<")
         exporter.only_groups(list(self.activated_groups))
         exporter.with_extras(self.option("extras"))
         exporter.with_hashes(not self.option("without-hashes"))
