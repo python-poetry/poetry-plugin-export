@@ -28,22 +28,8 @@ poetry = {git = "https://github.com/abn/poetry.git", rev = "use-export-plugin"}
 export = "poetry_export_plugin.plugins:ExportApplicationPlugin"
 
 [tool.black]
-line-length = 88
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+target-version = ['py37']
+preview = true
 
 [tool.isort]
 profile = "black"
