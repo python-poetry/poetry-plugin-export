@@ -1,14 +1,16 @@
+from __future__ import annotations
+
 import urllib.parse
 
-from pathlib import Path
 from typing import TYPE_CHECKING
-from typing import List
-from typing import Optional
-from typing import Union
+from typing import Iterable
+
+from cleo.io.io import IO
 
 
 if TYPE_CHECKING:
-    from cleo.io.io import IO
+    from pathlib import Path
+
     from poetry.poetry import Poetry
 
 
@@ -18,56 +20,54 @@ class Exporter:
     """
 
     FORMAT_REQUIREMENTS_TXT = "requirements.txt"
-    #: The names of the supported export formats.
-    ACCEPTED_FORMATS = (FORMAT_REQUIREMENTS_TXT,)
     ALLOWED_HASH_ALGORITHMS = ("sha256", "sha384", "sha512")
 
-    def __init__(self, poetry: "Poetry") -> None:
+    EXPORT_METHODS = {FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt"}
+
+    def __init__(self, poetry: Poetry) -> None:
         self._poetry = poetry
-        self._without_groups: Optional[List[str]] = None
-        self._with_groups: Optional[List[str]] = None
-        self._only_groups: Optional[List[str]] = None
-        self._extras: Optional[List[str]] = None
-        self._with_hashes: bool = True
-        self._with_credentials: bool = False
+        self._with_hashes = True
+        self._with_credentials = False
+        self._with_urls = True
+        self._extras: list[str] = []
+        self._groups: Iterable[str] | None = None
 
-    def without_groups(self, groups: List[str]) -> "Exporter":
-        self._without_groups = groups
+    @classmethod
+    def is_format_supported(cls, fmt: str) -> bool:
+        return fmt in cls.EXPORT_METHODS
 
-        return self
-
-    def with_groups(self, groups: List[str]) -> "Exporter":
-        self._with_groups = groups
-
-        return self
-
-    def only_groups(self, groups: List[str]) -> "Exporter":
-        self._only_groups = groups
-
-        return self
-
-    def with_extras(self, extras: List[str]) -> "Exporter":
+    def with_extras(self, extras: list[str]) -> Exporter:
         self._extras = extras
 
         return self
 
-    def with_hashes(self, with_hashes: bool = True) -> "Exporter":
+    def only_groups(self, groups: Iterable[str]) -> Exporter:
+        self._groups = groups
+
+        return self
+
+    def with_urls(self, with_urls: bool = True) -> Exporter:
+        self._with_urls = with_urls
+
+        return self
+
+    def with_hashes(self, with_hashes: bool = True) -> Exporter:
         self._with_hashes = with_hashes
 
         return self
 
-    def with_credentials(self, with_credentials: bool = True) -> "Exporter":
+    def with_credentials(self, with_credentials: bool = True) -> Exporter:
         self._with_credentials = with_credentials
 
         return self
 
-    def export(self, fmt: str, cwd: Path, output: Union["IO", str]) -> None:
-        if fmt not in self.ACCEPTED_FORMATS:
+    def export(self, fmt: str, cwd: Path, output: IO | str) -> None:
+        if not self.is_format_supported(fmt):
             raise ValueError(f"Invalid export format: {fmt}")
 
-        getattr(self, "_export_{}".format(fmt.replace(".", "_")))(cwd, output)
+        getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
 
-    def _export_requirements_txt(self, cwd: Path, output: Union["IO", str]) -> None:
+    def _export_requirements_txt(self, cwd: Path, output: IO | str) -> None:
         from cleo.io.null_io import NullIO
         from poetry.core.packages.utils.utils import path_to_url
         from poetry.puzzle.solver import Solver
@@ -78,22 +78,12 @@ class Exporter:
         content = ""
         dependency_lines = set()
 
-        if self._without_groups or self._with_groups or self._only_groups:
-            if self._with_groups:
-                # Default dependencies and opted-in optional dependencies
-                root = self._poetry.package.with_dependency_groups(self._with_groups)
-            elif self._without_groups:
-                # Default dependencies without selected groups
-                root = self._poetry.package.without_dependency_groups(
-                    self._without_groups
-                )
-            else:
-                # Only selected groups
-                root = self._poetry.package.with_dependency_groups(
-                    self._only_groups, only=True
-                )
+        if self._groups is not None:
+            root = self._poetry.package.with_dependency_groups(
+                list(self._groups), only=True
+            )
         else:
-            root = self._poetry.package.with_dependency_groups(["default"], only=True)
+            root = self._poetry.package.without_optional_dependency_groups()
 
         locked_repository = self._poetry.locker.locked_repository(True)
 
@@ -106,11 +96,19 @@ class Exporter:
         solver.provider.load_deferred(False)
 
         ops = solver.solve().calculate_operations()
-        packages = sorted([op.package for op in ops], key=lambda package: package.name)
+        packages = sorted((op.package for op in ops), key=lambda pkg: pkg.name)
+
+        # Get project dependencies.
+        if self._groups is not None:
+            root_package = self._poetry.package.with_dependency_groups(
+                list(self._groups), only=True
+            )
+        else:
+            root_package = self._poetry.package.without_optional_dependency_groups()
 
         for dependency_package in self._poetry.locker.get_project_dependency_packages(
-            project_requires=root.all_requires,
-            dev=True,
+            project_requires=root_package.all_requires,
+            project_python_marker=root_package.python_marker,
             extras=self._extras,
         ):
             line = ""
@@ -133,16 +131,15 @@ class Exporter:
             if is_direct_remote_reference:
                 line = requirement
             elif is_direct_local_reference:
-                dependency_uri = path_to_url(package.source_url)
-                line = f"{package.name} @ {dependency_uri}"
+                dependency_uri = path_to_url(dependency.source_url)
+                line = f"{dependency.name} @ {dependency_uri}"
             else:
                 line = f"{package.name}=={package.version}"
 
-            if not is_direct_remote_reference:
-                if ";" in requirement:
-                    markers = requirement.split(";", 1)[1].strip()
-                    if markers:
-                        line += f" ; {markers}"
+            if not is_direct_remote_reference and ";" in requirement:
+                markers = requirement.split(";", 1)[1].strip()
+                if markers:
+                    line += f" ; {markers}"
 
             if (
                 not is_direct_remote_reference
@@ -167,15 +164,14 @@ class Exporter:
                 if hashes:
                     line += " \\\n"
                     for i, h in enumerate(hashes):
-                        line += "    --hash={}{}".format(
-                            h, " \\\n" if i < len(hashes) - 1 else ""
-                        )
+                        suffix = " \\\n" if i < len(hashes) - 1 else ""
+                        line += f"    --hash={h}{suffix}"
             dependency_lines.add(line)
 
         content += "\n".join(sorted(dependency_lines))
         content += "\n"
 
-        if indexes:
+        if indexes and self._with_urls:
             # If we have extra indexes, we add them to the beginning of the output
             indexes_header = ""
             for index in sorted(indexes):
@@ -213,11 +209,10 @@ class Exporter:
 
         self._output(content, cwd, output)
 
-    def _output(self, content: str, cwd: Path, output: Union["IO", str]) -> None:
-        decoded = content
-        try:
-            output.write(decoded)
-        except AttributeError:
+    def _output(self, content: str, cwd: Path, output: IO | str) -> None:
+        if isinstance(output, IO):
+            output.write(content)
+        else:
             filepath = cwd / output
             with filepath.open("w", encoding="utf-8") as f:
-                f.write(decoded)
+                f.write(content)

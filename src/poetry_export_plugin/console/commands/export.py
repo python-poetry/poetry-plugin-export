@@ -1,11 +1,12 @@
+from __future__ import annotations
+
 from cleo.helpers import option
-from poetry.console.commands.command import Command
+from poetry.console.commands.installer_command import InstallerCommand
 
 from poetry_export_plugin.exporter import Exporter
 
 
-class ExportCommand(Command):
-
+class ExportCommand(InstallerCommand):
     name = "export"
     description = "Exports the lock file to alternative formats."
 
@@ -18,34 +19,18 @@ class ExportCommand(Command):
             default=Exporter.FORMAT_REQUIREMENTS_TXT,
         ),
         option("output", "o", "The name of the output file.", flag=False),
+        option("without-hashes", None, "Exclude hashes from the exported file."),
         option(
-            "without",
+            "without-urls",
             None,
-            "The dependency groups to ignore when exporting.",
-            flag=False,
-            multiple=True,
-        ),
-        option(
-            "with",
-            None,
-            "The optional dependency groups to include when exporting.",
-            flag=False,
-            multiple=True,
-        ),
-        option("default", None, "Only export the default dependencies."),
-        option(
-            "only",
-            None,
-            "The only dependency groups to include when exporting.",
-            flag=False,
-            multiple=True,
+            "Exclude source repository urls from the exported file.",
         ),
         option(
             "dev",
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
-        option("without-hashes", None, "Exclude hashes from the exported file."),
+        *InstallerCommand._group_dependency_options(),
         option(
             "extras",
             "E",
@@ -59,44 +44,8 @@ class ExportCommand(Command):
     def handle(self) -> None:
         fmt = self.option("format")
 
-        if fmt not in Exporter.ACCEPTED_FORMATS:
-            raise ValueError("Invalid export format: {}".format(fmt))
-
-        excluded_groups = []
-        included_groups = []
-        only_groups = []
-        if self.option("dev"):
-            self.line_error(
-                "<warning>The --dev option is deprecated, "
-                "use the `--with dev` notation instead.</warning>"
-            )
-            self.line_error("")
-            included_groups.append("dev")
-
-        excluded_groups.extend(
-            [
-                group.strip()
-                for groups in self.option("without")
-                for group in groups.split(",")
-            ]
-        )
-        included_groups.extend(
-            [
-                group.strip()
-                for groups in self.option("with")
-                for group in groups.split(",")
-            ]
-        )
-        only_groups.extend(
-            [
-                group.strip()
-                for groups in self.option("only")
-                for group in groups.split(",")
-            ]
-        )
-
-        if self.option("default"):
-            only_groups.append("default")
+        if not Exporter.is_format_supported(fmt):
+            raise ValueError(f"Invalid export format: {fmt}")
 
         output = self.option("output")
 
@@ -111,7 +60,7 @@ class ExportCommand(Command):
             elif self.io.is_verbose():
                 options.append(("-v", None))
 
-            self.call("lock", " ".join(options))
+            self.call("lock", " ".join(options))  # type: ignore[arg-type]
 
         if not locker.is_fresh():
             self.line_error(
@@ -124,10 +73,9 @@ class ExportCommand(Command):
             )
 
         exporter = Exporter(self.poetry)
-        exporter.with_groups(included_groups)
-        exporter.without_groups(excluded_groups)
-        exporter.only_groups(only_groups)
+        exporter.only_groups(list(self.activated_groups))
         exporter.with_extras(self.option("extras"))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
+        exporter.with_urls(not self.option("without-urls"))
         exporter.export(fmt, self.poetry.file.parent, output or self.io)
