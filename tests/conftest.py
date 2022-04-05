@@ -1,10 +1,13 @@
+from __future__ import annotations
+
 import shutil
 import sys
 import tempfile
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 from typing import Any
-from typing import Dict
+from typing import Iterator
 
 import pytest
 
@@ -13,11 +16,19 @@ from poetry.config.dict_config_source import DictConfigSource
 from poetry.core.packages.package import Package
 from poetry.factory import Factory
 from poetry.layouts import layout
-from poetry.repositories.pool import Pool
-from poetry.repositories.repository import Repository
+from poetry.repositories import Pool
+from poetry.repositories import Repository
 from poetry.utils.env import SystemEnv
 
 from tests.helpers import TestLocker
+
+
+if TYPE_CHECKING:
+    from poetry.poetry import Poetry
+    from pytest_mock import MockerFixture
+
+    from tests.types import FixtureDirGetter
+    from tests.types import ProjectFactory
 
 
 class Config(BaseConfig):
@@ -25,35 +36,35 @@ class Config(BaseConfig):
         self.merge(self._config_source.config)
         self.merge(self._auth_config_source.config)
 
-        return super(Config, self).get(setting_name, default=default)
+        return super().get(setting_name, default=default)
 
-    def raw(self) -> Dict[str, Any]:
+    def raw(self) -> dict[str, Any]:
         self.merge(self._config_source.config)
         self.merge(self._auth_config_source.config)
 
-        return super(Config, self).raw()
+        return super().raw()
 
-    def all(self) -> Dict[str, Any]:
+    def all(self) -> dict[str, Any]:
         self.merge(self._config_source.config)
         self.merge(self._auth_config_source.config)
 
-        return super(Config, self).all()
+        return super().all()
 
 
 @pytest.fixture
-def config_cache_dir(tmp_dir):
+def config_cache_dir(tmp_dir: str) -> Path:
     path = Path(tmp_dir) / ".cache" / "pypoetry"
     path.mkdir(parents=True)
     return path
 
 
 @pytest.fixture
-def config_virtualenvs_path(config_cache_dir):
+def config_virtualenvs_path(config_cache_dir: Path) -> Path:
     return config_cache_dir / "virtualenvs"
 
 
 @pytest.fixture
-def config_source(config_cache_dir):
+def config_source(config_cache_dir: Path) -> DictConfigSource:
     source = DictConfigSource()
     source.add_property("cache-dir", str(config_cache_dir))
 
@@ -61,14 +72,18 @@ def config_source(config_cache_dir):
 
 
 @pytest.fixture
-def auth_config_source():
+def auth_config_source() -> DictConfigSource:
     source = DictConfigSource()
 
     return source
 
 
 @pytest.fixture
-def config(config_source, auth_config_source, mocker):
+def config(
+    config_source: DictConfigSource,
+    auth_config_source: DictConfigSource,
+    mocker: MockerFixture,
+) -> Config:
     import keyring
 
     from keyring.backends.fail import Keyring
@@ -87,7 +102,7 @@ def config(config_source, auth_config_source, mocker):
 
 
 @pytest.fixture
-def tmp_dir():
+def tmp_dir() -> Iterator[str]:
     dir_ = tempfile.mkdtemp(prefix="poetry_")
 
     yield dir_
@@ -96,51 +111,62 @@ def tmp_dir():
 
 
 @pytest.fixture
-def fixture_dir():
-    def _fixture_dir(fixture):
-        return Path(__file__).parent.joinpath("fixtures").joinpath(fixture)
+def fixture_base() -> Path:
+    return Path(__file__).parent.joinpath("fixtures")
+
+
+@pytest.fixture
+def fixture_dir(fixture_base: Path) -> FixtureDirGetter:
+    def _fixture_dir(name: str) -> Path:
+        return fixture_base / name
 
     return _fixture_dir
 
 
 @pytest.fixture()
-def repo():
+def repo() -> Repository:
     return Repository()
 
 
 @pytest.fixture
-def installed():
+def installed() -> Repository:
     return Repository()
 
 
 @pytest.fixture(scope="session")
-def current_env():
+def current_env() -> SystemEnv:
     return SystemEnv(Path(sys.executable))
 
 
 @pytest.fixture(scope="session")
-def current_python(current_env):
+def current_python(current_env: SystemEnv) -> tuple[int, int, int]:
     return current_env.version_info[:3]
 
 
 @pytest.fixture(scope="session")
-def default_python(current_python):
-    return "^{}".format(".".join(str(v) for v in current_python[:2]))
+def default_python(current_python: tuple[int, int, int]) -> str:
+    return "^" + ".".join(str(v) for v in current_python[:2])
 
 
 @pytest.fixture
-def project_factory(tmp_dir, config, repo, installed, default_python):
+def project_factory(
+    tmp_dir: str,
+    config: Config,
+    repo: Repository,
+    installed: Repository,
+    default_python: str,
+) -> ProjectFactory:
     workspace = Path(tmp_dir)
 
     def _factory(
-        name=None,
-        dependencies=None,
-        dev_dependencies=None,
-        pyproject_content=None,
-        poetry_lock_content=None,
-        install_deps=True,
-    ):
-        project_dir = workspace / "poetry-fixture-{}".format(name)
+        name: str | None = None,
+        dependencies: dict[str, str] | None = None,
+        dev_dependencies: dict[str, str] | None = None,
+        pyproject_content: str | None = None,
+        poetry_lock_content: str | None = None,
+        install_deps: bool = True,
+    ) -> Poetry:
+        project_dir = workspace / f"poetry-fixture-{name}"
         dependencies = dependencies or {}
         dev_dependencies = dev_dependencies or {}
 
@@ -167,9 +193,7 @@ def project_factory(tmp_dir, config, repo, installed, default_python):
 
         poetry = Factory().create_poetry(project_dir)
 
-        locker = TestLocker(
-            poetry.locker.lock.path, poetry.locker._local_config
-        )  # noqa
+        locker = TestLocker(poetry.locker.lock.path, poetry.locker._local_config)
         locker.write()
 
         poetry.set_locker(locker)

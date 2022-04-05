@@ -1,4 +1,7 @@
+from __future__ import annotations
+
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import pytest
 
@@ -7,27 +10,43 @@ from cleo.testers.command_tester import CommandTester
 from poetry.installation import Installer
 from poetry.utils.env import MockEnv
 
-from tests.helpers import TestApplication
+from tests.helpers import PoetryTestApplication
 from tests.helpers import TestExecutor
 
 
+if TYPE_CHECKING:
+    from poetry.installation.executor import Executor
+    from poetry.poetry import Poetry
+    from poetry.utils.env import Env
+
+    from tests.types import CommandTesterFactory
+
+
 @pytest.fixture
-def app(poetry):
-    app_ = TestApplication(poetry)
+def app(poetry: Poetry) -> PoetryTestApplication:
+    app_ = PoetryTestApplication(poetry)
 
     return app_
 
 
 @pytest.fixture
-def env(tmp_dir):
+def env(tmp_dir: str) -> MockEnv:
     path = Path(tmp_dir) / ".venv"
     path.mkdir(parents=True)
     return MockEnv(path=path, is_venv=True)
 
 
 @pytest.fixture
-def command_tester_factory(app, env):
-    def _tester(command, poetry=None, installer=None, executor=None, environment=None):
+def command_tester_factory(
+    app: PoetryTestApplication, env: MockEnv
+) -> CommandTesterFactory:
+    def _tester(
+        command: str,
+        poetry: Poetry | None = None,
+        installer: Installer | None = None,
+        executor: Executor | None = None,
+        environment: Env | None = None,
+    ) -> CommandTester:
         app._load_plugins(NullIO())
 
         command = app.find(command)
@@ -69,6 +88,6 @@ def command_tester_factory(app, env):
 
 
 @pytest.fixture
-def do_lock(command_tester_factory, poetry):
+def do_lock(command_tester_factory: CommandTesterFactory, poetry: Poetry) -> None:
     command_tester_factory("lock").execute()
     assert poetry.locker.lock.exists()
