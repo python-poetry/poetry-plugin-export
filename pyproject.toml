@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "poetry-export-plugin"
+name = "poetry-plugin-export"
 version = "0.2.1"
 description = "Poetry plugin to export the dependencies to various formats"
 authors = ["Sébastien Eustace <sebastien@eustace.io>"]
@@ -7,7 +7,7 @@ license = "MIT"
 readme = "README.md"
 
 packages = [
-    { include = "poetry_export_plugin", from = "src" }
+    { include = "poetry_plugin_export", from = "src" }
 ]
 
 include = [
@@ -25,7 +25,7 @@ pytest-mock = "^3.6.1"
 poetry = {git = "https://github.com/abn/poetry.git", rev = "use-export-plugin"}
 
 [tool.poetry.plugins."poetry.application.plugin"]
-export = "poetry_export_plugin.plugins:ExportApplicationPlugin"
+export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
 
 [tool.black]
 target-version = ['py37']

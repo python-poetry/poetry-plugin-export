@@ -3,7 +3,7 @@ from __future__ import annotations
 from cleo.helpers import option
 from poetry.console.commands.installer_command import InstallerCommand
 
-from poetry_export_plugin.exporter import Exporter
+from poetry_plugin_export.exporter import Exporter
 
 
 class ExportCommand(InstallerCommand):
@@ -73,6 +73,7 @@ class ExportCommand(InstallerCommand):
             )
 
         exporter = Exporter(self.poetry)
+        print(exporter, "<<<<<<<")
         exporter.only_groups(list(self.activated_groups))
         exporter.with_extras(self.option("extras"))
         exporter.with_hashes(not self.option("without-hashes"))

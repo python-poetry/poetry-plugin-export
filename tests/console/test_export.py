@@ -7,7 +7,7 @@ import pytest
 
 from poetry.core.packages.package import Package
 
-from poetry_export_plugin.exporter import Exporter
+from poetry_plugin_export.exporter import Exporter
 from tests.markers import MARKER_PY
 
 

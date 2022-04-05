@@ -1,4 +1,4 @@
-# Poetry export plugin
+# Poetry Plugin: Export
 
 This package is a plugin that allows the export of locked packages to various formats.
 
@@ -12,19 +12,19 @@ This plugin provides the same features as the existing `export` command of Poetr
 The easiest way to install the `export` plugin is via the `plugin add` command of Poetry.
 
 ```bash
-poetry plugin add poetry-export-plugin
+poetry plugin add poetry-plugin-export
 ```
 
 If you used `pipx` to install Poetry you can add the plugin via the `pipx inject` command.
 
 ```bash
-pipx inject poetry poetry-export-plugin
+pipx inject poetry poetry-plugin-export
 ```
 
 Otherwise, if you used `pip` to install Poetry you can add the plugin packages via the `pip install` command.
 
 ```bash
-pip install poetry-export-plugin
+pip install poetry-plugin-export
 ```
 
 
