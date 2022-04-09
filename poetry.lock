@@ -361,6 +361,7 @@ packaging = "^20.4"
 pexpect = "^4.7.0"
 pkginfo = "^1.5"
 poetry-core = "^1.1.0a7"
+poetry-plugin-export = "^1.0"
 requests = "^2.18"
 requests-toolbelt = "^0.9.1"
 shellingham = "^1.1"
@@ -372,7 +373,7 @@ virtualenv = "(>=20.4.3,<20.4.5 || >=20.4.7)"
 type = "git"
 url = "https://github.com/abn/poetry.git"
 reference = "use-export-plugin"
-resolved_reference = "c5f74f605f0eecd5aedcfb75d06e5a7230ab1b16"
+resolved_reference = "aee5e054cb9978dc4908a8715a8c85a98a209b58"
 
 [[package]]
 name = "poetry-core"
@@ -641,7 +642,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "90f3e97cd2d184279fb3e5c0ebf6cba349fbf615158e98817e27ad1925e895a2"
+content-hash = "47488c6d0154828f63ebf2f95d6be02314fbd3e3e060fdbfd0b1bf526b8cfb84"
 
 [metadata.files]
 atomicwrites = [
