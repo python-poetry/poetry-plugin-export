@@ -88,7 +88,7 @@ def _export_requirements(tester: CommandTester, poetry: Poetry) -> None:
 foo==1.0.0 ; {MARKER_PY}
 """
 
-    assert expected == content
+    assert content == expected
 
 
 def test_export_exports_requirements_txt_file_locks_if_no_lock_file(
@@ -116,7 +116,7 @@ def test_export_prints_to_stdout_by_default(tester: CommandTester, do_lock: None
     expected = f"""\
 foo==1.0.0 ; {MARKER_PY}
 """
-    assert expected == tester.io.fetch_output()
+    assert tester.io.fetch_output() == expected
 
 
 def test_export_uses_requirements_txt_format_by_default(
@@ -126,7 +126,7 @@ def test_export_uses_requirements_txt_format_by_default(
     expected = f"""\
 foo==1.0.0 ; {MARKER_PY}
 """
-    assert expected == tester.io.fetch_output()
+    assert tester.io.fetch_output() == expected
 
 
 def test_export_includes_extras_by_flag(tester: CommandTester, do_lock: None):
@@ -135,7 +135,7 @@ def test_export_includes_extras_by_flag(tester: CommandTester, do_lock: None):
 bar==1.1.0 ; {MARKER_PY}
 foo==1.0.0 ; {MARKER_PY}
 """
-    assert expected == tester.io.fetch_output()
+    assert tester.io.fetch_output() == expected
 
 
 def test_export_with_urls(
