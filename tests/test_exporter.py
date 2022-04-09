@@ -15,8 +15,8 @@ from poetry.core.version.markers import parse_marker
 from poetry.factory import Factory
 from poetry.packages import Locker as BaseLocker
 from poetry.repositories.legacy_repository import LegacyRepository
-from poetry.utils.exporter import Exporter
 
+from poetry_plugin_export.exporter import Exporter
 from tests.markers import MARKER_PY
 from tests.markers import MARKER_PY27
 from tests.markers import MARKER_PY36
