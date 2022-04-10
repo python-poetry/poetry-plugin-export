@@ -82,7 +82,7 @@ class Exporter:
             list(self._groups or ["default"]), only=True
         )
 
-        locked_repository = self._poetry.locker.locked_repository(True)
+        locked_repository = self._poetry.locker.locked_repository()
 
         pool = Pool(ignore_repository_names=True)
         pool.add_repository(locked_repository)
