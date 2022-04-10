@@ -90,7 +90,7 @@ def poetry(fixture_dir: FixtureDirGetter, locker: Locker) -> Poetry:
 
 def set_package_requires(poetry: Poetry, skip: set[str] | None = None) -> None:
     skip = skip or set()
-    packages = poetry.locker.locked_repository(with_dev_reqs=True).packages
+    packages = poetry.locker.locked_repository().packages
     package = poetry.package.with_dependency_groups([], only=True)
     for pkg in packages:
         if pkg.name not in skip:
