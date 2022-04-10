@@ -78,12 +78,9 @@ class Exporter:
         content = ""
         dependency_lines = set()
 
-        if self._groups is not None:
-            root = self._poetry.package.with_dependency_groups(
-                list(self._groups), only=True
-            )
-        else:
-            root = self._poetry.package.without_optional_dependency_groups()
+        root = self._poetry.package.with_dependency_groups(
+            list(self._groups or ["default"]), only=True
+        )
 
         locked_repository = self._poetry.locker.locked_repository(True)
 
