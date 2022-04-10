@@ -373,7 +373,7 @@ virtualenv = "(>=20.4.3,<20.4.5 || >=20.4.7)"
 type = "git"
 url = "https://github.com/abn/poetry.git"
 reference = "use-export-plugin"
-resolved_reference = "aee5e054cb9978dc4908a8715a8c85a98a209b58"
+resolved_reference = "642775bf9c7ad2ac74e9495fd8290525bb9060c9"
 
 [[package]]
 name = "poetry-core"
