@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.0.1] - 2022-04-11
+
+### Fixed
+
+- Fixed a regression where export incorrectly always exported default group only. [#50](https://github.com/python-poetry/poetry-plugin-export/pull/50)
+
 ## [1.0.0] - 2022-04-05
 
 ### Fixed
@@ -31,7 +37,8 @@
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.1...main
+[1.0.1]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.1
 [1.0.0]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.0
 [0.2.1]: https://github.com/python-poetry/poetry-plugin-export/compare/0.2.1
 [0.2.0]: https://github.com/python-poetry/poetry-plugin-export/compare/0.2.0
