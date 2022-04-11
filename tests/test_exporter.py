@@ -930,7 +930,12 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
                     "category": "main",
                     "optional": False,
                     "python-versions": "*",
-                    "dependencies": {"foo": "rev 123456"},
+                    "dependencies": {
+                        "foo": {
+                            "git": "https://github.com/foo/foo.git",
+                            "rev": "123456",
+                        }
+                    },
                 },
             ],
             "metadata": {
