@@ -30,7 +30,7 @@ class Exporter:
         self._with_credentials = False
         self._with_urls = True
         self._extras: list[str] = []
-        self._groups: Iterable[str] | None = None
+        self._groups: Iterable[str] = ["default"]
 
     @classmethod
     def is_format_supported(cls, fmt: str) -> bool:
@@ -78,14 +78,11 @@ class Exporter:
         content = ""
         dependency_lines = set()
 
-        if self._groups is not None:
-            root = self._poetry.package.with_dependency_groups(
-                list(self._groups), only=True
-            )
-        else:
-            root = self._poetry.package.without_optional_dependency_groups()
+        root = self._poetry.package.with_dependency_groups(
+            list(self._groups), only=True
+        )
 
-        locked_repository = self._poetry.locker.locked_repository(True)
+        locked_repository = self._poetry.locker.locked_repository()
 
         pool = Pool(ignore_repository_names=True)
         pool.add_repository(locked_repository)
@@ -98,17 +95,9 @@ class Exporter:
         ops = solver.solve().calculate_operations()
         packages = sorted((op.package for op in ops), key=lambda pkg: pkg.name)
 
-        # Get project dependencies.
-        if self._groups is not None:
-            root_package = self._poetry.package.with_dependency_groups(
-                list(self._groups), only=True
-            )
-        else:
-            root_package = self._poetry.package.without_optional_dependency_groups()
-
         for dependency_package in self._poetry.locker.get_project_dependency_packages(
-            project_requires=root_package.all_requires,
-            project_python_marker=root_package.python_marker,
+            project_requires=root.all_requires,
+            project_python_marker=root.python_marker,
             extras=self._extras,
         ):
             line = ""
@@ -161,11 +150,9 @@ class Exporter:
 
                     hashes.append(f"{algorithm}:{h}")
 
-                if hashes:
-                    line += " \\\n"
-                    for i, h in enumerate(hashes):
-                        suffix = " \\\n" if i < len(hashes) - 1 else ""
-                        line += f"    --hash={h}{suffix}"
+                for h in hashes:
+                    line += f" \\\n    --hash={h}"
+
             dependency_lines.add(line)
 
         content += "\n".join(sorted(dependency_lines))
