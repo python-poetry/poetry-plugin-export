@@ -41,6 +41,10 @@ class ExportCommand(InstallerCommand):
         option("with-credentials", None, "Include credentials for extra indices."),
     ]
 
+    @property
+    def non_optional_groups(self) -> set[str]:
+        return {"default"}
+
     def handle(self) -> None:
         fmt = self.option("format")
 
