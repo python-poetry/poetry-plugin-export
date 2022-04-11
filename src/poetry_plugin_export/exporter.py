@@ -30,7 +30,7 @@ class Exporter:
         self._with_credentials = False
         self._with_urls = True
         self._extras: list[str] = []
-        self._groups: Iterable[str] | None = None
+        self._groups: Iterable[str] = ["default"]
 
     @classmethod
     def is_format_supported(cls, fmt: str) -> bool:
@@ -79,7 +79,7 @@ class Exporter:
         dependency_lines = set()
 
         root = self._poetry.package.with_dependency_groups(
-            list(self._groups or ["default"]), only=True
+            list(self._groups), only=True
         )
 
         locked_repository = self._poetry.locker.locked_repository()

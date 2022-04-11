@@ -731,6 +731,46 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
+def test_exporter_exports_requirements_txt_without_groups_if_set_explicity(
+    tmp_dir: str, poetry: Poetry
+):
+    poetry.locker.mock_lock_data(
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "category": "dev",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry)
+    exporter.only_groups([])
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
+
+    with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    assert content == "\n"
+
+
 def test_exporter_exports_requirements_txt_without_optional_packages(
     tmp_dir: str, poetry: Poetry
 ):
