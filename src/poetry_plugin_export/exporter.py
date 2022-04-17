@@ -8,6 +8,12 @@ from typing import Iterable
 from cleo.io.io import IO
 
 
+try:
+    from poetry.core.packages.dependency_group import MAIN_GROUP
+except ImportError:
+    MAIN_GROUP = "default"
+
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -30,7 +36,7 @@ class Exporter:
         self._with_credentials = False
         self._with_urls = True
         self._extras: list[str] = []
-        self._groups: Iterable[str] = ["default"]
+        self._groups: Iterable[str] = [MAIN_GROUP]
 
     @classmethod
     def is_format_supported(cls, fmt: str) -> bool:

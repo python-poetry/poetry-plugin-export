@@ -15,6 +15,12 @@ from poetry.factory import Factory
 from poetry.packages import Locker as BaseLocker
 from poetry.repositories.legacy_repository import LegacyRepository
 
+
+try:
+    from poetry.core.packages.dependency_group import MAIN_GROUP
+except ImportError:
+    MAIN_GROUP = "default"
+
 from poetry_plugin_export.exporter import Exporter
 from tests.markers import MARKER_PY
 from tests.markers import MARKER_PY27
@@ -540,7 +546,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
 
     exporter = Exporter(poetry)
     if dev:
-        exporter.only_groups(["default", "dev"])
+        exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
@@ -715,7 +721,7 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
@@ -802,7 +808,7 @@ def test_exporter_exports_requirements_txt_without_optional_packages(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
@@ -888,7 +894,7 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.with_hashes(False)
     exporter.with_extras(extras)
     exporter.export(
@@ -1457,7 +1463,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
@@ -1515,7 +1521,7 @@ def test_exporter_exports_requirements_txt_with_url_false(tmp_dir: str, poetry: 
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.with_urls(False)
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
@@ -1566,7 +1572,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
     )
     set_package_requires(poetry)
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
@@ -1650,7 +1656,7 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
 
     exporter = Exporter(poetry)
     if dev:
-        exporter.only_groups(["default", "dev"])
+        exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
@@ -1724,7 +1730,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
 
     with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
@@ -1790,7 +1796,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.with_credentials()
     exporter.export(
         "requirements.txt",
@@ -1956,7 +1962,7 @@ def test_exporter_doesnt_confuse_repeated_packages(tmp_dir: str, poetry: Poetry)
     poetry._package = root
 
     exporter = Exporter(poetry)
-    exporter.only_groups(["default", "dev"])
+    exporter.only_groups([MAIN_GROUP, "dev"])
     io = BufferedIO()
     exporter.export("requirements.txt", Path(tmp_dir), io)
 
