@@ -3,6 +3,12 @@ from __future__ import annotations
 from cleo.helpers import option
 from poetry.console.commands.installer_command import InstallerCommand
 
+
+try:
+    from poetry.core.packages.dependency_group import MAIN_GROUP
+except ImportError:
+    MAIN_GROUP = "default"
+
 from poetry_plugin_export.exporter import Exporter
 
 
@@ -43,7 +49,12 @@ class ExportCommand(InstallerCommand):
 
     @property
     def non_optional_groups(self) -> set[str]:
-        return {"default"}
+        # method only required for poetry <= 1.2.0-beta.2.dev0
+        return {MAIN_GROUP}
+
+    @property
+    def default_groups(self) -> set[str]:
+        return {MAIN_GROUP}
 
     def handle(self) -> None:
         fmt = self.option("format")

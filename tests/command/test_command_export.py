@@ -7,6 +7,12 @@ import pytest
 
 from poetry.core.packages.package import Package
 
+
+try:
+    from poetry.core.packages.dependency_group import MAIN_GROUP
+except ImportError:
+    MAIN_GROUP = "default"
+
 from poetry_plugin_export.exporter import Exporter
 from tests.markers import MARKER_PY
 
@@ -152,13 +158,16 @@ foo==1.0.0 ; {MARKER_PY}
             f"baz==2.0.0 ; {MARKER_PY}\nfoo==1.0.0 ; {MARKER_PY}\nopt==2.2.0 ;"
             f" {MARKER_PY}\n",
         ),
-        ("--without default", "\n"),
+        (f"--without {MAIN_GROUP}", "\n"),
         ("--without dev", f"foo==1.0.0 ; {MARKER_PY}\n"),
         ("--without opt", f"foo==1.0.0 ; {MARKER_PY}\n"),
-        ("--without default,dev,opt", "\n"),
-        ("--only default", f"foo==1.0.0 ; {MARKER_PY}\n"),
+        (f"--without {MAIN_GROUP},dev,opt", "\n"),
+        (f"--only {MAIN_GROUP}", f"foo==1.0.0 ; {MARKER_PY}\n"),
         ("--only dev", f"baz==2.0.0 ; {MARKER_PY}\n"),
-        ("--only default,dev", f"baz==2.0.0 ; {MARKER_PY}\nfoo==1.0.0 ; {MARKER_PY}\n"),
+        (
+            f"--only {MAIN_GROUP},dev",
+            f"baz==2.0.0 ; {MARKER_PY}\nfoo==1.0.0 ; {MARKER_PY}\n",
+        ),
     ],
 )
 def test_export_groups(
