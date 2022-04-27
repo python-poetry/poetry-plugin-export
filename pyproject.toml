@@ -41,14 +41,16 @@ lines_between_types = 1
 use_parentheses = true
 
 [tool.mypy]
-check_untyped_defs = true
-ignore_missing_imports = true
 show_error_codes = true
-warn_redundant_casts = true
-warn_unused_configs = true
-warn_unused_ignores = true
 enable_error_code = ["ignore-without-code"]
+strict = true
 files = "src"
+
+[[tool.mypy.overrides]]
+module = [
+  'cleo.*',
+]
+ignore_missing_imports = true
 
 [build-system]
 requires = ["poetry-core"]
