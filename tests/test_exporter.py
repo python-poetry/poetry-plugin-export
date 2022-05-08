@@ -601,6 +601,54 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
+def test_exporter_can_export_requirements_txt_with_standard_packages_and_sorted_hashes(
+    tmp_dir: str, poetry: Poetry
+):
+    poetry.locker.mock_lock_data(
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "hashes": {"foo": ["67890", "12345"], "bar": ["67890", "12345"]},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
+
+    with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = f"""\
+bar==4.5.6 ; {MARKER_PY} \\
+    --hash=sha256:12345 \\
+    --hash=sha256:67890
+foo==1.2.3 ; {MARKER_PY} \\
+    --hash=sha256:12345 \\
+    --hash=sha256:67890
+"""
+
+    assert content == expected
+
+
 def test_exporter_requirements_txt_with_standard_packages_and_hashes_disabled(
     tmp_dir: str, poetry: Poetry
 ):
