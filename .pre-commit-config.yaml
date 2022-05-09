@@ -47,7 +47,7 @@ repos:
           - pep8-naming==0.12.1
 
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.32.0
+    rev: v2.32.1
     hooks:
       - id: pyupgrade
         args: [--py37-plus]
@@ -90,6 +90,6 @@ repos:
           - types-requests
 
   - repo: https://github.com/pre-commit/pre-commit
-    rev: v2.18.1
+    rev: v2.19.0
     hooks:
       - id: validate_manifest
