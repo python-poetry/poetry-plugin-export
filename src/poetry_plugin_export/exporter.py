@@ -156,6 +156,8 @@ class Exporter:
 
                     hashes.append(f"{algorithm}:{h}")
 
+                hashes.sort()
+
                 for h in hashes:
                     line += f" \\\n    --hash={h}"
 
