@@ -12,7 +12,7 @@ if TYPE_CHECKING:
     from poetry.console.commands.command import Command
 
 
-class ExportApplicationPlugin(ApplicationPlugin):
+class ExportApplicationPlugin(ApplicationPlugin):  # type: ignore[misc]
     @property
     def commands(self) -> list[type[Command]]:
         return [ExportCommand]
