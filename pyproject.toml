@@ -23,6 +23,7 @@ pre-commit = "^2.18"
 pytest = "^7.1"
 pytest-mock = "^3.6.1"
 poetry = {git = "https://github.com/abn/poetry.git", rev = "use-export-plugin"}
+mypy = ">=0.950"
 
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
@@ -49,6 +50,8 @@ files = "src"
 [[tool.mypy.overrides]]
 module = [
   'cleo.*',
+  'poetry.*',
+  'poetry.core.*',
 ]
 ignore_missing_imports = true
 
