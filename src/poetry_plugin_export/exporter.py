@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from typing import Iterable
 
 from cleo.io.io import IO
+from poetry.repositories.http import HTTPRepository
 
 
 try:
@@ -126,6 +127,7 @@ class Exporter:
             if is_direct_remote_reference:
                 line = requirement
             elif is_direct_local_reference:
+                assert dependency.source_url is not None
                 dependency_uri = path_to_url(dependency.source_url)
                 line = f"{dependency.name} @ {dependency_uri}"
             else:
@@ -173,7 +175,7 @@ class Exporter:
                 repositories = [
                     r
                     for r in self._poetry.pool.repositories
-                    if r.url == index.rstrip("/")
+                    if isinstance(r, HTTPRepository) and r.url == index.rstrip("/")
                 ]
                 if not repositories:
                     continue
