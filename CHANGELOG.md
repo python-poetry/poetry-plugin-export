@@ -1,5 +1,16 @@
 # Change Log
 
+## [1.0.2] - 2022-05-10
+
+### Fixed
+
+- Fixed an issue where the exported hashes were not sorted. [#54](https://github.com/python-poetry/poetry-plugin-export/pull/54)
+
+### Changes
+
+- The implicit dependency group was renamed from "default" to "main". (Requires poetry-core > 1.1.0a7 to take effect.) [#52](https://github.com/python-poetry/poetry-plugin-export/pull/52)
+
+
 ## [1.0.1] - 2022-04-11
 
 ### Fixed
@@ -37,7 +48,8 @@
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.1...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.2...main
+[1.0.2]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.2
 [1.0.1]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.1
 [1.0.0]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.0
 [0.2.1]: https://github.com/python-poetry/poetry-plugin-export/compare/0.2.1
