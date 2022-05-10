@@ -100,7 +100,10 @@ class Exporter:
         solver.provider.load_deferred(False)
 
         ops = solver.solve().calculate_operations()
-        packages = sorted((op.package for op in ops), key=lambda pkg: pkg.name)
+        packages = sorted(
+            (op.package for op in ops),
+            key=lambda pkg: pkg.name,  # type: ignore[no-any-return]
+        )
 
         for dependency_package in self._poetry.locker.get_project_dependency_packages(
             project_requires=root.all_requires,
