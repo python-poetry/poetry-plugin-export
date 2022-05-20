@@ -45,7 +45,8 @@ use_parentheses = true
 show_error_codes = true
 enable_error_code = ["ignore-without-code"]
 strict = true
-files = "src"
+files = ["src", "tests"]
+exclude = ["^tests/fixtures/"]
 
 [[tool.mypy.overrides]]
 module = [

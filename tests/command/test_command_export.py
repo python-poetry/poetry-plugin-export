@@ -80,7 +80,7 @@ def setup(repo: Repository) -> None:
 
 
 @pytest.fixture
-def poetry(project_factory: ProjectFactory):
+def poetry(project_factory: ProjectFactory) -> Poetry:
     return project_factory(name="export", pyproject_content=PYPROJECT_CONTENT)
 
 
@@ -111,7 +111,7 @@ foo==1.0.0 ; {MARKER_PY}
 
 def test_export_exports_requirements_txt_file_locks_if_no_lock_file(
     tester: CommandTester, poetry: Poetry
-):
+) -> None:
     assert not poetry.locker.lock.exists()
     _export_requirements(tester, poetry)
     assert "The lock file does not exist. Locking." in tester.io.fetch_error()
@@ -119,17 +119,19 @@ def test_export_exports_requirements_txt_file_locks_if_no_lock_file(
 
 def test_export_exports_requirements_txt_uses_lock_file(
     tester: CommandTester, poetry: Poetry, do_lock: None
-):
+) -> None:
     _export_requirements(tester, poetry)
     assert "The lock file does not exist. Locking." not in tester.io.fetch_error()
 
 
-def test_export_fails_on_invalid_format(tester: CommandTester, do_lock: None):
+def test_export_fails_on_invalid_format(tester: CommandTester, do_lock: None) -> None:
     with pytest.raises(ValueError):
         tester.execute("--format invalid")
 
 
-def test_export_prints_to_stdout_by_default(tester: CommandTester, do_lock: None):
+def test_export_prints_to_stdout_by_default(
+    tester: CommandTester, do_lock: None
+) -> None:
     tester.execute("--format requirements.txt")
     expected = f"""\
 foo==1.0.0 ; {MARKER_PY}
@@ -139,7 +141,7 @@ foo==1.0.0 ; {MARKER_PY}
 
 def test_export_uses_requirements_txt_format_by_default(
     tester: CommandTester, do_lock: None
-):
+) -> None:
     tester.execute()
     expected = f"""\
 foo==1.0.0 ; {MARKER_PY}
@@ -172,12 +174,12 @@ foo==1.0.0 ; {MARKER_PY}
 )
 def test_export_groups(
     tester: CommandTester, do_lock: None, options: str, expected: str
-):
+) -> None:
     tester.execute(options)
     assert tester.io.fetch_output() == expected
 
 
-def test_export_includes_extras_by_flag(tester: CommandTester, do_lock: None):
+def test_export_includes_extras_by_flag(tester: CommandTester, do_lock: None) -> None:
     tester.execute("--format requirements.txt --extras feature_bar")
     expected = f"""\
 bar==1.1.0 ; {MARKER_PY}
@@ -188,7 +190,7 @@ foo==1.0.0 ; {MARKER_PY}
 
 def test_export_with_urls(
     monkeypatch: MonkeyPatch, tester: CommandTester, poetry: Poetry
-):
+) -> None:
     """
     We are just validating that the option gets passed. The option itself is tested in
     the Exporter test.

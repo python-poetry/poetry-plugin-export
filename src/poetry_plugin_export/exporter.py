@@ -36,14 +36,14 @@ class Exporter:
         self._with_hashes = True
         self._with_credentials = False
         self._with_urls = True
-        self._extras: list[str] = []
+        self._extras: bool | list[str] | None = []
         self._groups: Iterable[str] = [MAIN_GROUP]
 
     @classmethod
     def is_format_supported(cls, fmt: str) -> bool:
         return fmt in cls.EXPORT_METHODS
 
-    def with_extras(self, extras: list[str]) -> Exporter:
+    def with_extras(self, extras: bool | list[str] | None) -> Exporter:
         self._extras = extras
 
         return self

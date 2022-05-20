@@ -45,7 +45,7 @@ if TYPE_CHECKING:
     from tests.types import FixtureDirGetter
 
 
-class Locker(BaseLocker):
+class Locker(BaseLocker):  # type: ignore[misc]
     def __init__(self) -> None:
         self._lock = TOMLFile(Path.cwd().joinpath("poetry.lock"))
         self._locked = True
@@ -56,7 +56,7 @@ class Locker(BaseLocker):
 
         return self
 
-    def mock_lock_data(self, data: dict[str, Any]):
+    def mock_lock_data(self, data: dict[str, Any]) -> None:
         self._lock_data = data
 
     def is_locked(self) -> bool:
@@ -110,7 +110,7 @@ def set_package_requires(poetry: Poetry, skip: set[str] | None = None) -> None:
 
 def test_exporter_can_export_requirements_txt_with_standard_packages(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -154,7 +154,7 @@ foo==1.2.3 ; {MARKER_PY}
 
 def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -207,7 +207,9 @@ foo==1.2.3 ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
     assert content == expected
 
 
-def test_exporter_can_export_requirements_txt_poetry(tmp_dir: str, poetry: Poetry):
+def test_exporter_can_export_requirements_txt_poetry(
+    tmp_dir: str, poetry: Poetry
+) -> None:
     """Regression test for #3254"""
 
     poetry.locker.mock_lock_data(
@@ -326,7 +328,9 @@ def test_exporter_can_export_requirements_txt_poetry(tmp_dir: str, poetry: Poetr
         assert dependency.marker == expected_dependency.marker
 
 
-def test_exporter_can_export_requirements_txt_pyinstaller(tmp_dir: str, poetry: Poetry):
+def test_exporter_can_export_requirements_txt_pyinstaller(
+    tmp_dir: str, poetry: Poetry
+) -> None:
     """Regression test for #3254"""
 
     poetry.locker.mock_lock_data(
@@ -408,7 +412,7 @@ def test_exporter_can_export_requirements_txt_pyinstaller(tmp_dir: str, poetry: 
 
 def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -503,7 +507,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
 )
 def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_any(
     tmp_dir: str, poetry: Poetry, dev: bool, lines: list[str]
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -557,7 +561,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
 
 def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -603,7 +607,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 def test_exporter_can_export_requirements_txt_with_standard_packages_and_sorted_hashes(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -651,7 +655,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 def test_exporter_requirements_txt_with_standard_packages_and_hashes_disabled(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -696,7 +700,7 @@ foo==1.2.3 ; {MARKER_PY}
 
 def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -740,7 +744,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -787,7 +791,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 def test_exporter_exports_requirements_txt_without_groups_if_set_explicity(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -827,7 +831,7 @@ def test_exporter_exports_requirements_txt_without_groups_if_set_explicity(
 
 def test_exporter_exports_requirements_txt_without_optional_packages(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -904,7 +908,7 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
     poetry: Poetry,
     extras: bool | list[str] | None,
     lines: list[str],
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -961,7 +965,7 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
 
 def test_exporter_can_export_requirements_txt_with_git_packages(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1002,7 +1006,7 @@ foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY}
 
 def test_exporter_can_export_requirements_txt_with_nested_packages(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1057,7 +1061,7 @@ foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY}
 
 def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1112,7 +1116,7 @@ foo==1.2.3 ; {MARKER_PY}
 
 def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_markers(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1186,7 +1190,7 @@ foo==1.2.3 ; {MARKER_PY}
 
 def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1228,7 +1232,7 @@ foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY27.union(MARKER_PY36
 
 def test_exporter_can_export_requirements_txt_with_directory_packages(
     tmp_dir: str, poetry: Poetry, working_directory: Path
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1269,7 +1273,7 @@ foo @ {working_directory.as_uri()}/tests/fixtures/sample_project ; {MARKER_PY}
 
 def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
     tmp_dir: str, poetry: Poetry, working_directory: Path
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1343,7 +1347,7 @@ foo @ {root_uri}/sample_project ; {MARKER_PY}
 
 def test_exporter_can_export_requirements_txt_with_directory_packages_and_markers(
     tmp_dir: str, poetry: Poetry, working_directory: Path
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1386,7 +1390,7 @@ foo @ {working_directory.as_uri()}/tests/fixtures/sample_project ;\
 
 def test_exporter_can_export_requirements_txt_with_file_packages(
     tmp_dir: str, poetry: Poetry, working_directory: Path
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1428,7 +1432,7 @@ foo @ {working_directory.as_uri()}/tests/fixtures/distributions/demo-0.1.0.tar.g
 
 def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
     tmp_dir: str, poetry: Poetry, working_directory: Path
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1471,7 +1475,7 @@ foo @ {uri} ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
 
 def test_exporter_exports_requirements_txt_with_legacy_packages(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.pool.add_repository(
         LegacyRepository(
             "custom",
@@ -1529,7 +1533,9 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
-def test_exporter_exports_requirements_txt_with_url_false(tmp_dir: str, poetry: Poetry):
+def test_exporter_exports_requirements_txt_with_url_false(
+    tmp_dir: str, poetry: Poetry
+) -> None:
     poetry.pool.add_repository(
         LegacyRepository(
             "custom",
@@ -1588,7 +1594,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.pool.add_repository(
         LegacyRepository(
             "custom",
@@ -1659,7 +1665,7 @@ bar==4.5.6 ; {MARKER_PY} \\
 )
 def test_exporter_exports_requirements_txt_with_dev_extras(
     tmp_dir: str, poetry: Poetry, dev: bool, expected: list[str]
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1715,7 +1721,7 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
 
 def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_sources(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.pool.add_repository(
         LegacyRepository(
             "custom",
@@ -1801,7 +1807,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     tmp_dir: str, poetry: Poetry, config: Config
-):
+) -> None:
     poetry.config.merge(
         {
             "repositories": {"custom": {"url": "https://example.com/simple"}},
@@ -1869,7 +1875,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 def test_exporter_exports_requirements_txt_to_standard_output(
     tmp_dir: str, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(
         {
             "package": [
@@ -1909,7 +1915,9 @@ foo==1.2.3 ; {MARKER_PY}
     assert io.fetch_output() == expected
 
 
-def test_exporter_doesnt_confuse_repeated_packages(tmp_dir: str, poetry: Poetry):
+def test_exporter_doesnt_confuse_repeated_packages(
+    tmp_dir: str, poetry: Poetry
+) -> None:
     # Testcase derived from <https://github.com/python-poetry/poetry/issues/5141>.
     poetry.locker.mock_lock_data(
         {
@@ -2027,7 +2035,9 @@ click==8.0.3 ; {MARKER_PY37.union(MARKER_PY37_PY400)}
     assert io.fetch_output() == expected
 
 
-def test_exporter_handles_extras_next_to_non_extras(tmp_dir: str, poetry: Poetry):
+def test_exporter_handles_extras_next_to_non_extras(
+    tmp_dir: str, poetry: Poetry
+) -> None:
     # Testcase similar to the solver testcase added at #5305.
     poetry.locker.mock_lock_data(
         {

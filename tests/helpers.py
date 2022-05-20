@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from tomlkit.toml_document import TOMLDocument
 
 
-class PoetryTestApplication(Application):
+class PoetryTestApplication(Application):  # type: ignore[misc]
     def __init__(self, poetry: Poetry) -> None:
         super().__init__()
         self._poetry = poetry
@@ -34,14 +34,13 @@ class PoetryTestApplication(Application):
         )
 
 
-class TestLocker(Locker):
-    def __init__(self, lock: str | Path, local_config: dict) -> None:
+class TestLocker(Locker):  # type: ignore[misc]
+    def __init__(self, lock: str | Path, local_config: dict[str, Any]) -> None:
         self._lock = TOMLFile(lock)
         self._local_config = local_config
-        self._lock_data = None
+        self._lock_data: dict[str, Any] | None = None
         self._content_hash = self._get_content_hash()
         self._locked = False
-        self._lock_data = None
         self._write = False
 
     def write(self, write: bool = True) -> None:
@@ -55,7 +54,7 @@ class TestLocker(Locker):
 
         return self
 
-    def mock_lock_data(self, data: dict) -> None:
+    def mock_lock_data(self, data: dict[str, Any]) -> None:
         self.locked()
 
         self._lock_data = data
@@ -72,13 +71,13 @@ class TestLocker(Locker):
         self._lock_data = data
 
 
-class TestExecutor(Executor):
+class TestExecutor(Executor):  # type: ignore[misc]
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        self._installs = []
-        self._updates = []
-        self._uninstalls = []
+        self._installs: list[Package] = []
+        self._updates: list[Package] = []
+        self._uninstalls: list[Package] = []
 
     @property
     def installations(self) -> list[Package]:

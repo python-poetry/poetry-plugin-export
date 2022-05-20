@@ -31,7 +31,7 @@ if TYPE_CHECKING:
     from tests.types import ProjectFactory
 
 
-class Config(BaseConfig):
+class Config(BaseConfig):  # type: ignore[misc]
     def get(self, setting_name: str, default: Any = None) -> Any:
         self.merge(self._config_source.config)
         self.merge(self._auth_config_source.config)
@@ -42,13 +42,13 @@ class Config(BaseConfig):
         self.merge(self._config_source.config)
         self.merge(self._auth_config_source.config)
 
-        return super().raw()
+        return super().raw()  # type: ignore[no-any-return]
 
     def all(self) -> dict[str, Any]:
         self.merge(self._config_source.config)
         self.merge(self._auth_config_source.config)
 
-        return super().all()
+        return super().all()  # type: ignore[no-any-return]
 
 
 @pytest.fixture
@@ -88,7 +88,7 @@ def config(
 
     from keyring.backends.fail import Keyring
 
-    keyring.set_keyring(Keyring())
+    keyring.set_keyring(Keyring())  # type: ignore[no-untyped-call]
 
     c = Config()
     c.merge(config_source.config)
@@ -140,7 +140,7 @@ def current_env() -> SystemEnv:
 
 @pytest.fixture(scope="session")
 def current_python(current_env: SystemEnv) -> tuple[int, int, int]:
-    return current_env.version_info[:3]
+    return current_env.version_info[:3]  # type: ignore[no-any-return]
 
 
 @pytest.fixture(scope="session")
