@@ -49,8 +49,8 @@ def command_tester_factory(
     ) -> CommandTester:
         app._load_plugins(NullIO())
 
-        command = app.find(command)
-        tester = CommandTester(command)
+        cmd = app.find(command)
+        tester = CommandTester(cmd)
 
         # Setting the formatter from the application
         # TODO: Find a better way to do this in Cleo
@@ -63,12 +63,12 @@ def command_tester_factory(
             app._poetry = poetry
 
         poetry = app.poetry
-        command._pool = poetry.pool
+        cmd._pool = poetry.pool
 
-        if hasattr(command, "set_env"):
-            command.set_env(environment or env)
+        if hasattr(cmd, "set_env"):
+            cmd.set_env(environment or env)
 
-        if hasattr(command, "set_installer"):
+        if hasattr(cmd, "set_installer"):
             installer = installer or Installer(
                 tester.io,
                 env,
@@ -80,7 +80,7 @@ def command_tester_factory(
                 or TestExecutor(env, poetry.pool, poetry.config, tester.io),
             )
             installer.use_executor(True)
-            command.set_installer(installer)
+            cmd.set_installer(installer)
 
         return tester
 
