@@ -2029,7 +2029,7 @@ click-didyoumean==0.0.3 ; {MARKER_PY36_ONLY}
 click-didyoumean==0.3.0 ; {MARKER_PY37_PY400}
 click-plugins==1.1.1 ; {MARKER_PY36_ONLY.union(MARKER_PY37)}
 click==7.1.2 ; {MARKER_PY36_ONLY}
-click==8.0.3 ; {MARKER_PY37.union(MARKER_PY37_PY400)}
+click==8.0.3 ; {MARKER_PY37}
 """
 
     assert io.fetch_output() == expected
