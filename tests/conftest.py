@@ -31,24 +31,24 @@ if TYPE_CHECKING:
     from tests.types import ProjectFactory
 
 
-class Config(BaseConfig):  # type: ignore[misc]
+class Config(BaseConfig):
     def get(self, setting_name: str, default: Any = None) -> Any:
-        self.merge(self._config_source.config)
-        self.merge(self._auth_config_source.config)
+        self.merge(self._config_source.config)  # type: ignore[attr-defined]
+        self.merge(self._auth_config_source.config)  # type: ignore[attr-defined]
 
         return super().get(setting_name, default=default)
 
     def raw(self) -> dict[str, Any]:
-        self.merge(self._config_source.config)
-        self.merge(self._auth_config_source.config)
+        self.merge(self._config_source.config)  # type: ignore[attr-defined]
+        self.merge(self._auth_config_source.config)  # type: ignore[attr-defined]
 
-        return super().raw()  # type: ignore[no-any-return]
+        return super().raw()
 
     def all(self) -> dict[str, Any]:
-        self.merge(self._config_source.config)
-        self.merge(self._auth_config_source.config)
+        self.merge(self._config_source.config)  # type: ignore[attr-defined]
+        self.merge(self._auth_config_source.config)  # type: ignore[attr-defined]
 
-        return super().all()  # type: ignore[no-any-return]
+        return super().all()
 
 
 @pytest.fixture
@@ -139,8 +139,8 @@ def current_env() -> SystemEnv:
 
 
 @pytest.fixture(scope="session")
-def current_python(current_env: SystemEnv) -> tuple[int, int, int]:
-    return current_env.version_info[:3]  # type: ignore[no-any-return]
+def current_python(current_env: SystemEnv) -> tuple[Any, ...]:
+    return current_env.version_info[:3]
 
 
 @pytest.fixture(scope="session")
@@ -159,7 +159,7 @@ def project_factory(
     workspace = Path(tmp_dir)
 
     def _factory(
-        name: str | None = None,
+        name: str,
         dependencies: dict[str, str] | None = None,
         dev_dependencies: dict[str, str] | None = None,
         pyproject_content: str | None = None,
@@ -183,8 +183,8 @@ def project_factory(
                 author="PyTest Tester <mc.testy@testface.com>",
                 readme_format="md",
                 python=default_python,
-                dependencies=dependencies,
-                dev_dependencies=dev_dependencies,
+                dependencies=dict(dependencies),
+                dev_dependencies=dict(dev_dependencies),
             ).create(project_dir, with_tests=False)
 
         if poetry_lock_content:

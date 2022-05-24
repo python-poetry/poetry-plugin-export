@@ -14,19 +14,20 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from poetry.core.packages.package import Package
-    from poetry.installation.operations import OperationTypes
+    from poetry.installation.operations.operation import Operation
     from poetry.poetry import Poetry
     from tomlkit.toml_document import TOMLDocument
 
 
-class PoetryTestApplication(Application):  # type: ignore[misc]
+class PoetryTestApplication(Application):
     def __init__(self, poetry: Poetry) -> None:
         super().__init__()
         self._poetry = poetry
 
     def reset_poetry(self) -> None:
         poetry = self._poetry
-        self._poetry = Factory().create_poetry(self._poetry.file.path.parent)
+        assert poetry
+        self._poetry = Factory().create_poetry(poetry.file.path.parent)
         self._poetry.set_pool(poetry.pool)
         self._poetry.set_config(poetry.config)
         self._poetry.set_locker(
@@ -34,11 +35,11 @@ class PoetryTestApplication(Application):  # type: ignore[misc]
         )
 
 
-class TestLocker(Locker):  # type: ignore[misc]
+class TestLocker(Locker):
     def __init__(self, lock: str | Path, local_config: dict[str, Any]) -> None:
         self._lock = TOMLFile(lock)
         self._local_config = local_config
-        self._lock_data: dict[str, Any] | None = None
+        self._lock_data: TOMLDocument | None = None
         self._content_hash = self._get_content_hash()
         self._locked = False
         self._write = False
@@ -57,7 +58,7 @@ class TestLocker(Locker):  # type: ignore[misc]
     def mock_lock_data(self, data: dict[str, Any]) -> None:
         self.locked()
 
-        self._lock_data = data
+        self._lock_data = data  # type: ignore[assignment]
 
     def is_fresh(self) -> bool:
         return True
@@ -71,7 +72,7 @@ class TestLocker(Locker):  # type: ignore[misc]
         self._lock_data = data
 
 
-class TestExecutor(Executor):  # type: ignore[misc]
+class TestExecutor(Executor):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
@@ -91,17 +92,19 @@ class TestExecutor(Executor):  # type: ignore[misc]
     def removals(self) -> list[Package]:
         return self._uninstalls
 
-    def _do_execute_operation(self, operation: OperationTypes) -> None:
+    def _do_execute_operation(self, operation: Operation) -> int:
         super()._do_execute_operation(operation)
 
         if not operation.skipped:
             getattr(self, f"_{operation.job_type}s").append(operation.package)
 
-    def _execute_install(self, operation: OperationTypes) -> int:
         return 0
 
-    def _execute_update(self, operation: OperationTypes) -> int:
+    def _execute_install(self, operation: Operation) -> int:
         return 0
 
-    def _execute_remove(self, operation: OperationTypes) -> int:
+    def _execute_update(self, operation: Operation) -> int:
+        return 0
+
+    def _execute_remove(self, operation: Operation) -> int:
         return 0
