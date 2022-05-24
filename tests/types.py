@@ -29,7 +29,7 @@ class CommandTesterFactory(Protocol):
 class ProjectFactory(Protocol):
     def __call__(
         self,
-        name: str | None = None,
+        name: str,
         dependencies: dict[str, str] | None = None,
         dev_dependencies: dict[str, str] | None = None,
         pyproject_content: str | None = None,

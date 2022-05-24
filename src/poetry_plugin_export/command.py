@@ -12,7 +12,7 @@ except ImportError:
 from poetry_plugin_export.exporter import Exporter
 
 
-class ExportCommand(InstallerCommand):  # type: ignore[misc]
+class ExportCommand(InstallerCommand):
     name = "export"
     description = "Exports the lock file to alternative formats."
 
