@@ -22,7 +22,7 @@ poetry = "^1.2.0b1dev0"
 pre-commit = "^2.18"
 pytest = "^7.1"
 pytest-mock = "^3.6.1"
-poetry = {git = "https://github.com/abn/poetry.git", rev = "use-export-plugin"}
+poetry = {git = "https://github.com/python-poetry/poetry.git"}
 mypy = ">=0.950"
 
 [tool.poetry.plugins."poetry.application.plugin"]
