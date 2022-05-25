@@ -2138,7 +2138,8 @@ def test_exporter_handles_extras_next_to_non_extras(
 
     expected = f"""\
 localstack-ext==1.0.0 ; {MARKER_PY36}
-localstack==1.0.0 ; {MARKER_PY36}
+localstack-ext[bar]==1.0.0 ; {MARKER_PY36}
+localstack[foo]==1.0.0 ; {MARKER_PY36}
 something-else==1.0.0 ; {MARKER_PY36}
 something==1.0.0 ; {MARKER_PY36}
 """
