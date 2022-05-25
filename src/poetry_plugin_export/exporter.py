@@ -132,9 +132,9 @@ class Exporter:
             elif is_direct_local_reference:
                 assert dependency.source_url is not None
                 dependency_uri = path_to_url(dependency.source_url)
-                line = f"{dependency.name} @ {dependency_uri}"
+                line = f"{package.complete_name} @ {dependency_uri}"
             else:
-                line = f"{package.name}=={package.version}"
+                line = f"{package.complete_name}=={package.version}"
 
             if not is_direct_remote_reference and ";" in requirement:
                 markers = requirement.split(";", 1)[1].strip()
