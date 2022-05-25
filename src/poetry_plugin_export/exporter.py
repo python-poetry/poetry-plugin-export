@@ -75,11 +75,7 @@ class Exporter:
         getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
 
     def _export_requirements_txt(self, cwd: Path, output: IO | str) -> None:
-        from cleo.io.null_io import NullIO
         from poetry.core.packages.utils.utils import path_to_url
-        from poetry.puzzle.solver import Solver
-        from poetry.repositories.pool import Pool
-        from poetry.repositories.repository import Repository
 
         indexes = set()
         content = ""
@@ -87,22 +83,6 @@ class Exporter:
 
         root = self._poetry.package.with_dependency_groups(
             list(self._groups), only=True
-        )
-
-        locked_repository = self._poetry.locker.locked_repository()
-
-        pool = Pool(ignore_repository_names=True)
-        pool.add_repository(locked_repository)
-
-        solver = Solver(root, pool, Repository(), locked_repository, NullIO())
-        # Everything is resolved at this point, so we no longer need
-        # to load deferred dependencies (i.e. VCS, URL and path dependencies)
-        solver.provider.load_deferred(False)
-
-        ops = solver.solve().calculate_operations()
-        packages = sorted(
-            (op.package for op in ops),
-            key=lambda pkg: pkg.name,
         )
 
         for dependency_package in self._poetry.locker.get_project_dependency_packages(
@@ -114,9 +94,6 @@ class Exporter:
 
             dependency = dependency_package.dependency
             package = dependency_package.package
-
-            if package not in packages:
-                continue
 
             if package.develop:
                 line += "-e "
