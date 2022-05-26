@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.0.4] - 2022-05-26
+
+### Fixed
+
+- Fixed an issue where the exported dependencies did not list their active extras. [#65](https://github.com/python-poetry/poetry-plugin-export/pull/65)
+
+## [1.0.3] - 2022-05-23
+
+This release fixes test suite compatibility with upcoming Poetry releases. No functional changes.
+
 ## [1.0.2] - 2022-05-10
 
 ### Fixed
@@ -48,7 +58,9 @@
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.2...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.4...main
+[1.0.4]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.4
+[1.0.3]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.3
 [1.0.2]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.2
 [1.0.1]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.1
 [1.0.0]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.0
