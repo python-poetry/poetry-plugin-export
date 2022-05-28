@@ -22,14 +22,15 @@ except ImportError:
     MAIN_GROUP = "default"
 
 from poetry_plugin_export.exporter import Exporter
-from tests.compat import is_poetry_core_1_1_0b2_compat
+from tests.markers import MARKER_CPYTHON
 from tests.markers import MARKER_PY
 from tests.markers import MARKER_PY27
 from tests.markers import MARKER_PY36
 from tests.markers import MARKER_PY36_38
 from tests.markers import MARKER_PY36_ONLY
+from tests.markers import MARKER_PY36_PY362
 from tests.markers import MARKER_PY37
-from tests.markers import MARKER_PY37_PY400
+from tests.markers import MARKER_PY362_PY40
 from tests.markers import MARKER_PY_DARWIN
 from tests.markers import MARKER_PY_LINUX
 from tests.markers import MARKER_PY_WIN32
@@ -2026,12 +2027,10 @@ def test_exporter_doesnt_confuse_repeated_packages(
     expected = f"""\
 celery==5.1.2 ; {MARKER_PY36_ONLY}
 celery==5.2.3 ; {MARKER_PY37}
-click-didyoumean==0.0.3 ; {MARKER_PY36_ONLY}
-click-didyoumean==0.3.0 ; {
-    MARKER_PY37_PY400 if is_poetry_core_1_1_0b2_compat else MARKER_PY37
-}
-click-plugins==1.1.1 ; {MARKER_PY36_ONLY.union(MARKER_PY37)}
-click==7.1.2 ; {MARKER_PY36_ONLY}
+click-didyoumean==0.0.3 ; {MARKER_PY36_PY362}
+click-didyoumean==0.3.0 ; {MARKER_PY362_PY40}
+click-plugins==1.1.1 ; {MARKER_PY36}
+click==7.1.2 ; python_version < "3.7" and python_version >= "3.6"
 click==8.0.3 ; {MARKER_PY37}
 """
 
@@ -2145,6 +2144,107 @@ localstack-ext[bar]==1.0.0 ; {MARKER_PY36}
 localstack[foo]==1.0.0 ; {MARKER_PY36}
 something-else==1.0.0 ; {MARKER_PY36}
 something==1.0.0 ; {MARKER_PY36}
+"""
+
+    assert io.fetch_output() == expected
+
+
+def test_exporter_handles_overlapping_python_versions(
+    tmp_dir: str, poetry: Poetry
+) -> None:
+    # Testcase derived from
+    # https://github.com/python-poetry/poetry-plugin-export/issues/32.
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "ipython",
+                    "python-versions": ">=3.6",
+                    "version": "7.16.3",
+                    "category": "main",
+                    "optional": False,
+                    "dependencies": {},
+                },
+                {
+                    "name": "ipython",
+                    "python-versions": ">=3.7",
+                    "version": "7.34.0",
+                    "category": "main",
+                    "optional": False,
+                    "dependencies": {},
+                },
+                {
+                    "name": "slash",
+                    "python-versions": ">=3.6.*",
+                    "version": "1.13.0",
+                    "category": "main",
+                    "optional": False,
+                    "dependencies": {
+                        "ipython": [
+                            {
+                                "version": "*",
+                                "markers": (
+                                    'python_version >= "3.6" and implementation_name !='
+                                    ' "pypy"'
+                                ),
+                            },
+                            {
+                                "version": "<7.17.0",
+                                "markers": (
+                                    'python_version < "3.6" and implementation_name !='
+                                    ' "pypy"'
+                                ),
+                            },
+                        ],
+                    },
+                },
+            ],
+            "metadata": {
+                "lock-version": "1.1",
+                "python-versions": "^3.6",
+                "content-hash": (
+                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+                ),
+                "hashes": {
+                    "ipython": [],
+                    "slash": [],
+                },
+            },
+        }
+    )
+    root = poetry.package.with_dependency_groups([], only=True)
+    root.python_versions = "^3.6"
+    root.add_dependency(
+        Factory.create_dependency(
+            name="ipython",
+            constraint={"version": "*", "python": "~3.6"},
+        )
+    )
+    root.add_dependency(
+        Factory.create_dependency(
+            name="ipython",
+            constraint={"version": "^7.17", "python": "^3.7"},
+        )
+    )
+    root.add_dependency(
+        Factory.create_dependency(
+            name="slash",
+            constraint={
+                "version": "^1.12",
+                "markers": "implementation_name == 'cpython'",
+            },
+        )
+    )
+    poetry._package = root
+
+    exporter = Exporter(poetry)
+    io = BufferedIO()
+    exporter.export("requirements.txt", Path(tmp_dir), io)
+
+    expected = f"""\
+ipython==7.16.3 ; {MARKER_PY36_ONLY}
+ipython==7.34.0 ; {MARKER_PY37}
+slash==1.13.0 ; {MARKER_PY36} and {MARKER_CPYTHON}
 """
 
     assert io.fetch_output() == expected
