@@ -2058,7 +2058,7 @@ def test_exporter_handles_extras_next_to_non_extras(
                             },
                         ]
                     },
-                    "extras": {"foo": ["localstack-ext (>=1.0.0)"]},
+                    "extras": {"foo": ["localstack-ext[bar] (>=1.0.0)"]},
                 },
                 {
                     "name": "localstack-ext",
