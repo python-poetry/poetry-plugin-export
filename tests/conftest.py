@@ -125,12 +125,12 @@ def fixture_dir(fixture_base: Path) -> FixtureDirGetter:
 
 @pytest.fixture()
 def repo() -> Repository:
-    return Repository()
+    return Repository("repo")
 
 
 @pytest.fixture
 def installed() -> Repository:
-    return Repository()
+    return Repository("installed")
 
 
 @pytest.fixture(scope="session")
