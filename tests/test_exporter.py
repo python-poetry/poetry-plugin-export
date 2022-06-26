@@ -1724,13 +1724,13 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
 ) -> None:
     poetry.pool.add_repository(
         LegacyRepository(
-            "custom",
+            "custom-example",
             "https://example.com/simple",
         )
     )
     poetry.pool.add_repository(
         LegacyRepository(
-            "custom",
+            "custom-foobaz",
             "https://foobaz.com/simple",
         )
     )
