@@ -190,7 +190,7 @@ foo==1.0.0 ; {MARKER_PY}
 
 def test_export_excludes_markers(tester: CommandTester, do_lock: None) -> None:
     tester.execute("--format requirements.txt --without-markers")
-    expected = f"""\
+    expected = """\
 bar==1.1.0
 foo==1.0.0
 """
