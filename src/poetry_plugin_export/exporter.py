@@ -36,6 +36,7 @@ class Exporter:
         self._with_hashes = True
         self._with_credentials = False
         self._with_urls = True
+        self._with_markers = True
         self._extras: bool | list[str] | None = []
         self._groups: Iterable[str] = [MAIN_GROUP]
 
@@ -65,6 +66,11 @@ class Exporter:
 
     def with_credentials(self, with_credentials: bool = True) -> Exporter:
         self._with_credentials = with_credentials
+
+        return self
+
+    def with_markers(self, with_markers: bool = True) -> Exporter:
+        self._with_markers = with_markers
 
         return self
 
@@ -113,7 +119,9 @@ class Exporter:
             else:
                 line = f"{package.complete_name}=={package.version}"
 
-            if not is_direct_remote_reference and ";" in requirement:
+            if (self._with_markers and
+                    not is_direct_remote_reference and
+                    ";" in requirement):
                 markers = requirement.split(";", 1)[1].strip()
                 if markers:
                     line += f" ; {markers}"

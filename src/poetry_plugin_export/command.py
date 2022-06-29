@@ -31,6 +31,7 @@ class ExportCommand(InstallerCommand):
             None,
             "Exclude source repository urls from the exported file.",
         ),
+        option("without-markers", None, "Include python version markers."),
         option(
             "dev",
             None,
@@ -93,4 +94,5 @@ class ExportCommand(InstallerCommand):
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
+        exporter.with_markers(not self.option("without-markers"))
         exporter.export(fmt, self.poetry.file.parent, output or self.io)

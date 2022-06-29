@@ -188,6 +188,15 @@ foo==1.0.0 ; {MARKER_PY}
     assert tester.io.fetch_output() == expected
 
 
+def test_export_excludes_markers(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--format requirements.txt --without-markers")
+    expected = f"""\
+bar==1.1.0
+foo==1.0.0
+"""
+    assert tester.io.fetch_output() == expected
+
+
 def test_export_with_urls(
     monkeypatch: MonkeyPatch, tester: CommandTester, poetry: Poetry
 ) -> None:

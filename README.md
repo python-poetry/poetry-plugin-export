@@ -49,4 +49,5 @@ poetry export -f requirements.txt --output requirements.txt
 * `--dev`: Include development dependencies. (**Deprecated**)
 * `--extras (-E)`: Extra sets of dependencies to include.
 * `--without-hashes`: Exclude hashes from the exported file.
+* `--without-markers`: Exclude python version markers.
 * `--with-credentials`: Include credentials for extra indices.
