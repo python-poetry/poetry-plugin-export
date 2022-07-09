@@ -63,6 +63,7 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
   'poetry_plugin_export',
+  'tests.compat',
 ]
 warn_unused_ignores = false
 

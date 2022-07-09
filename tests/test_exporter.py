@@ -22,6 +22,7 @@ except ImportError:
     MAIN_GROUP = "default"
 
 from poetry_plugin_export.exporter import Exporter
+from tests.compat import is_poetry_core_1_1_0b2_compat
 from tests.markers import MARKER_PY
 from tests.markers import MARKER_PY27
 from tests.markers import MARKER_PY36
@@ -2026,7 +2027,9 @@ def test_exporter_doesnt_confuse_repeated_packages(
 celery==5.1.2 ; {MARKER_PY36_ONLY}
 celery==5.2.3 ; {MARKER_PY37}
 click-didyoumean==0.0.3 ; {MARKER_PY36_ONLY}
-click-didyoumean==0.3.0 ; {MARKER_PY37_PY400}
+click-didyoumean==0.3.0 ; {
+    MARKER_PY37_PY400 if is_poetry_core_1_1_0b2_compat else MARKER_PY37
+}
 click-plugins==1.1.1 ; {MARKER_PY36_ONLY.union(MARKER_PY37)}
 click==7.1.2 ; {MARKER_PY36_ONLY}
 click==8.0.3 ; {MARKER_PY37}
