@@ -16,14 +16,14 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-poetry = "^1.2.0b1dev0"
+poetry = "^1.2.0b3"
 
 [tool.poetry.dev-dependencies]
-pre-commit = "^2.18"
-pytest = "^7.1"
-pytest-mock = "^3.6.1"
+pre-commit = "^2.20.0"
+pytest = "^7.1.2"
+pytest-mock = "^3.8.2"
 poetry = {git = "https://github.com/python-poetry/poetry.git"}
-mypy = ">=0.950"
+mypy = ">=0.961"
 
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
@@ -43,10 +43,15 @@ use_parentheses = true
 
 [tool.mypy]
 show_error_codes = true
-enable_error_code = ["ignore-without-code"]
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
 strict = true
 files = ["src", "tests"]
 exclude = ["^tests/fixtures/"]
+namespace_packages = true
 
 [[tool.mypy.overrides]]
 module = [
