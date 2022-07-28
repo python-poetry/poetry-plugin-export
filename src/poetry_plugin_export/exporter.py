@@ -8,6 +8,8 @@ from typing import Iterable
 from cleo.io.io import IO
 from poetry.repositories.http import HTTPRepository
 
+from poetry_plugin_export.walker import get_project_dependency_packages
+
 
 try:
     from poetry.core.packages.dependency_group import MAIN_GROUP
@@ -85,7 +87,8 @@ class Exporter:
             list(self._groups), only=True
         )
 
-        for dependency_package in self._poetry.locker.get_project_dependency_packages(
+        for dependency_package in get_project_dependency_packages(
+            self._poetry.locker,
             project_requires=root.all_requires,
             project_python_marker=root.python_marker,
             extras=self._extras,
