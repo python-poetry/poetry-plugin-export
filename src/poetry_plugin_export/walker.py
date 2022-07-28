@@ -1,8 +1,10 @@
 from __future__ import annotations
 
-from copy import deepcopy
 from typing import TYPE_CHECKING
 
+from poetry.core.semver.util import constraint_regions
+from poetry.core.version.markers import AnyMarker
+from poetry.core.version.markers import SingleMarker
 from poetry.packages import DependencyPackage
 from poetry.utils.extras import get_extra_package_names
 
@@ -18,6 +20,33 @@ if TYPE_CHECKING:
     from poetry.packages import Locker
 
 
+def get_python_version_region_markers(packages: list[Package]) -> list[BaseMarker]:
+    markers = []
+
+    regions = constraint_regions([package.python_constraint for package in packages])
+    for region in regions:
+        marker: BaseMarker = AnyMarker()
+        if region.min is not None:
+            min_operator = ">=" if region.include_min else ">"
+            marker_name = (
+                "python_full_version" if region.min.precision > 2 else "python_version"
+            )
+            lo = SingleMarker(marker_name, f"{min_operator} {region.min}")
+            marker = marker.intersect(lo)
+
+        if region.max is not None:
+            max_operator = "<=" if region.include_max else "<"
+            marker_name = (
+                "python_full_version" if region.max.precision > 2 else "python_version"
+            )
+            hi = SingleMarker(marker_name, f"{max_operator} {region.max}")
+            marker = marker.intersect(hi)
+
+        markers.append(marker)
+
+    return markers
+
+
 def get_project_dependency_packages(
     locker: Locker,
     project_requires: list[Dependency],
@@ -28,7 +57,7 @@ def get_project_dependency_packages(
     if project_python_marker is not None:
         marked_requires: list[Dependency] = []
         for require in project_requires:
-            require = deepcopy(require)
+            require = require.clone()
             require.marker = require.marker.intersect(project_python_marker)
             marked_requires.append(require)
         project_requires = marked_requires
@@ -136,12 +165,23 @@ def walk_dependencies(
             ):
                 continue
 
-            require = deepcopy(require)
-            require.marker = require.marker.intersect(
-                requirement.marker.without_extras()
-            )
-            if not require.marker.is_empty():
-                dependencies.append(require)
+            base_marker = require.marker.intersect(requirement.marker.without_extras())
+
+            if not base_marker.is_empty():
+                # So as to give ourselves enough flexibility in choosing a solution,
+                # we need to split the world up into the python version ranges that
+                # this package might care about.
+                #
+                # We create a marker for all of the possible regions, and add a
+                # requirement for each separately.
+                candidates = packages_by_name.get(require.name, [])
+                region_markers = get_python_version_region_markers(candidates)
+                for region_marker in region_markers:
+                    marker = region_marker.intersect(base_marker)
+                    if not marker.is_empty():
+                        require2 = require.clone()
+                        require2.marker = marker
+                        dependencies.append(require2)
 
         key = locked_package
         if key not in nested_dependencies:
@@ -165,22 +205,38 @@ def get_locked_package(
     """
     decided = decided or {}
 
-    # Get the packages that are consistent with this dependency.
-    packages = [
-        package
-        for package in packages_by_name.get(dependency.name, [])
-        if package.python_constraint.allows_all(dependency.python_constraint)
-        and dependency.constraint.allows(package.version)
-    ]
+    candidates = packages_by_name.get(dependency.name, [])
 
-    # If we've previously made a choice that is compatible with the current
-    # requirement, stick with it.
-    for package in packages:
+    # If we've previously chosen a version of this package that is compatible with
+    # the current requirement, we are forced to stick with it.  (Else we end up with
+    # different versions of the same package at the same time.)
+    overlapping_candidates = set()
+    for package in candidates:
         old_decision = decided.get(package)
         if (
             old_decision is not None
             and not old_decision.marker.intersect(dependency.marker).is_empty()
         ):
-            return package
+            overlapping_candidates.add(package)
 
-    return next(iter(packages), None)
+    # If we have more than one overlapping candidate, we've run into trouble.
+    if len(overlapping_candidates) > 1:
+        return None
+
+    # Get the packages that are consistent with this dependency.
+    compatible_candidates = [
+        package
+        for package in candidates
+        if package.python_constraint.allows_all(dependency.python_constraint)
+        and dependency.constraint.allows(package.version)
+    ]
+
+    # If we have an overlapping candidate, we must use it.
+    if overlapping_candidates:
+        compatible_candidates = [
+            package
+            for package in compatible_candidates
+            if package in overlapping_candidates
+        ]
+
+    return next(iter(compatible_candidates), None)
