@@ -16,7 +16,8 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-poetry = "^1.2.0b1dev0"
+poetry = "^1.2.0b3"
+poetry-core = "^1.1.0b3"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.18"
@@ -42,8 +43,13 @@ lines_between_types = 1
 use_parentheses = true
 
 [tool.mypy]
+namespace_packages = true
 show_error_codes = true
-enable_error_code = ["ignore-without-code"]
+enable_error_code = [
+    "ignore-without-code",
+    "redundant-expr",
+    "truthy-bool",
+]
 strict = true
 files = ["src", "tests"]
 exclude = ["^tests/fixtures/"]
@@ -63,7 +69,6 @@ ignore_missing_imports = true
 [[tool.mypy.overrides]]
 module = [
   'poetry_plugin_export',
-  'tests.compat',
 ]
 warn_unused_ignores = false
 
