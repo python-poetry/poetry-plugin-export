@@ -95,7 +95,7 @@ def config(
     c.set_config_source(config_source)
     c.set_auth_config_source(auth_config_source)
 
-    mocker.patch("poetry.factory.Factory.create_config", return_value=c)
+    mocker.patch("poetry.config.config.Config.create", return_value=c)
     mocker.patch("poetry.config.config.Config.set_config_source")
 
     return c
