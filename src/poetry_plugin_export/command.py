@@ -2,12 +2,7 @@ from __future__ import annotations
 
 from cleo.helpers import option
 from poetry.console.commands.installer_command import InstallerCommand
-
-
-try:
-    from poetry.core.packages.dependency_group import MAIN_GROUP
-except ImportError:
-    MAIN_GROUP = "default"
+from poetry.core.packages.dependency_group import MAIN_GROUP
 
 from poetry_plugin_export.exporter import Exporter
 

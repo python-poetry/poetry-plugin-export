@@ -5,13 +5,8 @@ from unittest.mock import Mock
 
 import pytest
 
+from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.packages.package import Package
-
-
-try:
-    from poetry.core.packages.dependency_group import MAIN_GROUP
-except ImportError:
-    MAIN_GROUP = "default"
 
 from poetry_plugin_export.exporter import Exporter
 from tests.markers import MARKER_PY
