@@ -2139,3 +2139,81 @@ something==1.0.0 ; {MARKER_PY36}
 """
 
     assert io.fetch_output() == expected
+
+
+@pytest.mark.parametrize(
+    ["with_extras", "expected"],
+    [
+        (
+            True,
+            [f"foo[test]==1.0.0 ; {MARKER_PY36}", f"pytest==6.24.0 ; {MARKER_PY36}"],
+        ),
+        (
+            False,
+            [f"foo==1.0.0 ; {MARKER_PY36}"],
+        ),
+    ],
+)
+def test_exporter_omits_unwanted_extras(
+    tmp_dir: str, poetry: Poetry, with_extras: bool, expected: list[str]
+) -> None:
+    # Testcase derived from
+    # https://github.com/python-poetry/poetry/issues/5779
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "python-versions": ">=3.6",
+                    "version": "1.0.0",
+                    "category": "main",
+                    "optional": False,
+                    "dependencies": {"pytest": {"version": "^6.2.4", "optional": True}},
+                    "extras": {"test": ["pytest (>=6.2.4,<7.0.0)"]},
+                },
+                {
+                    "name": "pytest",
+                    "python-versions": ">=3.6",
+                    "version": "6.24.0",
+                    "category": "dev",
+                    "optional": False,
+                    "dependencies": {},
+                },
+            ],
+            "metadata": {
+                "lock-version": "1.1",
+                "python-versions": "^3.6",
+                "content-hash": (
+                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+                ),
+                "hashes": {
+                    "foo": [],
+                    "pytest": [],
+                },
+            },
+        }
+    )
+    root = poetry.package.with_dependency_groups([], only=True)
+    root.python_versions = "^3.6"
+    root.add_dependency(
+        Factory.create_dependency(
+            name="foo",
+            constraint={"version": "*"},
+        )
+    )
+    root.add_dependency(
+        Factory.create_dependency(
+            name="foo",
+            constraint={"version": "*", "extras": ["test"]},
+            groups=["with-extras"],
+        )
+    )
+    poetry._package = root
+
+    io = BufferedIO()
+    exporter = Exporter(poetry)
+    if with_extras:
+        exporter.only_groups(["with-extras"])
+    exporter.export("requirements.txt", Path(tmp_dir), io)
+
+    assert io.fetch_output() == "\n".join(expected) + "\n"
