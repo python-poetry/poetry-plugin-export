@@ -9,27 +9,20 @@ import pytest
 
 from cleo.io.buffered_io import BufferedIO
 from poetry.core.packages.dependency import Dependency
+from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.toml.file import TOMLFile
 from poetry.core.version.markers import parse_marker
 from poetry.factory import Factory
 from poetry.packages import Locker as BaseLocker
 from poetry.repositories.legacy_repository import LegacyRepository
 
-
-try:
-    from poetry.core.packages.dependency_group import MAIN_GROUP
-except ImportError:
-    MAIN_GROUP = "default"
-
 from poetry_plugin_export.exporter import Exporter
-from tests.compat import is_poetry_core_1_1_0b2_compat
 from tests.markers import MARKER_PY
 from tests.markers import MARKER_PY27
 from tests.markers import MARKER_PY36
 from tests.markers import MARKER_PY36_38
 from tests.markers import MARKER_PY36_ONLY
 from tests.markers import MARKER_PY37
-from tests.markers import MARKER_PY37_PY400
 from tests.markers import MARKER_PY_DARWIN
 from tests.markers import MARKER_PY_LINUX
 from tests.markers import MARKER_PY_WIN32
@@ -2027,9 +2020,7 @@ def test_exporter_doesnt_confuse_repeated_packages(
 celery==5.1.2 ; {MARKER_PY36_ONLY}
 celery==5.2.3 ; {MARKER_PY37}
 click-didyoumean==0.0.3 ; {MARKER_PY36_ONLY}
-click-didyoumean==0.3.0 ; {
-    MARKER_PY37_PY400 if is_poetry_core_1_1_0b2_compat else MARKER_PY37
-}
+click-didyoumean==0.3.0 ; {MARKER_PY37}
 click-plugins==1.1.1 ; {MARKER_PY36_ONLY.union(MARKER_PY37)}
 click==7.1.2 ; {MARKER_PY36_ONLY}
 click==8.0.3 ; {MARKER_PY37}

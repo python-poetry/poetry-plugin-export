@@ -6,13 +6,8 @@ from typing import TYPE_CHECKING
 from typing import Iterable
 
 from cleo.io.io import IO
+from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.repositories.http import HTTPRepository
-
-
-try:
-    from poetry.core.packages.dependency_group import MAIN_GROUP
-except ImportError:
-    MAIN_GROUP = "default"
 
 
 if TYPE_CHECKING:
