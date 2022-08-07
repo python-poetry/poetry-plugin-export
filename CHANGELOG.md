@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.0.6] - 2022-08-07
+
+### Fixed
+
+- Fixed an issue the markers of exported dependencies overlapped. [#94](https://github.com/python-poetry/poetry-plugin-export/pull/94)
+
 ## [1.0.5] - 2022-07-12
 
 ### Added
@@ -64,12 +70,13 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.5...main
-[1.0.5]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.5
-[1.0.4]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.4
-[1.0.3]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.3
-[1.0.2]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.2
-[1.0.1]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.1
-[1.0.0]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.0
-[0.2.1]: https://github.com/python-poetry/poetry-plugin-export/compare/0.2.1
-[0.2.0]: https://github.com/python-poetry/poetry-plugin-export/compare/0.2.0
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.6...main
+[1.0.6]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.6
+[1.0.5]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.5
+[1.0.4]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.4
+[1.0.3]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.3
+[1.0.2]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.2
+[1.0.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.1
+[1.0.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.0
+[0.2.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/0.2.1
+[0.2.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/0.2.0
