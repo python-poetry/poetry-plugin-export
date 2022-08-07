@@ -43,6 +43,7 @@ class TestLocker(Locker):
         self._content_hash = self._get_content_hash()
         self._locked = False
         self._write = False
+        self._contains_credential = False
 
     def write(self, write: bool = True) -> None:
         self._write = write
