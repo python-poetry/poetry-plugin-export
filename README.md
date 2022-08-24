@@ -9,10 +9,10 @@ This plugin provides the same features as the existing `export` command of Poetr
 
 ## Installation
 
-The easiest way to install the `export` plugin is via the `plugin add` command of Poetry.
+The easiest way to install the `export` plugin is via the `self add` command of Poetry.
 
 ```bash
-poetry plugin add poetry-plugin-export
+poetry self add poetry-plugin-export
 ```
 
 If you used `pipx` to install Poetry you can add the plugin via the `pipx inject` command.
