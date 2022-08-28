@@ -35,6 +35,7 @@ from tests.markers import MARKER_WINDOWS
 
 
 if TYPE_CHECKING:
+    from collections.abc import Collection
     from pathlib import Path
 
     from packaging.utils import NormalizedName
@@ -890,22 +891,6 @@ foo==1.2.3 ; {MARKER_PY} \\
     ["extras", "lines"],
     [
         (
-            None,
-            [f"foo==1.2.3 ; {MARKER_PY}"],
-        ),
-        (
-            False,
-            [f"foo==1.2.3 ; {MARKER_PY}"],
-        ),
-        (
-            True,
-            [
-                f"bar==4.5.6 ; {MARKER_PY}",
-                f"foo==1.2.3 ; {MARKER_PY}",
-                f"spam==0.1.0 ; {MARKER_PY}",
-            ],
-        ),
-        (
             ["feature-bar"],
             [
                 f"bar==4.5.6 ; {MARKER_PY}",
@@ -918,7 +903,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_exports_requirements_txt_with_optional_packages(
     tmp_path: Path,
     poetry: Poetry,
-    extras: bool | list[NormalizedName] | None,
+    extras: Collection[NormalizedName],
     lines: list[str],
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]

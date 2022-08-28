@@ -11,9 +11,9 @@ from poetry.utils.extras import get_extra_package_names
 
 
 if TYPE_CHECKING:
+    from collections.abc import Collection
     from collections.abc import Iterable
     from collections.abc import Iterator
-    from collections.abc import Sequence
 
     from packaging.utils import NormalizedName
     from poetry.core.packages.dependency import Dependency
@@ -53,7 +53,7 @@ def get_project_dependency_packages(
     locker: Locker,
     project_requires: list[Dependency],
     project_python_marker: BaseMarker | None = None,
-    extras: bool | Sequence[NormalizedName] | None = None,
+    extras: Collection[NormalizedName] = (),
 ) -> Iterator[DependencyPackage]:
     # Apply the project python marker to all requirements.
     if project_python_marker is not None:
@@ -67,22 +67,17 @@ def get_project_dependency_packages(
     repository = locker.locked_repository()
 
     # Build a set of all packages required by our selected extras
-    extra_package_names: set[str] | None = None
-
-    if extras is not True:
-        locked_extras = {
-            canonicalize_name(extra): [
-                canonicalize_name(dependency) for dependency in dependencies
-            ]
-            for extra, dependencies in locker.lock_data.get("extras", {}).items()
-        }
-        extra_package_names = set(
-            get_extra_package_names(
-                repository.packages,
-                locked_extras,
-                extras or (),
-            )
-        )
+    locked_extras = {
+        canonicalize_name(extra): [
+            canonicalize_name(dependency) for dependency in dependencies
+        ]
+        for extra, dependencies in locker.lock_data.get("extras", {}).items()
+    }
+    extra_package_names = get_extra_package_names(
+        repository.packages,
+        locked_extras,
+        extras,
+    )
 
     # If a package is optional and we haven't opted in to it, do not select
     selected = []
@@ -92,9 +87,7 @@ def get_project_dependency_packages(
         except IndexError:
             continue
 
-        if extra_package_names is not None and (
-            package.optional and package.name not in extra_package_names
-        ):
+        if package.optional and package.name not in extra_package_names:
             # a package is locked as optional, but is not activated via extras
             continue
 
