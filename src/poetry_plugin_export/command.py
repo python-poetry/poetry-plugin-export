@@ -31,6 +31,16 @@ class ExportCommand(InstallerCommand):
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
+        option(
+            "all",
+            None,
+            "Include all groups and extras",
+        ),
+        option(
+            "all-extras",
+            None,
+            "Include all extras",
+        ),
         *InstallerCommand._group_dependency_options(),
         option(
             "extras",
@@ -82,6 +92,8 @@ class ExportCommand(InstallerCommand):
                 "</warning>"
             )
 
+        groups = self.activated_groups
+
         # Checking extras
         extras = {
             extra for extra_opt in self.option("extras") for extra in extra_opt.split()
@@ -92,8 +104,19 @@ class ExportCommand(InstallerCommand):
                 f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
             )
 
+        # handle 'all'
+        if self.option("all"):
+            extras = set(self.poetry.package.extras.keys())
+            groups = self.poetry.package.dependency_group_names(include_optional=True)
+
+        # handle 'all-extras'
+        if self.option("all-extras"):
+            if self.option("extras"):
+                raise ValueError("Can't have --all-extras and --extras together.")
+            extras = set(self.poetry.package.extras.keys())
+
         exporter = Exporter(self.poetry)
-        exporter.only_groups(list(self.activated_groups))
+        exporter.only_groups(list(groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))

@@ -211,6 +211,34 @@ def test_export_reports_invalid_extras(tester: CommandTester, do_lock: None) -> 
     assert str(error.value) == expected
 
 
+def test_all_option(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--all")
+    expected = f"""\
+bar==1.1.0 ; {MARKER_PY}
+baz==2.0.0 ; {MARKER_PY}
+foo==1.0.0 ; {MARKER_PY}
+opt==2.2.0 ; {MARKER_PY}
+qux==1.2.0 ; {MARKER_PY}
+"""
+    assert tester.io.fetch_output() == expected
+
+
+def test_all_extras_option(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--all-extras")
+    expected = f"""\
+bar==1.1.0 ; {MARKER_PY}
+foo==1.0.0 ; {MARKER_PY}
+qux==1.2.0 ; {MARKER_PY}
+"""
+    assert tester.io.fetch_output() == expected
+
+
+def test_all_extras_and_extras(tester: CommandTester, do_lock: None) -> None:
+    with pytest.raises(ValueError) as error:
+        tester.execute("--all-extras --extras 'feature_bar'")
+    assert str(error.value) == "Can't have --all-extras and --extras together."
+
+
 def test_export_with_urls(
     monkeypatch: MonkeyPatch, tester: CommandTester, poetry: Poetry
 ) -> None:
