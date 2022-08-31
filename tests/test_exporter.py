@@ -2398,3 +2398,59 @@ foo @ https://example.com/foo-linux.whl ; {MARKER_PY36} and {MARKER_LINUX}
 """
 
     assert io.fetch_output() == expected
+
+
+def test_exporter_tolerates_non_existent_extra(tmp_dir: str, poetry: Poetry) -> None:
+    # foo actually has a 'bar' extra, but pyproject.toml mistakenly references a 'baz'
+    # extra.
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                    "dependencies": {
+                        "bar": {
+                            "version": ">=0.1.0",
+                            "optional": True,
+                            "markers": "extra == 'bar'",
+                        }
+                    },
+                    "extras": {"bar": ["bar (>=0.1.0)"]},
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "hashes": {"foo": [], "bar": []},
+            },
+        }
+    )
+    root = poetry.package.with_dependency_groups([], only=True)
+    root.add_dependency(
+        Factory.create_dependency(
+            name="foo", constraint={"version": "^1.2", "extras": ["baz"]}
+        )
+    )
+    poetry._package = root
+
+    exporter = Exporter(poetry)
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
+
+    with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = f"""\
+foo[baz]==1.2.3 ; {MARKER_PY27} or {MARKER_PY36}
+"""
+    assert content == expected
