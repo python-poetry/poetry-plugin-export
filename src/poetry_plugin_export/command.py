@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from cleo.helpers import option
-from poetry.console.commands.installer_command import InstallerCommand
+from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 from poetry_plugin_export.exporter import Exporter
 
 
-class ExportCommand(InstallerCommand):
+class ExportCommand(GroupCommand):
     name = "export"
     description = "Exports the lock file to alternative formats."
 
@@ -31,7 +31,7 @@ class ExportCommand(InstallerCommand):
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
-        *InstallerCommand._group_dependency_options(),
+        *GroupCommand._group_dependency_options(),
         option(
             "extras",
             "E",
