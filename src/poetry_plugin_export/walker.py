@@ -229,6 +229,7 @@ def get_locked_package(
         for package in candidates
         if package.python_constraint.allows_all(dependency.python_constraint)
         and dependency.constraint.allows(package.version)
+        and (dependency.source_type is None or dependency.is_same_source_as(package))
     ]
 
     # If we have an overlapping candidate, we must use it.
