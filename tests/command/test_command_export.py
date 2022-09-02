@@ -50,6 +50,7 @@ classifiers = [
 python = "~2.7 || ^3.6"
 foo = "^1.0"
 bar = { version = "^1.1", optional = true }
+qux = { version = "^1.2", optional = true }
 
 [tool.poetry.group.dev.dependencies]
 baz = "^2.0"
@@ -63,6 +64,7 @@ opt = "^2.2"
 
 [tool.poetry.extras]
 feature_bar = ["bar"]
+feature_qux = ["qux"]
 """
 
 
@@ -72,6 +74,7 @@ def setup(repo: Repository) -> None:
     repo.add_package(Package("bar", "1.1.0"))
     repo.add_package(Package("baz", "2.0.0"))
     repo.add_package(Package("opt", "2.2.0"))
+    repo.add_package(Package("qux", "1.2.0"))
 
 
 @pytest.fixture
@@ -174,13 +177,38 @@ def test_export_groups(
     assert tester.io.fetch_output() == expected
 
 
-def test_export_includes_extras_by_flag(tester: CommandTester, do_lock: None) -> None:
-    tester.execute("--format requirements.txt --extras feature_bar")
-    expected = f"""\
+@pytest.mark.parametrize(
+    "extras, expected",
+    [
+        (
+            "feature_bar",
+            f"""\
 bar==1.1.0 ; {MARKER_PY}
 foo==1.0.0 ; {MARKER_PY}
-"""
+""",
+        ),
+        (
+            "feature_bar feature_qux",
+            f"""\
+bar==1.1.0 ; {MARKER_PY}
+foo==1.0.0 ; {MARKER_PY}
+qux==1.2.0 ; {MARKER_PY}
+""",
+        ),
+    ],
+)
+def test_export_includes_extras_by_flag(
+    tester: CommandTester, do_lock: None, extras: str, expected: str
+) -> None:
+    tester.execute(f"--format requirements.txt --extras '{extras}'")
     assert tester.io.fetch_output() == expected
+
+
+def test_export_reports_invalid_extras(tester: CommandTester, do_lock: None) -> None:
+    with pytest.raises(ValueError) as error:
+        tester.execute("--format requirements.txt --extras 'SUS AMONGUS'")
+    expected = "Extra [AMONGUS, SUS] is not specified."
+    assert str(error.value) == expected
 
 
 def test_export_with_urls(

@@ -82,9 +82,19 @@ class ExportCommand(GroupCommand):
                 "</warning>"
             )
 
+        # Checking extras
+        extras = {
+            extra for extra_opt in self.option("extras") for extra in extra_opt.split()
+        }
+        invalid_extras = extras - self.poetry.package.extras.keys()
+        if invalid_extras:
+            raise ValueError(
+                f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
+            )
+
         exporter = Exporter(self.poetry)
         exporter.only_groups(list(self.activated_groups))
-        exporter.with_extras(self.option("extras"))
+        exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
