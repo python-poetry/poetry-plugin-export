@@ -18,6 +18,8 @@ from poetry.repositories.legacy_repository import LegacyRepository
 
 from poetry_plugin_export.exporter import Exporter
 from tests.markers import MARKER_CPYTHON
+from tests.markers import MARKER_DARWIN
+from tests.markers import MARKER_LINUX
 from tests.markers import MARKER_PY
 from tests.markers import MARKER_PY27
 from tests.markers import MARKER_PY36
@@ -2321,3 +2323,78 @@ def test_exporter_omits_unwanted_extras(
     exporter.export("requirements.txt", Path(tmp_dir), io)
 
     assert io.fetch_output() == "\n".join(expected) + "\n"
+
+
+def test_exporter_respects_package_sources(tmp_dir: str, poetry: Poetry) -> None:
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "python-versions": ">=3.6",
+                    "version": "1.0.0",
+                    "category": "main",
+                    "optional": False,
+                    "dependencies": {},
+                    "source": {
+                        "type": "url",
+                        "url": "https://example.com/foo-darwin.whl",
+                    },
+                },
+                {
+                    "name": "foo",
+                    "python-versions": ">=3.6",
+                    "version": "1.0.0",
+                    "category": "main",
+                    "optional": False,
+                    "dependencies": {},
+                    "source": {
+                        "type": "url",
+                        "url": "https://example.com/foo-linux.whl",
+                    },
+                },
+            ],
+            "metadata": {
+                "lock-version": "1.1",
+                "python-versions": "^3.6",
+                "content-hash": (
+                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+                ),
+                "hashes": {
+                    "foo": [],
+                },
+            },
+        }
+    )
+    root = poetry.package.with_dependency_groups([], only=True)
+    root.python_versions = "^3.6"
+    root.add_dependency(
+        Factory.create_dependency(
+            name="foo",
+            constraint={
+                "url": "https://example.com/foo-linux.whl",
+                "platform": "linux",
+            },
+        )
+    )
+    root.add_dependency(
+        Factory.create_dependency(
+            name="foo",
+            constraint={
+                "url": "https://example.com/foo-darwin.whl",
+                "platform": "darwin",
+            },
+        )
+    )
+    poetry._package = root
+
+    io = BufferedIO()
+    exporter = Exporter(poetry)
+    exporter.export("requirements.txt", Path(tmp_dir), io)
+
+    expected = f"""\
+foo @ https://example.com/foo-darwin.whl ; {MARKER_PY36} and {MARKER_DARWIN}
+foo @ https://example.com/foo-linux.whl ; {MARKER_PY36} and {MARKER_LINUX}
+"""
+
+    assert io.fetch_output() == expected
