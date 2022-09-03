@@ -160,7 +160,7 @@ def walk_dependencies(
 
         for require in locked_package.requires:
             if require.is_optional() and not any(
-                require in locked_package.extras[feature]
+                require in locked_package.extras.get(feature, ())
                 for feature in locked_package.features
             ):
                 continue
