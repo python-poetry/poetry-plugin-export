@@ -155,8 +155,10 @@ foo==1.0.0 ; {MARKER_PY}
         ("--with opt", f"foo==1.0.0 ; {MARKER_PY}\nopt==2.2.0 ; {MARKER_PY}\n"),
         (
             "--with dev,opt",
-            f"baz==2.0.0 ; {MARKER_PY}\nfoo==1.0.0 ; {MARKER_PY}\nopt==2.2.0 ;"
-            f" {MARKER_PY}\n",
+            (
+                f"baz==2.0.0 ; {MARKER_PY}\nfoo==1.0.0 ; {MARKER_PY}\nopt==2.2.0 ;"
+                f" {MARKER_PY}\n"
+            ),
         ),
         (f"--without {MAIN_GROUP}", "\n"),
         ("--without dev", f"foo==1.0.0 ; {MARKER_PY}\n"),
