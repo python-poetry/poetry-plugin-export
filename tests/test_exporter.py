@@ -1804,6 +1804,110 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
+def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
+    tmp_dir: str, poetry: Poetry
+) -> None:
+    poetry.pool.remove_repository("PyPI")
+    poetry.config.merge(
+        {
+            "repositories": {
+                "custom-a": {"url": "https://a.example.com/simple"},
+                "custom-b": {"url": "https://b.example.com/simple"},
+            },
+            "http-basic": {
+                "custom-a": {"username": "foo", "password": "bar"},
+                "custom-b": {"username": "baz", "password": "qux"},
+            },
+        }
+    )
+    poetry.pool.add_repository(
+        LegacyRepository(
+            "custom-b",
+            "https://b.example.com/simple",
+            config=poetry.config,
+        ),
+        default=True,
+    )
+    poetry.pool.add_repository(
+        LegacyRepository(
+            "custom-a",
+            "https://a.example.com/simple",
+            config=poetry.config,
+        ),
+        secondary=True,
+    )
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "legacy",
+                        "url": "https://a.example.com/simple",
+                        "reference": "",
+                    },
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "category": "dev",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "legacy",
+                        "url": "https://b.example.com/simple",
+                        "reference": "",
+                    },
+                },
+                {
+                    "name": "baz",
+                    "version": "7.8.9",
+                    "category": "dev",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "legacy",
+                        "url": "https://b.example.com/simple",
+                        "reference": "",
+                    },
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "hashes": {"foo": ["12345"], "bar": ["67890"], "baz": ["24680"]},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry)
+    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.with_credentials()
+    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
+
+    with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = f"""\
+--extra-index-url https://foo:bar@a.example.com/simple
+--index-url https://baz:qux@b.example.com/simple
+
+bar==4.5.6 ; {MARKER_PY} \\
+    --hash=sha256:67890
+baz==7.8.9 ; {MARKER_PY} \\
+    --hash=sha256:24680
+foo==1.2.3 ; {MARKER_PY} \\
+    --hash=sha256:12345
+"""
+
+    assert content == expected
+
+
 def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     tmp_dir: str, poetry: Poetry, config: Config
 ) -> None:
