@@ -131,7 +131,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": []},
+                "files": {"foo": [], "bar": []},
             },
         }
     )
@@ -185,7 +185,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": [], "baz": []},
+                "files": {"foo": [], "bar": [], "baz": []},
             },
         }
     )
@@ -270,7 +270,7 @@ def test_exporter_can_export_requirements_txt_poetry(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {
+                "files": {
                     "poetry": [],
                     "keyring": [],
                     "secretstorage": [],
@@ -368,7 +368,7 @@ def test_exporter_can_export_requirements_txt_pyinstaller(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"pyinstaller": [], "altgraph": [], "macholib": []},
+                "files": {"pyinstaller": [], "altgraph": [], "macholib": []},
             },
         }
     )
@@ -453,7 +453,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"a": [], "b": [], "c": [], "d": []},
+                "files": {"a": [], "b": [], "c": [], "d": []},
             },
         }
     )
@@ -529,7 +529,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"a": [], "b": []},
+                "files": {"a": [], "b": []},
             },
         }
     )
@@ -582,7 +582,10 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -628,7 +631,16 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_sorted_
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["67890", "12345"], "bar": ["67890", "12345"]},
+                "files": {
+                    "foo": [
+                        {"name": "foo1.whl", "hash": "67890"},
+                        {"name": "foo2.whl", "hash": "12345"},
+                    ],
+                    "bar": [
+                        {"name": "bar1.whl", "hash": "67890"},
+                        {"name": "bar2.whl", "hash": "12345"},
+                    ],
+                },
             },
         }
     )
@@ -676,7 +688,10 @@ def test_exporter_requirements_txt_with_standard_packages_and_hashes_disabled(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -721,7 +736,10 @@ def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -765,7 +783,10 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -812,7 +833,10 @@ def test_exporter_exports_requirements_txt_without_groups_if_set_explicity(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -852,7 +876,10 @@ def test_exporter_exports_requirements_txt_without_optional_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -937,7 +964,11 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"], "spam": ["abcde"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                    "spam": [{"name": "spam.whl", "hash": "abcde"}],
+                },
             },
             "extras": {"feature_bar": ["bar"]},
         }
@@ -984,7 +1015,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": []},
+                "files": {"foo": []},
             },
         }
     )
@@ -1038,7 +1069,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": []},
+                "files": {"foo": [], "bar": []},
             },
         }
     )
@@ -1092,7 +1123,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": [], "baz": []},
+                "files": {"foo": [], "bar": [], "baz": []},
             },
         }
     )
@@ -1162,7 +1193,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": [], "baz": []},
+                "files": {"foo": [], "bar": [], "baz": []},
             },
         }
     )
@@ -1210,7 +1241,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": []},
+                "files": {"foo": []},
             },
         }
     )
@@ -1251,7 +1282,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": []},
+                "files": {"foo": []},
             },
         }
     )
@@ -1322,7 +1353,7 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": [], "baz": []},
+                "files": {"foo": [], "bar": [], "baz": []},
             },
         }
     )
@@ -1367,7 +1398,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": []},
+                "files": {"foo": []},
             },
         }
     )
@@ -1409,7 +1440,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": []},
+                "files": {"foo": []},
             },
         }
     )
@@ -1452,7 +1483,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": []},
+                "files": {"foo": []},
             },
         }
     )
@@ -1507,7 +1538,10 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -1567,7 +1601,10 @@ def test_exporter_exports_requirements_txt_with_url_false(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -1619,7 +1656,9 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"bar": ["67890"]},
+                "files": {
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -1701,7 +1740,7 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": [], "baz": []},
+                "files": {"foo": [], "bar": [], "baz": []},
             },
         }
     )
@@ -1776,7 +1815,11 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"], "baz": ["24680"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                    "baz": [{"name": "baz.whl", "hash": "24680"}],
+                },
             },
         }
     )
@@ -1842,7 +1885,10 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
             },
         }
     )
@@ -1896,7 +1942,7 @@ def test_exporter_exports_requirements_txt_to_standard_output(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": []},
+                "files": {"foo": [], "bar": []},
             },
         }
     )
@@ -1993,7 +2039,7 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 "content-hash": (
                     "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
                 ),
-                "hashes": {
+                "files": {
                     "celery": [],
                     "click-didyoumean": [],
                     "click-plugins": [],
@@ -2112,7 +2158,7 @@ def test_exporter_handles_extras_next_to_non_extras(
                 "content-hash": (
                     "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
                 ),
-                "hashes": {
+                "files": {
                     "localstack": [],
                     "localstack-ext": [],
                     "something": [],
@@ -2202,7 +2248,7 @@ def test_exporter_handles_overlapping_python_versions(
                 "content-hash": (
                     "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
                 ),
-                "hashes": {
+                "files": {
                     "ipython": [],
                     "slash": [],
                 },
@@ -2292,7 +2338,7 @@ def test_exporter_omits_unwanted_extras(
                 "content-hash": (
                     "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
                 ),
-                "hashes": {
+                "files": {
                     "foo": [],
                     "pytest": [],
                 },
@@ -2360,7 +2406,7 @@ def test_exporter_respects_package_sources(tmp_dir: str, poetry: Poetry) -> None
                 "content-hash": (
                     "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
                 ),
-                "hashes": {
+                "files": {
                     "foo": [],
                 },
             },
@@ -2432,7 +2478,7 @@ def test_exporter_tolerates_non_existent_extra(tmp_dir: str, poetry: Poetry) -> 
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": [], "bar": []},
+                "files": {"foo": [], "bar": []},
             },
         }
     )
