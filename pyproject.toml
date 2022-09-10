@@ -18,8 +18,8 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.7"
-poetry = "^1.2.0b3"
-poetry-core = "^1.1.0b3"
+poetry = "^1.2.0"
+poetry-core = "^1.1.0"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.18"
