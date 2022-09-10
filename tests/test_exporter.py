@@ -1879,7 +1879,11 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "hashes": {"foo": ["12345"], "bar": ["67890"], "baz": ["24680"]},
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                    "baz": [{"name": "baz.whl", "hash": "24680"}],
+                },
             },
         }
     )
