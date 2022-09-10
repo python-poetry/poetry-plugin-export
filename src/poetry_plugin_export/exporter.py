@@ -167,7 +167,7 @@ class Exporter:
                         if self._with_credentials
                         else repository.url
                     )
-                    indexes_header = f"--index-url {url}\n"
+                    indexes_header += f"--index-url {url}\n"
                     continue
 
                 url = (
