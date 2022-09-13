@@ -1,5 +1,21 @@
 # Change Log
 
+## [1.0.7] - 2022-09-13
+
+### Added
+
+- Add support for multiple extras in a single flag ([#103](https://github.com/python-poetry/poetry-plugin-export/pull/103)).
+- Add `homepage` and `repository` to metadata ([#113](https://github.com/python-poetry/poetry-plugin-export/pull/113)).
+- Add a `poetry-export` pre-commit hook ([#85](https://github.com/python-poetry/poetry-plugin-export/pull/85)).
+
+### Fixed
+
+- Fix an issue where a virtual environment was created unnecessarily when running `poetry export` (requires poetry 1.2.1) ([#106](https://github.com/python-poetry/poetry-plugin-export/pull/106)).
+- Fix an issue where package sources were not taken into account ([#111](https://github.com/python-poetry/poetry-plugin-export/pull/111)).
+- Fix an issue where trying to export with extras that do not exist results in empty output ([#103](https://github.com/python-poetry/poetry-plugin-export/pull/103)).
+- Fix an issue where exporting a dependency on a package with a non-existent extra fails ([#109](https://github.com/python-poetry/poetry-plugin-export/pull/109)).
+- Fix an issue where only one of `--index-url` and `--extra-index-url` were exported ([#117](https://github.com/python-poetry/poetry-plugin-export/pull/117)).
+
 ## [1.0.6] - 2022-08-07
 
 ### Fixed
@@ -70,7 +86,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.6...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.0.7...main
+[1.0.7]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.7
 [1.0.6]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.6
 [1.0.5]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.5
 [1.0.4]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.4
