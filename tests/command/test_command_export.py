@@ -209,7 +209,7 @@ def test_export_includes_extras_by_flag(
 def test_export_reports_invalid_extras(tester: CommandTester, do_lock: None) -> None:
     with pytest.raises(ValueError) as error:
         tester.execute("--format requirements.txt --extras 'SUS AMONGUS'")
-    expected = "Extra [AMONGUS, SUS] is not specified."
+    expected = "Extra [amongus, sus] is not specified."
     assert str(error.value) == expected
 
 

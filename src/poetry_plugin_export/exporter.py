@@ -15,6 +15,7 @@ from poetry_plugin_export.walker import get_project_dependency_packages
 if TYPE_CHECKING:
     from pathlib import Path
 
+    from packaging.utils import NormalizedName
     from poetry.poetry import Poetry
 
 
@@ -33,14 +34,14 @@ class Exporter:
         self._with_hashes = True
         self._with_credentials = False
         self._with_urls = True
-        self._extras: bool | list[str] | None = []
+        self._extras: bool | list[NormalizedName] | None = []
         self._groups: Iterable[str] = [MAIN_GROUP]
 
     @classmethod
     def is_format_supported(cls, fmt: str) -> bool:
         return fmt in cls.EXPORT_METHODS
 
-    def with_extras(self, extras: bool | list[str] | None) -> Exporter:
+    def with_extras(self, extras: bool | list[NormalizedName] | None) -> Exporter:
         self._extras = extras
 
         return self

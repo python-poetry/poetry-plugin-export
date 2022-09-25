@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from cleo.helpers import option
+from packaging.utils import canonicalize_name
 from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
@@ -84,9 +85,13 @@ class ExportCommand(GroupCommand):
 
         # Checking extras
         extras = {
-            extra for extra_opt in self.option("extras") for extra in extra_opt.split()
+            canonicalize_name(extra)
+            for extra_opt in self.option("extras")
+            for extra in extra_opt.split()
         }
-        invalid_extras = extras - self.poetry.package.extras.keys()
+        invalid_extras = extras - {
+            canonicalize_name(extra) for extra in self.poetry.package.extras
+        }
         if invalid_extras:
             raise ValueError(
                 f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
