@@ -23,10 +23,14 @@ class Exporter:
     Exporter class to export a lock file to alternative formats.
     """
 
+    FORMAT_CONSTRAINTS_TXT = "constraints.txt"
     FORMAT_REQUIREMENTS_TXT = "requirements.txt"
     ALLOWED_HASH_ALGORITHMS = ("sha256", "sha384", "sha512")
 
-    EXPORT_METHODS = {FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt"}
+    EXPORT_METHODS = {
+        FORMAT_CONSTRAINTS_TXT: "_export_constraints_txt",
+        FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt",
+    }
 
     def __init__(self, poetry: Poetry) -> None:
         self._poetry = poetry
@@ -71,7 +75,15 @@ class Exporter:
 
         getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
 
+    def _export_constraints_txt(self, cwd: Path, output: IO | str) -> None:
+        return self._export_generic_txt(cwd, output, export_as_constraints=True)
+
     def _export_requirements_txt(self, cwd: Path, output: IO | str) -> None:
+        return self._export_generic_txt(cwd, output, export_as_constraints=False)
+
+    def _export_generic_txt(
+        self, cwd: Path, output: IO | str, export_as_constraints: bool
+    ) -> None:
         from poetry.core.packages.utils.utils import path_to_url
 
         indexes = set()
@@ -90,10 +102,18 @@ class Exporter:
         ):
             line = ""
 
+            if export_as_constraints:
+                dependency_package = dependency_package.without_features()
+
             dependency = dependency_package.dependency
             package = dependency_package.package
 
             if package.develop:
+                if export_as_constraints:
+                    raise RuntimeError(
+                        f"{package.pretty_name} is configured for develop mode"
+                        " which is incompatible with the constraints format."
+                    )
                 line += "-e "
 
             requirement = dependency.to_pep_508(with_extras=False)

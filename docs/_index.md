@@ -14,7 +14,7 @@ menu:
 The export plugin allows the export of locked packages to various formats.
 
 {{% note %}}
-Only the `requirements.txt` format is currently supported.
+Only the `constraints.txt` and `requirements.txt` formats are currently supported.
 {{% /note %}}
 
 ## Exporting packages
@@ -65,7 +65,7 @@ poetry export --only test,docs
 
 ### Available options
 
-* `--format (-f)`: The format to export to (default: `requirements.txt`). Currently, only `requirements.txt` is supported.
+* `--format (-f)`: The format to export to (default: `requirements.txt`). Currently, only `constraints.txt` and `requirements.txt` are supported.
 * `--output (-o)`: The name of the output file.  If omitted, print to standard output.
 * `--without`: The dependency groups to ignore when exporting.
 * `--with`: The optional dependency groups to include when exporting.
