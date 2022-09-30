@@ -107,8 +107,30 @@ def set_package_requires(poetry: Poetry, skip: set[str] | None = None) -> None:
     poetry._package = package
 
 
-def test_exporter_keeps_extras_for_requirements_txt(
-    tmp_dir: str, poetry: Poetry
+@pytest.mark.parametrize(
+    ["fmt", "expected"],
+    [
+        (
+            "constraints.txt",
+            [
+                f"bar==4.5.6 ; {MARKER_PY}",
+                f"baz==7.8.9 ; {MARKER_PY}",
+                f"foo==1.2.3 ; {MARKER_PY}",
+            ],
+        ),
+        (
+            "requirements.txt",
+            [
+                f"bar==4.5.6 ; {MARKER_PY}",
+                f"bar[baz]==4.5.6 ; {MARKER_PY}",
+                f"baz==7.8.9 ; {MARKER_PY}",
+                f"foo==1.2.3 ; {MARKER_PY}",
+            ],
+        ),
+    ],
+)
+def test_exporter_handles_extras_for_txt_formats(
+    tmp_dir: str, poetry: Poetry, fmt: str, expected: list[str]
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -159,85 +181,12 @@ def test_exporter_keeps_extras_for_requirements_txt(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry)
-    exporter.export("requirements.txt", Path(tmp_dir), "requirements.txt")
+    exporter.export(fmt, Path(tmp_dir), "exported.txt")
 
-    with (Path(tmp_dir) / "requirements.txt").open(encoding="utf-8") as f:
+    with (Path(tmp_dir) / "exported.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-bar[baz]==4.5.6 ; {MARKER_PY}
-baz==7.8.9 ; {MARKER_PY}
-foo==1.2.3 ; {MARKER_PY}
-"""
-
-    assert content == expected
-
-
-def test_exporter_removes_extras_for_constraints_txt(
-    tmp_dir: str, poetry: Poetry
-) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "category": "main",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "bar": {
-                            "extras": ["baz"],
-                            "version": ">=0.1.0",
-                        }
-                    },
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "category": "main",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "baz": {
-                            "version": ">=0.1.0",
-                            "optional": True,
-                            "markers": "extra == 'baz'",
-                        }
-                    },
-                    "extras": {"baz": ["baz (>=0.1.0)"]},
-                },
-                {
-                    "name": "baz",
-                    "version": "7.8.9",
-                    "category": "main",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
-                "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
-            },
-        }
-    )
-    set_package_requires(poetry)
-
-    exporter = Exporter(poetry)
-    exporter.export("constraints.txt", Path(tmp_dir), "constraints.txt")
-
-    with (Path(tmp_dir) / "constraints.txt").open(encoding="utf-8") as f:
-        content = f.read()
-
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-baz==7.8.9 ; {MARKER_PY}
-foo==1.2.3 ; {MARKER_PY}
-"""
-
-    assert content == expected
+    assert content == "\n".join(expected) + "\n"
 
 
 def test_exporter_can_export_requirements_txt_with_standard_packages(
