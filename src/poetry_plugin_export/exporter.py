@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import functools
 import urllib.parse
 
 from typing import TYPE_CHECKING
@@ -27,10 +28,9 @@ class Exporter:
     FORMAT_REQUIREMENTS_TXT = "requirements.txt"
     ALLOWED_HASH_ALGORITHMS = ("sha256", "sha384", "sha512")
 
-    EXPORT_METHODS = {
-        FORMAT_CONSTRAINTS_TXT: "_export_constraints_txt",
-        FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt",
-    }
+    # Entries are inserted into this dict below after the relevant methods are
+    # defined.
+    EXPORT_METHODS = {}
 
     def __init__(self, poetry: Poetry) -> None:
         self._poetry = poetry
@@ -73,16 +73,10 @@ class Exporter:
         if not self.is_format_supported(fmt):
             raise ValueError(f"Invalid export format: {fmt}")
 
-        getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
-
-    def _export_constraints_txt(self, cwd: Path, output: IO | str) -> None:
-        return self._export_generic_txt(cwd, output, export_as_constraints=True)
-
-    def _export_requirements_txt(self, cwd: Path, output: IO | str) -> None:
-        return self._export_generic_txt(cwd, output, export_as_constraints=False)
+        self.EXPORT_METHODS[fmt](self, cwd, output)
 
     def _export_generic_txt(
-        self, cwd: Path, output: IO | str, export_as_constraints: bool
+        self, cwd: Path, output: IO | str, with_extras: bool, allow_editable: bool
     ) -> None:
         from poetry.core.packages.utils.utils import path_to_url
 
@@ -102,14 +96,14 @@ class Exporter:
         ):
             line = ""
 
-            if export_as_constraints:
+            if not with_extras:
                 dependency_package = dependency_package.without_features()
 
             dependency = dependency_package.dependency
             package = dependency_package.package
 
             if package.develop:
-                if export_as_constraints:
+                if not allow_editable:
                     raise RuntimeError(
                         f"{package.pretty_name} is configured for develop mode"
                         " which is incompatible with the constraints format."
@@ -203,6 +197,13 @@ class Exporter:
             content = indexes_header + "\n" + content
 
         self._output(content, cwd, output)
+
+    EXPORT_METHODS[FORMAT_CONSTRAINTS_TXT] = functools.partial(
+        _export_generic_txt, with_extras=False, allow_editable=False
+    )
+    EXPORT_METHODS[FORMAT_REQUIREMENTS_TXT] = functools.partial(
+        _export_generic_txt, with_extras=True, allow_editable=True
+    )
 
     def _output(self, content: str, cwd: Path, output: IO | str) -> None:
         if isinstance(output, IO):
