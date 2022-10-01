@@ -24,7 +24,6 @@ if TYPE_CHECKING:
     from poetry.poetry import Poetry
     from pytest_mock import MockerFixture
 
-    from tests.types import FixtureDirGetter
     from tests.types import ProjectFactory
 
 
@@ -95,16 +94,13 @@ def config(
 
 
 @pytest.fixture
-def fixture_base() -> Path:
-    return Path(__file__).parent.joinpath("fixtures")
+def fixture_root() -> Path:
+    return Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
-def fixture_dir(fixture_base: Path) -> FixtureDirGetter:
-    def _fixture_dir(name: str) -> Path:
-        return fixture_base / name
-
-    return _fixture_dir
+def fixture_root_uri(fixture_root: Path) -> str:
+    return fixture_root.as_uri()
 
 
 @pytest.fixture()

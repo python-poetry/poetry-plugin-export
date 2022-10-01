@@ -5,8 +5,6 @@ from typing import Protocol  # noqa: TYP001
 
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from cleo.testers.command_tester import CommandTester
     from poetry.installation import Installer
     from poetry.installation.executor import Executor
@@ -36,9 +34,4 @@ class ProjectFactory(Protocol):
         poetry_lock_content: str | None = None,
         install_deps: bool = True,
     ) -> Poetry:
-        ...
-
-
-class FixtureDirGetter(Protocol):
-    def __call__(self, name: str) -> Path:
         ...

@@ -39,7 +39,6 @@ if TYPE_CHECKING:
     from poetry.poetry import Poetry
 
     from tests.conftest import Config
-    from tests.types import FixtureDirGetter
 
 
 class Locker(BaseLocker):
@@ -66,19 +65,14 @@ class Locker(BaseLocker):
         return "123456789"
 
 
-@pytest.fixture
-def plugin_root_uri() -> str:
-    return Path(__file__).parent.parent.as_uri()
-
-
 @pytest.fixture()
 def locker() -> Locker:
     return Locker()
 
 
 @pytest.fixture
-def poetry(fixture_dir: FixtureDirGetter, locker: Locker) -> Poetry:
-    p = Factory().create_poetry(fixture_dir("sample_project"))
+def poetry(fixture_root: Path, locker: Locker) -> Poetry:
+    p = Factory().create_poetry(fixture_root / "sample_project")
     p._locker = locker
 
     return p
@@ -1252,7 +1246,7 @@ foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY27.union(MARKER_PY36
 
 
 def test_exporter_can_export_requirements_txt_with_directory_packages(
-    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
+    tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1286,14 +1280,14 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
         content = f.read()
 
     expected = f"""\
-foo @ {plugin_root_uri}/tests/fixtures/sample_project ; {MARKER_PY}
+foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
 """
 
     assert content == expected
 
 
 def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
-    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
+    tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1356,18 +1350,17 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    root_uri = f"{plugin_root_uri}/tests/fixtures"
     expected = f"""\
-bar @ {root_uri}/project_with_nested_local/bar ; {MARKER_PY}
-baz @ {root_uri}/project_with_nested_local ; {MARKER_PY}
-foo @ {root_uri}/sample_project ; {MARKER_PY}
+bar @ {fixture_root_uri}/project_with_nested_local/bar ; {MARKER_PY}
+baz @ {fixture_root_uri}/project_with_nested_local ; {MARKER_PY}
+foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
 """
 
     assert content == expected
 
 
 def test_exporter_can_export_requirements_txt_with_directory_packages_and_markers(
-    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
+    tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1402,7 +1395,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
         content = f.read()
 
     expected = f"""\
-foo @ {plugin_root_uri}/tests/fixtures/sample_project ;\
+foo @ {fixture_root_uri}/sample_project ;\
  {MARKER_PY27.union(MARKER_PY36_ONLY)}
 """
 
@@ -1410,7 +1403,7 @@ foo @ {plugin_root_uri}/tests/fixtures/sample_project ;\
 
 
 def test_exporter_can_export_requirements_txt_with_file_packages(
-    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
+    tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1444,7 +1437,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
         content = f.read()
 
     expected = f"""\
-foo @ {plugin_root_uri}/tests/fixtures/distributions/demo-0.1.0.tar.gz ;\
+foo @ {fixture_root_uri}/distributions/demo-0.1.0.tar.gz ;\
  {MARKER_PY}
 """
 
@@ -1452,7 +1445,7 @@ foo @ {plugin_root_uri}/tests/fixtures/distributions/demo-0.1.0.tar.gz ;\
 
 
 def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
-    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
+    tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1486,7 +1479,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    uri = f"{plugin_root_uri}/tests/fixtures/distributions/demo-0.1.0.tar.gz"
+    uri = f"{fixture_root_uri}/distributions/demo-0.1.0.tar.gz"
     expected = f"""\
 foo @ {uri} ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
 """
