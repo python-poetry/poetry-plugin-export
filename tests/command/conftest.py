@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
@@ -15,6 +14,8 @@ from tests.helpers import TestExecutor
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from poetry.installation.executor import Executor
     from poetry.poetry import Poetry
     from poetry.utils.env import Env
@@ -30,8 +31,8 @@ def app(poetry: Poetry) -> PoetryTestApplication:
 
 
 @pytest.fixture
-def env(tmp_dir: str) -> MockEnv:
-    path = Path(tmp_dir) / ".venv"
+def env(tmp_path: Path) -> MockEnv:
+    path = tmp_path / ".venv"
     path.mkdir(parents=True)
     return MockEnv(path=path, is_venv=True)
 
