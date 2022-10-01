@@ -106,8 +106,8 @@ class Exporter:
             if package.develop:
                 if not allow_editable:
                     raise RuntimeError(
-                        f"{package.pretty_name} is configured for develop mode"
-                        " which is incompatible with the constraints format."
+                        f"{package.pretty_name} is locked in develop (editable) mode,"
+                        " which is incompatible with the constraints.txt format."
                     )
                 line += "-e "
 
