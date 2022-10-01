@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+import os
+
+from contextlib import contextmanager
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import Iterator
 
 from poetry.console.application import Application
 from poetry.core.toml.file import TOMLFile
@@ -109,3 +113,13 @@ class TestExecutor(Executor):
 
     def _execute_remove(self, operation: Operation) -> int:
         return 0
+
+
+@contextmanager
+def as_cwd(path: Path) -> Iterator[Path]:
+    old_cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield path
+    finally:
+        os.chdir(old_cwd)

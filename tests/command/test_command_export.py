@@ -13,6 +13,8 @@ from tests.markers import MARKER_PY
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from _pytest.monkeypatch import MonkeyPatch
     from cleo.testers.command_tester import CommandTester
     from poetry.poetry import Poetry
@@ -89,10 +91,13 @@ def tester(
     return command_tester_factory("export", poetry=poetry)
 
 
-def _export_requirements(tester: CommandTester, poetry: Poetry) -> None:
-    tester.execute("--format requirements.txt --output requirements.txt")
+def _export_requirements(tester: CommandTester, poetry: Poetry, tmp_path: Path) -> None:
+    from tests.helpers import as_cwd
 
-    requirements = poetry.file.parent / "requirements.txt"
+    with as_cwd(tmp_path):
+        tester.execute("--format requirements.txt --output requirements.txt")
+
+    requirements = tmp_path / "requirements.txt"
     assert requirements.exists()
 
     with requirements.open(encoding="utf-8") as f:
@@ -108,17 +113,17 @@ foo==1.0.0 ; {MARKER_PY}
 
 
 def test_export_exports_requirements_txt_file_locks_if_no_lock_file(
-    tester: CommandTester, poetry: Poetry
+    tester: CommandTester, poetry: Poetry, tmp_path: Path
 ) -> None:
     assert not poetry.locker.lock.exists()
-    _export_requirements(tester, poetry)
+    _export_requirements(tester, poetry, tmp_path)
     assert "The lock file does not exist. Locking." in tester.io.fetch_error()
 
 
 def test_export_exports_requirements_txt_uses_lock_file(
-    tester: CommandTester, poetry: Poetry, do_lock: None
+    tester: CommandTester, poetry: Poetry, tmp_path: Path, do_lock: None
 ) -> None:
-    _export_requirements(tester, poetry)
+    _export_requirements(tester, poetry, tmp_path)
     assert "The lock file does not exist. Locking." not in tester.io.fetch_error()
 
 

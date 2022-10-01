@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from cleo.helpers import option
 from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
@@ -99,4 +101,4 @@ class ExportCommand(GroupCommand):
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
-        exporter.export(fmt, self.poetry.file.parent, output or self.io)
+        exporter.export(fmt, Path.cwd(), output or self.io)
