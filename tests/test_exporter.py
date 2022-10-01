@@ -3,7 +3,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Iterator
 
 import pytest
 
@@ -38,7 +37,6 @@ from tests.markers import MARKER_WINDOWS
 
 if TYPE_CHECKING:
     from poetry.poetry import Poetry
-    from pytest_mock import MockerFixture
 
     from tests.conftest import Config
     from tests.types import FixtureDirGetter
@@ -69,15 +67,8 @@ class Locker(BaseLocker):
 
 
 @pytest.fixture
-def working_directory() -> Path:
-    return Path(__file__).parent.parent
-
-
-@pytest.fixture(autouse=True)
-def mock_path_cwd(
-    mocker: MockerFixture, working_directory: Path
-) -> Iterator[MockerFixture]:
-    yield mocker.patch("pathlib.Path.cwd", return_value=working_directory)
+def plugin_root_uri() -> str:
+    return Path(__file__).parent.parent.as_uri()
 
 
 @pytest.fixture()
@@ -809,7 +800,7 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
-def test_exporter_exports_requirements_txt_without_groups_if_set_explicity(
+def test_exporter_exports_requirements_txt_without_groups_if_set_explicitly(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
@@ -1261,7 +1252,7 @@ foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY27.union(MARKER_PY36
 
 
 def test_exporter_can_export_requirements_txt_with_directory_packages(
-    tmp_path: Path, poetry: Poetry, working_directory: Path
+    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1295,14 +1286,14 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
         content = f.read()
 
     expected = f"""\
-foo @ {working_directory.as_uri()}/tests/fixtures/sample_project ; {MARKER_PY}
+foo @ {plugin_root_uri}/tests/fixtures/sample_project ; {MARKER_PY}
 """
 
     assert content == expected
 
 
 def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
-    tmp_path: Path, poetry: Poetry, working_directory: Path
+    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1365,7 +1356,7 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    root_uri = f"{working_directory.as_uri()}/tests/fixtures"
+    root_uri = f"{plugin_root_uri}/tests/fixtures"
     expected = f"""\
 bar @ {root_uri}/project_with_nested_local/bar ; {MARKER_PY}
 baz @ {root_uri}/project_with_nested_local ; {MARKER_PY}
@@ -1376,7 +1367,7 @@ foo @ {root_uri}/sample_project ; {MARKER_PY}
 
 
 def test_exporter_can_export_requirements_txt_with_directory_packages_and_markers(
-    tmp_path: Path, poetry: Poetry, working_directory: Path
+    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1411,7 +1402,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
         content = f.read()
 
     expected = f"""\
-foo @ {working_directory.as_uri()}/tests/fixtures/sample_project ;\
+foo @ {plugin_root_uri}/tests/fixtures/sample_project ;\
  {MARKER_PY27.union(MARKER_PY36_ONLY)}
 """
 
@@ -1419,7 +1410,7 @@ foo @ {working_directory.as_uri()}/tests/fixtures/sample_project ;\
 
 
 def test_exporter_can_export_requirements_txt_with_file_packages(
-    tmp_path: Path, poetry: Poetry, working_directory: Path
+    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1453,7 +1444,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
         content = f.read()
 
     expected = f"""\
-foo @ {working_directory.as_uri()}/tests/fixtures/distributions/demo-0.1.0.tar.gz ;\
+foo @ {plugin_root_uri}/tests/fixtures/distributions/demo-0.1.0.tar.gz ;\
  {MARKER_PY}
 """
 
@@ -1461,7 +1452,7 @@ foo @ {working_directory.as_uri()}/tests/fixtures/distributions/demo-0.1.0.tar.g
 
 
 def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
-    tmp_path: Path, poetry: Poetry, working_directory: Path
+    tmp_path: Path, poetry: Poetry, plugin_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
@@ -1495,7 +1486,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    uri = f"{working_directory.as_uri()}/tests/fixtures/distributions/demo-0.1.0.tar.gz"
+    uri = f"{plugin_root_uri}/tests/fixtures/distributions/demo-0.1.0.tar.gz"
     expected = f"""\
 foo @ {uri} ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
 """

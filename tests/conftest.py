@@ -52,12 +52,8 @@ class Config(BaseConfig):
 def config_cache_dir(tmp_path: Path) -> Path:
     path = tmp_path / ".cache" / "pypoetry"
     path.mkdir(parents=True)
+
     return path
-
-
-@pytest.fixture
-def config_virtualenvs_path(config_cache_dir: Path) -> Path:
-    return config_cache_dir / "virtualenvs"
 
 
 @pytest.fixture
