@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import functools
 import urllib.parse
 
+from functools import partialmethod
 from typing import TYPE_CHECKING
 from typing import Iterable
 
@@ -28,9 +28,10 @@ class Exporter:
     FORMAT_REQUIREMENTS_TXT = "requirements.txt"
     ALLOWED_HASH_ALGORITHMS = ("sha256", "sha384", "sha512")
 
-    # Entries are inserted into this dict below after the relevant methods are
-    # defined.
-    EXPORT_METHODS = {}
+    EXPORT_METHODS = {
+        FORMAT_CONSTRAINTS_TXT: "_export_constraints_txt",
+        FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt",
+    }
 
     def __init__(self, poetry: Poetry) -> None:
         self._poetry = poetry
@@ -73,7 +74,7 @@ class Exporter:
         if not self.is_format_supported(fmt):
             raise ValueError(f"Invalid export format: {fmt}")
 
-        self.EXPORT_METHODS[fmt](self, cwd, output)
+        getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
 
     def _export_generic_txt(
         self, cwd: Path, output: IO | str, with_extras: bool, allow_editable: bool
@@ -196,19 +197,16 @@ class Exporter:
 
             content = indexes_header + "\n" + content
 
-        self._output(content, cwd, output)
-
-    EXPORT_METHODS[FORMAT_CONSTRAINTS_TXT] = functools.partial(
-        _export_generic_txt, with_extras=False, allow_editable=False
-    )
-    EXPORT_METHODS[FORMAT_REQUIREMENTS_TXT] = functools.partial(
-        _export_generic_txt, with_extras=True, allow_editable=True
-    )
-
-    def _output(self, content: str, cwd: Path, output: IO | str) -> None:
         if isinstance(output, IO):
             output.write(content)
         else:
-            filepath = cwd / output
-            with filepath.open("w", encoding="utf-8") as f:
-                f.write(content)
+            with (cwd / output).open("w", encoding="utf-8") as txt:
+                txt.write(content)
+
+    _export_constraints_txt = partialmethod(
+        _export_generic_txt, with_extras=False, allow_editable=False
+    )
+
+    _export_requirements_txt = partialmethod(
+        _export_generic_txt, with_extras=True, allow_editable=True
+    )
