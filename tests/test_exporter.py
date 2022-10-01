@@ -36,6 +36,7 @@ from tests.markers import MARKER_WINDOWS
 
 
 if TYPE_CHECKING:
+    from packaging.utils import NormalizedName
     from poetry.poetry import Poetry
 
     from tests.conftest import Config
@@ -905,7 +906,7 @@ foo==1.2.3 ; {MARKER_PY} \\
             ],
         ),
         (
-            ["feature_bar"],
+            ["feature-bar"],
             [
                 f"bar==4.5.6 ; {MARKER_PY}",
                 f"foo==1.2.3 ; {MARKER_PY}",
@@ -917,7 +918,7 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_exports_requirements_txt_with_optional_packages(
     tmp_path: Path,
     poetry: Poetry,
-    extras: bool | list[str] | None,
+    extras: bool | list[NormalizedName] | None,
     lines: list[str],
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]

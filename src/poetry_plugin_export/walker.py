@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from packaging.utils import canonicalize_name
 from poetry.core.semver.util import constraint_regions
 from poetry.core.version.markers import AnyMarker
 from poetry.core.version.markers import SingleMarker
@@ -14,6 +15,7 @@ if TYPE_CHECKING:
     from collections.abc import Iterator
     from collections.abc import Sequence
 
+    from packaging.utils import NormalizedName
     from poetry.core.packages.dependency import Dependency
     from poetry.core.packages.package import Package
     from poetry.core.version.markers import BaseMarker
@@ -51,7 +53,7 @@ def get_project_dependency_packages(
     locker: Locker,
     project_requires: list[Dependency],
     project_python_marker: BaseMarker | None = None,
-    extras: bool | Sequence[str] | None = None,
+    extras: bool | Sequence[NormalizedName] | None = None,
 ) -> Iterator[DependencyPackage]:
     # Apply the project python marker to all requirements.
     if project_python_marker is not None:
@@ -68,10 +70,16 @@ def get_project_dependency_packages(
     extra_package_names: set[str] | None = None
 
     if extras is not True:
+        locked_extras = {
+            canonicalize_name(extra): [
+                canonicalize_name(dependency) for dependency in dependencies
+            ]
+            for extra, dependencies in locker.lock_data.get("extras", {}).items()
+        }
         extra_package_names = set(
             get_extra_package_names(
                 repository.packages,
-                locker.lock_data.get("extras", {}),
+                locked_extras,  # type: ignore[arg-type]
                 extras or (),
             )
         )
