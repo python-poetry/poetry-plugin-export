@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import urllib.parse
 
+from functools import partialmethod
 from typing import TYPE_CHECKING
 from typing import Iterable
 
@@ -23,10 +24,14 @@ class Exporter:
     Exporter class to export a lock file to alternative formats.
     """
 
+    FORMAT_CONSTRAINTS_TXT = "constraints.txt"
     FORMAT_REQUIREMENTS_TXT = "requirements.txt"
     ALLOWED_HASH_ALGORITHMS = ("sha256", "sha384", "sha512")
 
-    EXPORT_METHODS = {FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt"}
+    EXPORT_METHODS = {
+        FORMAT_CONSTRAINTS_TXT: "_export_constraints_txt",
+        FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt",
+    }
 
     def __init__(self, poetry: Poetry) -> None:
         self._poetry = poetry
@@ -71,7 +76,9 @@ class Exporter:
 
         getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
 
-    def _export_requirements_txt(self, cwd: Path, output: IO | str) -> None:
+    def _export_generic_txt(
+        self, cwd: Path, output: IO | str, with_extras: bool, allow_editable: bool
+    ) -> None:
         from poetry.core.packages.utils.utils import path_to_url
 
         indexes = set()
@@ -90,10 +97,18 @@ class Exporter:
         ):
             line = ""
 
+            if not with_extras:
+                dependency_package = dependency_package.without_features()
+
             dependency = dependency_package.dependency
             package = dependency_package.package
 
             if package.develop:
+                if not allow_editable:
+                    raise RuntimeError(
+                        f"{package.pretty_name} is locked in develop (editable) mode,"
+                        " which is incompatible with the constraints.txt format."
+                    )
                 line += "-e "
 
             requirement = dependency.to_pep_508(with_extras=False)
@@ -182,12 +197,16 @@ class Exporter:
 
             content = indexes_header + "\n" + content
 
-        self._output(content, cwd, output)
-
-    def _output(self, content: str, cwd: Path, output: IO | str) -> None:
         if isinstance(output, IO):
             output.write(content)
         else:
-            filepath = cwd / output
-            with filepath.open("w", encoding="utf-8") as f:
-                f.write(content)
+            with (cwd / output).open("w", encoding="utf-8") as txt:
+                txt.write(content)
+
+    _export_constraints_txt = partialmethod(
+        _export_generic_txt, with_extras=False, allow_editable=False
+    )
+
+    _export_requirements_txt = partialmethod(
+        _export_generic_txt, with_extras=True, allow_editable=True
+    )

@@ -664,7 +664,7 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
-def test_exporter_requirements_txt_with_standard_packages_and_hashes_disabled(
+def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_disabled(  # noqa: E501
     tmp_dir: str, poetry: Poetry
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
@@ -2477,6 +2477,137 @@ def test_exporter_omits_unwanted_extras(
     exporter.export("requirements.txt", Path(tmp_dir), io)
 
     assert io.fetch_output() == "\n".join(expected) + "\n"
+
+
+@pytest.mark.parametrize(
+    ["fmt", "expected"],
+    [
+        (
+            "constraints.txt",
+            [
+                f"bar==4.5.6 ; {MARKER_PY}",
+                f"baz==7.8.9 ; {MARKER_PY}",
+                f"foo==1.2.3 ; {MARKER_PY}",
+            ],
+        ),
+        (
+            "requirements.txt",
+            [
+                f"bar==4.5.6 ; {MARKER_PY}",
+                f"bar[baz]==4.5.6 ; {MARKER_PY}",
+                f"baz==7.8.9 ; {MARKER_PY}",
+                f"foo==1.2.3 ; {MARKER_PY}",
+            ],
+        ),
+    ],
+)
+def test_exporter_omits_and_includes_extras_for_txt_formats(
+    tmp_dir: str, poetry: Poetry, fmt: str, expected: list[str]
+) -> None:
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                    "dependencies": {
+                        "bar": {
+                            "extras": ["baz"],
+                            "version": ">=0.1.0",
+                        }
+                    },
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                    "dependencies": {
+                        "baz": {
+                            "version": ">=0.1.0",
+                            "optional": True,
+                            "markers": "extra == 'baz'",
+                        }
+                    },
+                    "extras": {"baz": ["baz (>=0.1.0)"]},
+                },
+                {
+                    "name": "baz",
+                    "version": "7.8.9",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "files": {"foo": [], "bar": [], "baz": []},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry)
+    exporter.export(fmt, Path(tmp_dir), "exported.txt")
+
+    with (Path(tmp_dir) / "exported.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    assert content == "\n".join(expected) + "\n"
+
+
+def test_exporter_raises_exception_for_constraints_txt_with_editable_packages(
+    tmp_dir: str, poetry: Poetry
+) -> None:
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "git",
+                        "url": "https://github.com/foo/foo.git",
+                        "reference": "123456",
+                    },
+                    "develop": True,
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "directory",
+                        "url": "tests/fixtures/sample_project",
+                        "reference": "",
+                    },
+                    "develop": True,
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "files": {"foo": [], "bar": []},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    with pytest.raises(RuntimeError):
+        exporter = Exporter(poetry)
+        exporter.export("constraints.txt", Path(tmp_dir), "constraints.txt")
+
+    assert not (Path(tmp_dir) / "constraints.txt").exists()
 
 
 def test_exporter_respects_package_sources(tmp_dir: str, poetry: Poetry) -> None:
