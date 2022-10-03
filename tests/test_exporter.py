@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -36,6 +35,8 @@ from tests.markers import MARKER_WINDOWS
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from packaging.utils import NormalizedName
     from poetry.poetry import Poetry
 
@@ -43,8 +44,8 @@ if TYPE_CHECKING:
 
 
 class Locker(BaseLocker):
-    def __init__(self) -> None:
-        self._lock = TOMLFile(Path.cwd().joinpath("poetry.lock"))
+    def __init__(self, fixture_root: Path) -> None:
+        self._lock = TOMLFile(fixture_root / "poetry.lock")
         self._locked = True
         self._content_hash = self._get_content_hash()
 
@@ -66,9 +67,9 @@ class Locker(BaseLocker):
         return "123456789"
 
 
-@pytest.fixture()
-def locker() -> Locker:
-    return Locker()
+@pytest.fixture
+def locker(fixture_root: Path) -> Locker:
+    return Locker(fixture_root)
 
 
 @pytest.fixture
@@ -1260,7 +1261,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
                     "python-versions": "*",
                     "source": {
                         "type": "directory",
-                        "url": "tests/fixtures/sample_project",
+                        "url": "sample_project",
                         "reference": "",
                     },
                 }
@@ -1301,7 +1302,7 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
                     "python-versions": "*",
                     "source": {
                         "type": "directory",
-                        "url": "tests/fixtures/sample_project",
+                        "url": "sample_project",
                         "reference": "",
                     },
                 },
@@ -1313,10 +1314,7 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
                     "python-versions": "*",
                     "source": {
                         "type": "directory",
-                        "url": (
-                            "tests/fixtures/sample_project/"
-                            "../project_with_nested_local/bar"
-                        ),
+                        "url": "sample_project/../project_with_nested_local/bar",
                         "reference": "",
                     },
                 },
@@ -1328,10 +1326,7 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
                     "python-versions": "*",
                     "source": {
                         "type": "directory",
-                        "url": (
-                            "tests/fixtures/sample_project/"
-                            "../project_with_nested_local/bar/.."
-                        ),
+                        "url": "sample_project/../project_with_nested_local/bar/..",
                         "reference": "",
                     },
                 },
@@ -1375,7 +1370,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
                     "marker": "python_version < '3.7'",
                     "source": {
                         "type": "directory",
-                        "url": "tests/fixtures/sample_project",
+                        "url": "sample_project",
                         "reference": "",
                     },
                 }
@@ -1417,7 +1412,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
                     "python-versions": "*",
                     "source": {
                         "type": "file",
-                        "url": "tests/fixtures/distributions/demo-0.1.0.tar.gz",
+                        "url": "distributions/demo-0.1.0.tar.gz",
                         "reference": "",
                     },
                 }
@@ -1460,7 +1455,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
                     "marker": "python_version < '3.7'",
                     "source": {
                         "type": "file",
-                        "url": "tests/fixtures/distributions/demo-0.1.0.tar.gz",
+                        "url": "distributions/demo-0.1.0.tar.gz",
                         "reference": "",
                     },
                 }
@@ -2573,7 +2568,7 @@ def test_exporter_raises_exception_for_constraints_txt_with_editable_packages(
                     "python-versions": "*",
                     "source": {
                         "type": "directory",
-                        "url": "tests/fixtures/sample_project",
+                        "url": "sample_project",
                         "reference": "",
                     },
                     "develop": True,
