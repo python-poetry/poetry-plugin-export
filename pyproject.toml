@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "poetry-plugin-export"
-version = "1.1.0"
+version = "1.1.1"
 description = "Poetry plugin to export the dependencies to various formats"
 authors = ["Sébastien Eustace <sebastien@eustace.io>"]
 license = "MIT"
