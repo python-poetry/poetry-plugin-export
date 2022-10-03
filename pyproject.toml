@@ -30,6 +30,12 @@ pytest-randomly = "^3.12"
 pytest-xdist = { version = "^2.5", extras = ["psutil"] }
 mypy = ">=0.971"
 
+# only used in github actions
+[tool.poetry.group.github-actions]
+optional = true
+[tool.poetry.group.github-actions.dependencies]
+pytest-github-actions-annotate-failures = "^0.1.7"
+
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
 
