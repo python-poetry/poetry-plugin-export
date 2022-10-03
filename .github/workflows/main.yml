@@ -77,4 +77,4 @@ jobs:
         run: poetry run mypy
 
       - name: Run pytest
-        run: poetry run python -m pytest -p no:sugar -q tests/
+        run: poetry run pytest -v tests/
