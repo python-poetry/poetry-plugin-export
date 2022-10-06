@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from packaging.utils import canonicalize_name
-from poetry.core.semver.util import constraint_regions
+from poetry.core.constraints.version.util import constraint_regions
 from poetry.core.version.markers import AnyMarker
 from poetry.core.version.markers import SingleMarker
 from poetry.packages import DependencyPackage
