@@ -6,6 +6,7 @@ from typing import Any
 import pytest
 
 from cleo.io.buffered_io import BufferedIO
+from cleo.io.null_io import NullIO
 from poetry.core.packages.dependency import Dependency
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.toml.file import TOMLFile
@@ -124,7 +125,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -178,7 +179,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -272,7 +273,7 @@ def test_exporter_can_export_requirements_txt_poetry(
         poetry, skip={"keyring", "secretstorage", "cryptography", "six"}
     )
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -361,7 +362,7 @@ def test_exporter_can_export_requirements_txt_pyinstaller(
     )
     set_package_requires(poetry, skip={"altgraph", "macholib"})
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -446,7 +447,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
     )
     set_package_requires(poetry, skip={"b", "c", "d"})
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -534,7 +535,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
     )
     poetry._package = root
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     if dev:
         exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -578,7 +579,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -633,7 +634,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_sorted_
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -684,7 +685,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.with_hashes(False)
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -732,7 +733,7 @@ def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -779,7 +780,7 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -829,7 +830,7 @@ def test_exporter_exports_requirements_txt_without_groups_if_set_explicitly(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -872,7 +873,7 @@ def test_exporter_exports_requirements_txt_without_optional_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -962,7 +963,7 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.with_hashes(False)
     exporter.with_extras(extras)
@@ -1008,7 +1009,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1062,7 +1063,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
     )
     set_package_requires(poetry, skip={"foo"})
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1116,7 +1117,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
     )
     set_package_requires(poetry, skip={"bar", "baz"})
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1186,7 +1187,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.with_hashes(False)
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -1234,7 +1235,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1275,7 +1276,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1340,7 +1341,7 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1384,7 +1385,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1426,7 +1427,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1469,7 +1470,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1527,7 +1528,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -1590,7 +1591,7 @@ def test_exporter_exports_requirements_txt_with_url_false(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.with_urls(False)
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -1643,7 +1644,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
         }
     )
     set_package_requires(poetry)
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -1726,7 +1727,7 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     if dev:
         exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -1805,7 +1806,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -1912,7 +1913,7 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.with_credentials()
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -1982,7 +1983,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.with_credentials()
     exporter.export(
@@ -2036,7 +2037,7 @@ def test_exporter_exports_requirements_txt_to_standard_output(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
@@ -2150,7 +2151,7 @@ def test_exporter_doesnt_confuse_repeated_packages(
     )
     poetry._package = root
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
@@ -2265,7 +2266,7 @@ def test_exporter_handles_extras_next_to_non_extras(
     )
     poetry._package = root
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
@@ -2368,7 +2369,7 @@ def test_exporter_handles_overlapping_python_versions(
     )
     poetry._package = root
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
@@ -2451,7 +2452,7 @@ def test_exporter_omits_unwanted_extras(
     poetry._package = root
 
     io = BufferedIO()
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     if with_extras:
         exporter.only_groups(["with-extras"])
     exporter.export("requirements.txt", tmp_path, io)
@@ -2532,7 +2533,7 @@ def test_exporter_omits_and_includes_extras_for_txt_formats(
     )
     set_package_requires(poetry)
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export(fmt, tmp_path, "exported.txt")
 
     with (tmp_path / "exported.txt").open(encoding="utf-8") as f:
@@ -2541,7 +2542,7 @@ def test_exporter_omits_and_includes_extras_for_txt_formats(
     assert content == "\n".join(expected) + "\n"
 
 
-def test_exporter_raises_exception_for_constraints_txt_with_editable_packages(
+def test_exporter_prints_warning_for_constraints_txt_with_editable_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
@@ -2562,6 +2563,13 @@ def test_exporter_raises_exception_for_constraints_txt_with_editable_packages(
                 },
                 {
                     "name": "bar",
+                    "version": "7.8.9",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                },
+                {
+                    "name": "baz",
                     "version": "4.5.6",
                     "category": "main",
                     "optional": False,
@@ -2577,17 +2585,29 @@ def test_exporter_raises_exception_for_constraints_txt_with_editable_packages(
             "metadata": {
                 "python-versions": "*",
                 "content-hash": "123456789",
-                "files": {"foo": [], "bar": []},
+                "files": {"foo": [], "bar": [], "baz": []},
             },
         }
     )
     set_package_requires(poetry)
 
-    with pytest.raises(RuntimeError):
-        exporter = Exporter(poetry)
-        exporter.export("constraints.txt", tmp_path, "constraints.txt")
+    io = BufferedIO()
+    exporter = Exporter(poetry, io)
+    exporter.export("constraints.txt", tmp_path, "constraints.txt")
 
-    assert not (tmp_path / "constraints.txt").exists()
+    expected_error_out = (
+        "<warning>Warning: foo is locked in develop (editable) mode, which is "
+        "incompatible with the constraints.txt format.\n"
+        "<warning>Warning: baz is locked in develop (editable) mode, which is "
+        "incompatible with the constraints.txt format.\n"
+    )
+
+    assert io.fetch_error() == expected_error_out
+
+    with (tmp_path / "constraints.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    assert content == f"bar==7.8.9 ; {MARKER_PY}\n"
 
 
 def test_exporter_respects_package_sources(tmp_path: Path, poetry: Poetry) -> None:
@@ -2654,7 +2674,7 @@ def test_exporter_respects_package_sources(tmp_path: Path, poetry: Poetry) -> No
     poetry._package = root
 
     io = BufferedIO()
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, io)
 
     expected = f"""\
@@ -2709,7 +2729,7 @@ def test_exporter_tolerates_non_existent_extra(tmp_path: Path, poetry: Poetry) -
     )
     poetry._package = root
 
-    exporter = Exporter(poetry)
+    exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:

@@ -100,7 +100,7 @@ class ExportCommand(GroupCommand):
                 f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
             )
 
-        exporter = Exporter(self.poetry)
+        exporter = Exporter(self.poetry, self.io)
         exporter.only_groups(list(self.activated_groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
