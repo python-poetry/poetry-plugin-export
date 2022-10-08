@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import shutil
+
 from typing import TYPE_CHECKING
 from unittest.mock import Mock
 
@@ -229,3 +231,44 @@ def test_export_with_urls(
     monkeypatch.setattr(Exporter, "with_urls", mock_export)
     tester.execute("--without-urls")
     mock_export.assert_called_once_with(False)
+
+
+def test_export_exports_constraints_txt_with_warnings(
+    tmp_path: Path,
+    fixture_root: Path,
+    project_factory: ProjectFactory,
+    command_tester_factory: CommandTesterFactory,
+) -> None:
+    # On Windows we have to make sure that the path dependency and the pyproject.toml
+    # are on the same drive, otherwise locking fails.
+    # (in our CI fixture_root is on D:\ but temp_path is on C:\)
+    editable_dep_path = tmp_path / "project_with_nested_local"
+    shutil.copytree(fixture_root / "project_with_nested_local", editable_dep_path)
+
+    pyproject_content = f"""\
+[tool.poetry]
+name = "simple-project"
+version = "1.2.3"
+description = "Some description."
+authors = [
+    "Sébastien Eustace <sebastien@eustace.io>"
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+baz = ">1.0"
+project-with-nested-local = {{ path = "{editable_dep_path.as_posix()}", \
+develop = true }}
+"""
+    poetry = project_factory(name="export", pyproject_content=pyproject_content)
+    tester = command_tester_factory("export", poetry=poetry)
+    tester.execute("--format constraints.txt")
+
+    develop_warning = (
+        "Warning: project-with-nested-local is locked in develop (editable) mode, which"
+        " is incompatible with the constraints.txt format.\n"
+    )
+    expected = 'baz==2.0.0 ; python_version >= "3.6" and python_version < "4.0"\n'
+
+    assert develop_warning in tester.io.fetch_error()
+    assert tester.io.fetch_output() == expected

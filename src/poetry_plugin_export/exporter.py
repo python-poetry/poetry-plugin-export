@@ -34,8 +34,9 @@ class Exporter:
         FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt",
     }
 
-    def __init__(self, poetry: Poetry) -> None:
+    def __init__(self, poetry: Poetry, io: IO) -> None:
         self._poetry = poetry
+        self._io = io
         self._with_hashes = True
         self._with_credentials = False
         self._with_urls = True
@@ -106,10 +107,12 @@ class Exporter:
 
             if package.develop:
                 if not allow_editable:
-                    raise RuntimeError(
-                        f"{package.pretty_name} is locked in develop (editable) mode,"
-                        " which is incompatible with the constraints.txt format."
+                    self._io.write_error_line(
+                        f"<warning>Warning: {package.pretty_name} is locked in develop"
+                        " (editable) mode, which is incompatible with the"
+                        " constraints.txt format.</warning>"
                     )
+                    continue
                 line += "-e "
 
             requirement = dependency.to_pep_508(with_extras=False)
