@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.1.2] - 2022-10-09
+
+### Fixed
+
+- Fix an issue where exporting a `constraints.txt` file fails if an editable dependency is locked ([#140](https://github.com/python-poetry/poetry-plugin-export/pull/140)).
+
+
 ## [1.1.1] - 2022-10-03
 
 This release fixes test suite compatibility with upcoming Poetry releases. No functional changes.
@@ -109,7 +116,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.1.1...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.1.2...main
+[1.1.2]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.1.2
 [1.1.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.1.1
 [1.1.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.1.0
 [1.0.7]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.0.7
