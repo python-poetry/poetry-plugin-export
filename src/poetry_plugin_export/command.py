@@ -92,9 +92,7 @@ class ExportCommand(GroupCommand):
             for extra_opt in self.option("extras")
             for extra in extra_opt.split()
         }
-        invalid_extras = extras - {
-            canonicalize_name(extra) for extra in self.poetry.package.extras
-        }
+        invalid_extras = extras - self.poetry.package.extras.keys()
         if invalid_extras:
             raise ValueError(
                 f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."

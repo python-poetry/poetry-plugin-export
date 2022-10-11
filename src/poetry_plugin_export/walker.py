@@ -79,7 +79,7 @@ def get_project_dependency_packages(
         extra_package_names = set(
             get_extra_package_names(
                 repository.packages,
-                locked_extras,  # type: ignore[arg-type]
+                locked_extras,
                 extras or (),
             )
         )
