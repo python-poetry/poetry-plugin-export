@@ -3,20 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from packaging.utils import canonicalize_name
-
-
-try:
-    # turn isort off because it moves the "type: ignore" to the next line
-    # isort: off
-    from poetry.core.constraints.version.util import (  # type: ignore[import]
-        constraint_regions,
-    )
-
-    # isort: on
-except ImportError:
-    # poetry-core < 1.3
-    from poetry.core.semver.util import constraint_regions
-
+from poetry.core.constraints.version.util import constraint_regions
 from poetry.core.version.markers import AnyMarker
 from poetry.core.version.markers import SingleMarker
 from poetry.packages import DependencyPackage
@@ -92,7 +79,7 @@ def get_project_dependency_packages(
         extra_package_names = set(
             get_extra_package_names(
                 repository.packages,
-                locked_extras,  # type: ignore[arg-type]
+                locked_extras,
                 extras or (),
             )
         )
