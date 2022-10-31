@@ -14,7 +14,15 @@ from poetry.core.packages.package import Package
 from poetry.factory import Factory
 from poetry.layouts import layout
 from poetry.repositories import Repository
-from poetry.repositories import RepositoryPool
+
+
+try:
+    from poetry.repositories.repository_pool import (  # type: ignore[import] # noqa: E501
+        RepositoryPool,
+    )
+except ImportError:  # poetry<1.3.0
+    from poetry.repositories.pool import Pool as RepositoryPool
+
 from poetry.utils.env import SystemEnv
 
 from tests.helpers import TestLocker
