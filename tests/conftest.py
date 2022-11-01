@@ -13,8 +13,16 @@ from poetry.config.dict_config_source import DictConfigSource
 from poetry.core.packages.package import Package
 from poetry.factory import Factory
 from poetry.layouts import layout
-from poetry.repositories import Pool
 from poetry.repositories import Repository
+
+
+try:
+    from poetry.repositories.repository_pool import (  # type: ignore[import] # noqa: E501
+        RepositoryPool,
+    )
+except ImportError:  # poetry<1.3.0
+    from poetry.repositories.pool import Pool as RepositoryPool
+
 from poetry.utils.env import SystemEnv
 
 from tests.helpers import TestLocker
@@ -177,7 +185,7 @@ def project_factory(
         poetry.set_locker(locker)
         poetry.set_config(config)
 
-        pool = Pool()
+        pool = RepositoryPool()
         pool.add_repository(repo)
 
         poetry.set_pool(pool)

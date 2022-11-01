@@ -8,7 +8,14 @@ from typing import Iterable
 
 from cleo.io.io import IO
 from poetry.core.packages.dependency_group import MAIN_GROUP
-from poetry.repositories.http import HTTPRepository
+
+
+try:
+    from poetry.repositories.http_repository import (  # type: ignore[import] # noqa: E501
+        HTTPRepository,
+    )
+except ImportError:  # poetry<1.3.0
+    from poetry.repositories.http import HTTPRepository
 
 from poetry_plugin_export.walker import get_project_dependency_packages
 
