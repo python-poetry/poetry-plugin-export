@@ -45,9 +45,8 @@ if TYPE_CHECKING:
 
 class Locker(BaseLocker):
     def __init__(self, fixture_root: Path) -> None:
-        self._lock = fixture_root / "poetry.lock"
+        super().__init__(fixture_root / "poetry.lock", {})
         self._locked = True
-        self._content_hash = self._get_content_hash()
 
     def locked(self, is_locked: bool = True) -> Locker:
         self._locked = is_locked
@@ -55,7 +54,7 @@ class Locker(BaseLocker):
         return self
 
     def mock_lock_data(self, data: dict[str, Any]) -> None:
-        self._lock_data = data
+        self._lock_data = data  # type: ignore[assignment]
 
     def is_locked(self) -> bool:
         return self._locked

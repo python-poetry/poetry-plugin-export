@@ -11,6 +11,7 @@ import pytest
 from poetry.config.config import Config as BaseConfig
 from poetry.config.dict_config_source import DictConfigSource
 from poetry.core.packages.package import Package
+from poetry.core.toml import TOMLFile
 from poetry.factory import Factory
 from poetry.layouts import layout
 from poetry.repositories import Repository
@@ -179,7 +180,13 @@ def project_factory(
 
         poetry = Factory().create_poetry(project_dir)
 
-        locker = TestLocker(poetry.locker.lock, poetry.locker._local_config)
+        lock = poetry.locker.lock
+        if isinstance(lock, TOMLFile):
+            # poetry < 1.3
+            lock_path = lock.path
+        else:
+            lock_path = lock
+        locker = TestLocker(lock_path, poetry.locker._local_config)
         locker.write()
 
         poetry.set_locker(locker)

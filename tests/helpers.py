@@ -3,21 +3,24 @@ from __future__ import annotations
 import os
 
 from contextlib import contextmanager
-from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Iterator
 
 from poetry.console.application import Application
+from poetry.core.toml import TOMLFile
 from poetry.factory import Factory
 from poetry.installation.executor import Executor
 from poetry.packages import Locker
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from poetry.core.packages.package import Package
     from poetry.installation.operations.operation import Operation
     from poetry.poetry import Poetry
+    from tomlkit.toml_document import TOMLDocument
 
 
 class PoetryTestApplication(Application):
@@ -31,17 +34,18 @@ class PoetryTestApplication(Application):
         self._poetry = Factory().create_poetry(poetry.file.path.parent)
         self._poetry.set_pool(poetry.pool)
         self._poetry.set_config(poetry.config)
-        self._poetry.set_locker(
-            TestLocker(poetry.locker.lock, self._poetry.local_config)
-        )
+        lock = poetry.locker.lock
+        if isinstance(lock, TOMLFile):
+            # poetry < 1.3
+            lock_path = lock.path
+        else:
+            lock_path = lock
+        self._poetry.set_locker(TestLocker(lock_path, self._poetry.local_config))
 
 
 class TestLocker(Locker):
     def __init__(self, lock: str | Path, local_config: dict[str, Any]) -> None:
-        self._lock = lock if isinstance(lock, Path) else Path(lock)
-        self._local_config = local_config
-        self._lock_data: dict[str, Any] | None = None
-        self._content_hash = self._get_content_hash()
+        super().__init__(lock, local_config)
         self._locked = False
         self._write = False
         self._contains_credential = False
@@ -60,12 +64,12 @@ class TestLocker(Locker):
     def mock_lock_data(self, data: dict[str, Any]) -> None:
         self.locked()
 
-        self._lock_data = data
+        self._lock_data = data  # type: ignore[assignment]
 
     def is_fresh(self) -> bool:
         return True
 
-    def _write_lock_data(self, data: dict[str, Any]) -> None:
+    def _write_lock_data(self, data: TOMLDocument) -> None:
         if self._write:
             super()._write_lock_data(data)
             self._locked = True
