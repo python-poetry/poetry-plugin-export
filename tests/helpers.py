@@ -3,20 +3,19 @@ from __future__ import annotations
 import os
 
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Iterator
+from typing import cast
 
 from poetry.console.application import Application
-from poetry.core.toml import TOMLFile
 from poetry.factory import Factory
 from poetry.installation.executor import Executor
 from poetry.packages import Locker
 
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from poetry.core.packages.package import Package
     from poetry.installation.operations.operation import Operation
     from poetry.poetry import Poetry
@@ -35,11 +34,11 @@ class PoetryTestApplication(Application):
         self._poetry.set_pool(poetry.pool)
         self._poetry.set_config(poetry.config)
         lock = poetry.locker.lock
-        if isinstance(lock, TOMLFile):
+        if isinstance(lock, Path):
+            lock_path = cast("Path", lock)
+        else:
             # poetry < 1.3
             lock_path = lock.path
-        else:
-            lock_path = lock
         self._poetry.set_locker(TestLocker(lock_path, self._poetry.local_config))
 
 

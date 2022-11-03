@@ -5,13 +5,13 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import cast
 
 import pytest
 
 from poetry.config.config import Config as BaseConfig
 from poetry.config.dict_config_source import DictConfigSource
 from poetry.core.packages.package import Package
-from poetry.core.toml import TOMLFile
 from poetry.factory import Factory
 from poetry.layouts import layout
 from poetry.repositories import Repository
@@ -181,11 +181,11 @@ def project_factory(
         poetry = Factory().create_poetry(project_dir)
 
         lock = poetry.locker.lock
-        if isinstance(lock, TOMLFile):
+        if isinstance(lock, Path):
+            lock_path = cast("Path", lock)
+        else:
             # poetry < 1.3
             lock_path = lock.path
-        else:
-            lock_path = lock
         locker = TestLocker(lock_path, poetry.locker._local_config)
         locker.write()
 
