@@ -3,20 +3,19 @@ from __future__ import annotations
 import os
 
 from contextlib import contextmanager
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Iterator
+from typing import cast
 
 from poetry.console.application import Application
-from poetry.core.toml.file import TOMLFile
 from poetry.factory import Factory
 from poetry.installation.executor import Executor
 from poetry.packages import Locker
 
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from poetry.core.packages.package import Package
     from poetry.installation.operations.operation import Operation
     from poetry.poetry import Poetry
@@ -34,17 +33,18 @@ class PoetryTestApplication(Application):
         self._poetry = Factory().create_poetry(poetry.file.path.parent)
         self._poetry.set_pool(poetry.pool)
         self._poetry.set_config(poetry.config)
-        self._poetry.set_locker(
-            TestLocker(poetry.locker.lock.path, self._poetry.local_config)
-        )
+        lock = poetry.locker.lock
+        if isinstance(lock, Path):
+            lock_path = cast("Path", lock)
+        else:
+            # poetry < 1.3
+            lock_path = lock.path
+        self._poetry.set_locker(TestLocker(lock_path, self._poetry.local_config))
 
 
 class TestLocker(Locker):
     def __init__(self, lock: str | Path, local_config: dict[str, Any]) -> None:
-        self._lock = TOMLFile(lock)
-        self._local_config = local_config
-        self._lock_data: TOMLDocument | None = None
-        self._content_hash = self._get_content_hash()
+        super().__init__(lock, local_config)
         self._locked = False
         self._write = False
         self._contains_credential = False

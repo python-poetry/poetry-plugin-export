@@ -9,7 +9,6 @@ from cleo.io.buffered_io import BufferedIO
 from cleo.io.null_io import NullIO
 from poetry.core.packages.dependency import Dependency
 from poetry.core.packages.dependency_group import MAIN_GROUP
-from poetry.core.toml.file import TOMLFile
 from poetry.core.version.markers import parse_marker
 from poetry.factory import Factory
 from poetry.packages import Locker as BaseLocker
@@ -46,9 +45,8 @@ if TYPE_CHECKING:
 
 class Locker(BaseLocker):
     def __init__(self, fixture_root: Path) -> None:
-        self._lock = TOMLFile(fixture_root / "poetry.lock")
+        super().__init__(fixture_root / "poetry.lock", {})
         self._locked = True
-        self._content_hash = self._get_content_hash()
 
     def locked(self, is_locked: bool = True) -> Locker:
         self._locked = is_locked

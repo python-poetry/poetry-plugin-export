@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
+from typing import cast
 
 import pytest
 
@@ -179,7 +180,13 @@ def project_factory(
 
         poetry = Factory().create_poetry(project_dir)
 
-        locker = TestLocker(poetry.locker.lock.path, poetry.locker._local_config)
+        lock = poetry.locker.lock
+        if isinstance(lock, Path):
+            lock_path = cast("Path", lock)
+        else:
+            # poetry < 1.3
+            lock_path = lock.path
+        locker = TestLocker(lock_path, poetry.locker._local_config)
         locker.write()
 
         poetry.set_locker(locker)
