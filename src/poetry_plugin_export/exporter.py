@@ -8,6 +8,8 @@ from typing import Iterable
 
 from cleo.io.io import IO
 from poetry.core.packages.dependency_group import MAIN_GROUP
+from pathlib import Path
+import os
 
 
 try:
@@ -211,6 +213,7 @@ class Exporter:
         if isinstance(output, IO):
             output.write(content)
         else:
+            Path(os.path.dirname(output)).mkdir(parents=True, exist_ok=True)
             with (cwd / output).open("w", encoding="utf-8") as txt:
                 txt.write(content)
 
