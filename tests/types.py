@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class CommandTesterFactory(Protocol):
     def __call__(
-        self: CommandTester,
+        self,
         command: str,
         poetry: Poetry | None = None,
         installer: Installer | None = None,

@@ -55,7 +55,7 @@ class ExportCommand(GroupCommand):
     def default_groups(self) -> set[str]:
         return {MAIN_GROUP}
 
-    def handle(self) -> None:
+    def handle(self) -> int:
         fmt = self.option("format")
 
         if not Exporter.is_format_supported(fmt):
@@ -105,3 +105,5 @@ class ExportCommand(GroupCommand):
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
         exporter.export(fmt, Path.cwd(), output or self.io)
+
+        return 0

@@ -5,7 +5,6 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import cast
 
 import pytest
 
@@ -15,15 +14,7 @@ from poetry.core.packages.package import Package
 from poetry.factory import Factory
 from poetry.layouts import layout
 from poetry.repositories import Repository
-
-
-try:
-    from poetry.repositories.repository_pool import (  # type: ignore[import] # noqa: E501
-        RepositoryPool,
-    )
-except ImportError:  # poetry<1.3.0
-    from poetry.repositories.pool import Pool as RepositoryPool
-
+from poetry.repositories.repository_pool import RepositoryPool
 from poetry.utils.env import SystemEnv
 
 from tests.helpers import TestLocker
@@ -180,13 +171,7 @@ def project_factory(
 
         poetry = Factory().create_poetry(project_dir)
 
-        lock = poetry.locker.lock
-        if isinstance(lock, Path):
-            lock_path = cast("Path", lock)
-        else:
-            # poetry < 1.3
-            lock_path = lock.path
-        locker = TestLocker(lock_path, poetry.locker._local_config)
+        locker = TestLocker(poetry.locker.lock, poetry.locker._local_config)
         locker.write()
 
         poetry.set_locker(locker)

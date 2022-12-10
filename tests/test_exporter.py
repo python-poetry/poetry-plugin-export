@@ -54,7 +54,7 @@ class Locker(BaseLocker):
         return self
 
     def mock_lock_data(self, data: dict[str, Any]) -> None:
-        self._lock_data = data  # type: ignore[assignment]
+        self._lock_data = data
 
     def is_locked(self) -> bool:
         return self._locked
