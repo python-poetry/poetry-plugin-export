@@ -3,11 +3,9 @@ from __future__ import annotations
 import os
 
 from contextlib import contextmanager
-from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
 from typing import Iterator
-from typing import cast
 
 from poetry.console.application import Application
 from poetry.factory import Factory
@@ -16,6 +14,8 @@ from poetry.packages import Locker
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from poetry.core.packages.package import Package
     from poetry.installation.operations.operation import Operation
     from poetry.poetry import Poetry
@@ -33,13 +33,9 @@ class PoetryTestApplication(Application):
         self._poetry = Factory().create_poetry(poetry.file.path.parent)
         self._poetry.set_pool(poetry.pool)
         self._poetry.set_config(poetry.config)
-        lock = poetry.locker.lock
-        if isinstance(lock, Path):
-            lock_path = cast("Path", lock)
-        else:
-            # poetry < 1.3
-            lock_path = lock.path
-        self._poetry.set_locker(TestLocker(lock_path, self._poetry.local_config))
+        self._poetry.set_locker(
+            TestLocker(poetry.locker.lock, self._poetry.local_config)
+        )
 
 
 class TestLocker(Locker):
@@ -63,7 +59,7 @@ class TestLocker(Locker):
     def mock_lock_data(self, data: dict[str, Any]) -> None:
         self.locked()
 
-        self._lock_data = data  # type: ignore[assignment]
+        self._lock_data = data
 
     def is_fresh(self) -> bool:
         return True

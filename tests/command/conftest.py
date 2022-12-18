@@ -6,6 +6,8 @@ import pytest
 
 from cleo.io.null_io import NullIO
 from cleo.testers.command_tester import CommandTester
+from poetry.console.commands.env_command import EnvCommand
+from poetry.console.commands.installer_command import InstallerCommand
 from poetry.installation import Installer
 from poetry.utils.env import MockEnv
 
@@ -64,12 +66,11 @@ def command_tester_factory(
             app._poetry = poetry
 
         poetry = app.poetry
-        cmd._pool = poetry.pool
 
-        if hasattr(cmd, "set_env"):
+        if isinstance(cmd, EnvCommand):
             cmd.set_env(environment or env)
 
-        if hasattr(cmd, "set_installer"):
+        if isinstance(cmd, InstallerCommand):
             installer = installer or Installer(
                 tester.io,
                 env,
