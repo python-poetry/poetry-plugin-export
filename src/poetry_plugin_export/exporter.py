@@ -8,6 +8,8 @@ from typing import Iterable
 
 from cleo.io.io import IO
 from poetry.core.packages.dependency_group import MAIN_GROUP
+from poetry.core.packages.utils.utils import create_nested_marker
+from poetry.core.version.markers import parse_marker
 from poetry.repositories.http_repository import HTTPRepository
 
 from poetry_plugin_export.walker import get_project_dependency_packages
@@ -93,11 +95,17 @@ class Exporter:
             list(self._groups), only=True
         )
 
+        python_marker = parse_marker(
+            create_nested_marker(
+                "python_version", self._poetry.package._python_constraint
+            )
+        )
+
         for dependency_package in get_project_dependency_packages(
             self._poetry.locker,
             project_requires=root.all_requires,
             root_package_name=root.name,
-            project_python_marker=root.python_marker,
+            project_python_marker=python_marker,
             extras=self._extras,
         ):
             line = ""
