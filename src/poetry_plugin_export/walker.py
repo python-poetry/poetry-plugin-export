@@ -52,6 +52,7 @@ def get_python_version_region_markers(packages: list[Package]) -> list[BaseMarke
 def get_project_dependency_packages(
     locker: Locker,
     project_requires: list[Dependency],
+    root_package_name: NormalizedName,
     project_python_marker: BaseMarker | None = None,
     extras: Collection[NormalizedName] = (),
 ) -> Iterator[DependencyPackage]:
@@ -96,6 +97,7 @@ def get_project_dependency_packages(
     for package, dependency in get_project_dependencies(
         project_requires=selected,
         locked_packages=repository.packages,
+        root_package_name=root_package_name,
     ):
         yield DependencyPackage(dependency=dependency, package=package)
 
@@ -103,6 +105,7 @@ def get_project_dependency_packages(
 def get_project_dependencies(
     project_requires: list[Dependency],
     locked_packages: list[Package],
+    root_package_name: NormalizedName,
 ) -> Iterable[tuple[Package, Dependency]]:
     # group packages entries by name, this is required because requirement might use
     # different constraints.
@@ -122,6 +125,7 @@ def get_project_dependencies(
     nested_dependencies = walk_dependencies(
         dependencies=project_requires,
         packages_by_name=packages_by_name,
+        root_package_name=root_package_name,
     )
 
     return nested_dependencies.items()
@@ -130,6 +134,7 @@ def get_project_dependencies(
 def walk_dependencies(
     dependencies: list[Dependency],
     packages_by_name: dict[str, list[Package]],
+    root_package_name: NormalizedName,
 ) -> dict[Package, Dependency]:
     nested_dependencies: dict[Package, Dependency] = {}
 
@@ -137,6 +142,8 @@ def walk_dependencies(
     while dependencies:
         requirement = dependencies.pop(0)
         if (requirement, requirement.marker) in visited:
+            continue
+        if requirement.name == root_package_name:
             continue
         visited.add((requirement, requirement.marker))
 

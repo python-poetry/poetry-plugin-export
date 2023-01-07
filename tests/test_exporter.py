@@ -1115,6 +1115,43 @@ foo==1.2.3 ; {MARKER_PY}
     assert content == expected
 
 
+def test_exporter_can_export_requirements_txt_with_circular_root_dependency(
+    tmp_path: Path, poetry: Poetry
+) -> None:
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "category": "main",
+                    "optional": False,
+                    "python-versions": "*",
+                    "dependencies": {poetry.package.pretty_name: {"version": "1.2.3"}},
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "files": {"foo": []},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry, NullIO())
+    exporter.export("requirements.txt", tmp_path, "requirements.txt")
+
+    with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = f"""\
+foo==1.2.3 ; {MARKER_PY}
+"""
+
+    assert content == expected
+
+
 def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_markers(
     tmp_path: Path, poetry: Poetry
 ) -> None:

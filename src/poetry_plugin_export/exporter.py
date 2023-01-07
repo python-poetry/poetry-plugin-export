@@ -95,6 +95,7 @@ class Exporter:
         for dependency_package in get_project_dependency_packages(
             self._poetry.locker,
             project_requires=root.all_requires,
+            root_package_name=root.name,
             project_python_marker=root.python_marker,
             extras=self._extras,
         ):
