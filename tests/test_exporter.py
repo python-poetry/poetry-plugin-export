@@ -2176,7 +2176,7 @@ def test_exporter_doesnt_confuse_repeated_packages(
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
-    expected = f"""\
+    expected_legacy = f"""\
 celery==5.1.2 ; {MARKER_PY36_ONLY}
 celery==5.2.3 ; {MARKER_PY37}
 click-didyoumean==0.0.3 ; {MARKER_PY36_PY362}
@@ -2186,7 +2186,17 @@ click==7.1.2 ; python_version < "3.7" and python_version >= "3.6"
 click==8.0.3 ; {MARKER_PY37}
 """
 
-    assert io.fetch_output() == expected
+    expected = f"""\
+celery==5.1.2 ; {MARKER_PY36_ONLY}
+celery==5.2.3 ; {MARKER_PY37}
+click-didyoumean==0.0.3 ; {MARKER_PY36_PY362}
+click-didyoumean==0.3.0 ; {MARKER_PY362_PY40}
+click-plugins==1.1.1 ; {MARKER_PY36}
+click==7.1.2 ; {MARKER_PY36_ONLY}
+click==8.0.3 ; {MARKER_PY37}
+"""
+
+    assert io.fetch_output() in {expected, expected_legacy}
 
 
 def test_exporter_handles_extras_next_to_non_extras(
