@@ -1,6 +1,17 @@
 # Change Log
 
 
+## [1.3.0] - 2023-01-30
+
+### Changed
+
+- Drop some compatibility code and bump minimum required poetry version to 1.3.0 ([#167](https://github.com/python-poetry/poetry-plugin-export/pull/167)).
+
+### Fixed
+
+- Fix an issue were the export failed if there was a circular dependency on the root package ([#118](https://github.com/python-poetry/poetry-plugin-export/pull/118)).
+
+
 ## [1.2.0] - 2022-11-05
 
 ### Changed
@@ -29,7 +40,7 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 
 ### Fixed
 
-- Fix an issue where a relative path passed via `-o` was not ìnterpreted relative to the current working directory ([#130](https://github.com/python-poetry/poetry-plugin-export/pull/130)).
+- Fix an issue where a relative path passed via `-o` was not interpreted relative to the current working directory ([#130](https://github.com/python-poetry/poetry-plugin-export/pull/130)).
 - Fix an issue where the names of extras were not normalized according to PEP 685 ([#123](https://github.com/python-poetry/poetry-plugin-export/pull/123)).
 
 
@@ -125,7 +136,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.2.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.3.0...main
+[1.3.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.3.0
 [1.2.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.2.0
 [1.1.2]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.1.2
 [1.1.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.1.1
