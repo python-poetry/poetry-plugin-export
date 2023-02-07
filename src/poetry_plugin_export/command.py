@@ -18,8 +18,10 @@ class ExportCommand(GroupCommand):
         option(
             "format",
             "f",
-            "Format to export to. Currently, only constraints.txt and requirements.txt"
-            " are supported.",
+            (
+                "Format to export to. Currently, only constraints.txt and"
+                " requirements.txt are supported."
+            ),
             flag=False,
             default=Exporter.FORMAT_REQUIREMENTS_TXT,
         ),
