@@ -6,7 +6,8 @@ import pytest
 
 
 def test_walk_dependencies_multiple_versions_when_latest_is_not_compatible():
-    # TODO: Support this case: https://github.com/python-poetry/poetry-plugin-export/issues/183
+    # TODO: Support this case:
+    # https://github.com/python-poetry/poetry-plugin-export/issues/183
     with pytest.raises(DependencyWalkerError):
         walk_dependencies(
             dependencies=[
