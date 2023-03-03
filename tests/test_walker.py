@@ -3,6 +3,7 @@ from poetry_plugin_export.walker import walk_dependencies, DependencyWalkerError
 from poetry.core.packages.dependency import Dependency
 from poetry.core.packages.package import Package
 import pytest
+from packaging.utils import NormalizedName
 
 
 def test_walk_dependencies_multiple_versions_when_latest_is_not_compatible() -> None:
@@ -18,5 +19,5 @@ def test_walk_dependencies_multiple_versions_when_latest_is_not_compatible() -> 
             packages_by_name={
                 "grpcio": [Package("grpcio", "1.51.3"), Package("grpcio", "1.49.1")]
             },
-            root_package_name="package-name",
+            root_package_name=NormalizedName("package-name"),
         )
