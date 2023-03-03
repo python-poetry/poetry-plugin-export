@@ -1,9 +1,11 @@
-from poetry_plugin_export.walker import walk_dependencies, DependencyWalkerError
+import pytest
 
+from packaging.utils import NormalizedName
 from poetry.core.packages.dependency import Dependency
 from poetry.core.packages.package import Package
-import pytest
-from packaging.utils import NormalizedName
+
+from poetry_plugin_export.walker import DependencyWalkerError
+from poetry_plugin_export.walker import walk_dependencies
 
 
 def test_walk_dependencies_multiple_versions_when_latest_is_not_compatible() -> None:
