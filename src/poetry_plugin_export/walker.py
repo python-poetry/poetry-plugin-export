@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Set
+from typing import TYPE_CHECKING
 
 from packaging.utils import canonicalize_name
 from poetry.core.constraints.version.util import constraint_regions
