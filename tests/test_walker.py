@@ -5,7 +5,7 @@ from poetry.core.packages.package import Package
 import pytest
 
 
-def test_walk_dependencies_multiple_versions_when_latest_is_not_compatible():
+def test_walk_dependencies_multiple_versions_when_latest_is_not_compatible() -> None:
     # TODO: Support this case:
     # https://github.com/python-poetry/poetry-plugin-export/issues/183
     with pytest.raises(DependencyWalkerError):
