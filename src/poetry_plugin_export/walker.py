@@ -242,10 +242,27 @@ def get_locked_package(
 
     # If we have an overlapping candidate, we must use it.
     if overlapping_candidates:
-        compatible_candidates = [
+        filtered_compatible_candidates = [
             package
             for package in compatible_candidates
             if package in overlapping_candidates
         ]
 
+        if not filtered_compatible_candidates:
+            # TODO: Support this case:
+            # https://github.com/python-poetry/poetry-plugin-export/issues/183
+            raise DependencyWalkerError(
+                f"The `{dependency.name}` package has the following compatible"
+                f" candidates `{compatible_candidates}`;  but, the exporter dependency"
+                f" walker previously elected `{overlapping_candidates.pop()}` which is"
+                f" not compatible with the dependency `{dependency}`. Please contribute"
+                " to `poetry-plugin-export` to solve this problem."
+            )
+
+        compatible_candidates = filtered_compatible_candidates
+
     return next(iter(compatible_candidates), None)
+
+
+class DependencyWalkerError(Exception):
+    pass
