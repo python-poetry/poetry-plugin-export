@@ -80,14 +80,17 @@ def poetry(fixture_root: Path, locker: Locker) -> Poetry:
     return p
 
 
-def set_package_requires(poetry: Poetry, skip: set[str] | None = None) -> None:
+def set_package_requires(
+    poetry: Poetry, skip: set[str] | None = None, dev: set[str] | None = None
+) -> None:
     skip = skip or set()
+    dev = dev or set()
     packages = poetry.locker.locked_repository().packages
     package = poetry.package.with_dependency_groups([], only=True)
     for pkg in packages:
         if pkg.name not in skip:
             dep = pkg.to_dependency()
-            if pkg.category == "dev":
+            if pkg.name in dev:
                 dep._groups = frozenset(["dev"])
             package.add_dependency(dep)
 
@@ -103,14 +106,12 @@ def test_exporter_can_export_requirements_txt_with_standard_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -147,7 +148,6 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "python_version < '3.7'",
@@ -155,7 +155,6 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "extra =='foo'",
@@ -163,7 +162,6 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
                 {
                     "name": "baz",
                     "version": "7.8.9",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "sys_platform == 'win32'",
@@ -204,7 +202,6 @@ def test_exporter_can_export_requirements_txt_poetry(
                 {
                     "name": "poetry",
                     "version": "1.1.4",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"keyring": "*"},
@@ -212,7 +209,6 @@ def test_exporter_can_export_requirements_txt_poetry(
                 {
                     "name": "junit-xml",
                     "version": "1.9",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"six": "*"},
@@ -220,7 +216,6 @@ def test_exporter_can_export_requirements_txt_poetry(
                 {
                     "name": "keyring",
                     "version": "21.8.0",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -233,7 +228,6 @@ def test_exporter_can_export_requirements_txt_poetry(
                 {
                     "name": "secretstorage",
                     "version": "3.3.0",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"cryptography": "*"},
@@ -241,7 +235,6 @@ def test_exporter_can_export_requirements_txt_poetry(
                 {
                     "name": "cryptography",
                     "version": "3.2",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"six": "*"},
@@ -249,7 +242,6 @@ def test_exporter_can_export_requirements_txt_poetry(
                 {
                     "name": "six",
                     "version": "1.15.0",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -325,7 +317,6 @@ def test_exporter_can_export_requirements_txt_pyinstaller(
                 {
                     "name": "pyinstaller",
                     "version": "4.0",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -339,14 +330,12 @@ def test_exporter_can_export_requirements_txt_pyinstaller(
                 {
                     "name": "altgraph",
                     "version": "0.17",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "macholib",
                     "version": "1.8",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"altgraph": ">=0.15"},
@@ -405,7 +394,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
                 {
                     "name": "a",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "python_version < '3.7'",
@@ -414,7 +402,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
                 {
                     "name": "b",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "platform_system == 'Windows'",
@@ -423,7 +410,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
                 {
                     "name": "c",
                     "version": "7.8.9",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "sys_platform == 'win32'",
@@ -432,7 +418,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
                 {
                     "name": "d",
                     "version": "0.0.1",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -500,14 +485,12 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
                 {
                     "name": "a",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "b",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"a": ">=1.2.3"},
@@ -554,14 +537,12 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -603,14 +584,12 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_sorted_
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -660,14 +639,12 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -708,14 +685,12 @@ def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -730,7 +705,7 @@ def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -755,14 +730,12 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -777,7 +750,7 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -805,14 +778,12 @@ def test_exporter_exports_requirements_txt_without_groups_if_set_explicitly(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -827,7 +798,7 @@ def test_exporter_exports_requirements_txt_without_groups_if_set_explicitly(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([])
@@ -848,14 +819,12 @@ def test_exporter_exports_requirements_txt_without_optional_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": True,
                     "python-versions": "*",
                 },
@@ -870,7 +839,7 @@ def test_exporter_exports_requirements_txt_without_optional_packages(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -912,14 +881,12 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": True,
                     "python-versions": "*",
                     "dependencies": {"spam": ">=0.1"},
@@ -927,7 +894,6 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
                 {
                     "name": "spam",
                     "version": "0.1.0",
-                    "category": "main",
                     "optional": True,
                     "python-versions": "*",
                 },
@@ -973,7 +939,6 @@ def test_exporter_can_export_requirements_txt_with_git_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1014,7 +979,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1026,7 +990,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -1069,7 +1032,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"bar": {"version": "4.5.6"}},
@@ -1077,7 +1039,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"baz": {"version": "7.8.9"}},
@@ -1085,7 +1046,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
                 {
                     "name": "baz",
                     "version": "7.8.9",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"foo": {"version": "1.2.3"}},
@@ -1124,7 +1084,6 @@ def test_exporter_can_export_requirements_txt_with_circular_root_dependency(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {poetry.package.pretty_name: {"version": "1.2.3"}},
@@ -1161,7 +1120,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -1180,7 +1138,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_
                 {
                     "name": "bar",
                     "version": "7.8.9",
-                    "category": "main",
                     "optional": True,
                     "python-versions": "*",
                     "dependencies": {
@@ -1193,7 +1150,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_
                 {
                     "name": "baz",
                     "version": "10.11.13",
-                    "category": "main",
                     "optional": True,
                     "python-versions": "*",
                 },
@@ -1235,7 +1191,6 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "python_version < '3.7'",
@@ -1277,7 +1232,6 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1318,7 +1272,6 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1330,7 +1283,6 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1342,7 +1294,6 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
                 {
                     "name": "baz",
                     "version": "7.8.9",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1385,7 +1336,6 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "python_version < '3.7'",
@@ -1428,7 +1378,6 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1470,7 +1419,6 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "marker": "python_version < '3.7'",
@@ -1519,14 +1467,12 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1546,7 +1492,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -1582,14 +1528,12 @@ def test_exporter_exports_requirements_txt_with_url_false(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1609,7 +1553,7 @@ def test_exporter_exports_requirements_txt_with_url_false(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -1644,7 +1588,6 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1663,7 +1606,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -1711,14 +1654,12 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
                 {
                     "name": "foo",
                     "version": "1.2.1",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "1.2.2",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -1733,7 +1674,6 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
                 {
                     "name": "baz",
                     "version": "1.2.3",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -1745,7 +1685,7 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"baz"})
 
     exporter = Exporter(poetry, NullIO())
     if dev:
@@ -1779,7 +1719,6 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1791,7 +1730,6 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1803,7 +1741,6 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
                 {
                     "name": "baz",
                     "version": "7.8.9",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1824,7 +1761,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar", "baz"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -1886,7 +1823,6 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1898,7 +1834,6 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1910,7 +1845,6 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
                 {
                     "name": "baz",
                     "version": "7.8.9",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -1931,7 +1865,7 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar", "baz"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -1974,14 +1908,12 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "dev",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -2001,7 +1933,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -2036,14 +1968,12 @@ def test_exporter_exports_requirements_txt_to_standard_output(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -2079,7 +2009,6 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 {
                     "name": "celery",
                     "version": "5.1.2",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "<3.7",
                     "dependencies": {
@@ -2091,7 +2020,6 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 {
                     "name": "celery",
                     "version": "5.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": ">=3.7",
                     "dependencies": {
@@ -2103,7 +2031,6 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 {
                     "name": "click",
                     "version": "7.1.2",
-                    "category": "main",
                     "optional": False,
                     "python-versions": (
                         ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
@@ -2112,7 +2039,6 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 {
                     "name": "click",
                     "version": "8.0.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": ">=3.6",
                     "dependencies": {},
@@ -2120,7 +2046,6 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 {
                     "name": "click-didyoumean",
                     "version": "0.0.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"click": "*"},
@@ -2128,7 +2053,6 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 {
                     "name": "click-didyoumean",
                     "version": "0.3.0",
-                    "category": "main",
                     "optional": False,
                     "python-versions": ">=3.6.2,<4.0.0",
                     "dependencies": {"click": ">=7"},
@@ -2136,7 +2060,6 @@ def test_exporter_doesnt_confuse_repeated_packages(
                 {
                     "name": "click-plugins",
                     "version": "1.1.1",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {"click": ">=4.0"},
@@ -2210,7 +2133,6 @@ def test_exporter_handles_extras_next_to_non_extras(
                     "name": "localstack",
                     "python-versions": "*",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {
                         "localstack-ext": [
@@ -2228,7 +2150,6 @@ def test_exporter_handles_extras_next_to_non_extras(
                     "name": "localstack-ext",
                     "python-versions": "*",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {
                         "something": "*",
@@ -2250,7 +2171,6 @@ def test_exporter_handles_extras_next_to_non_extras(
                     "name": "something",
                     "python-versions": "*",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {},
                 },
@@ -2258,7 +2178,6 @@ def test_exporter_handles_extras_next_to_non_extras(
                     "name": "something-else",
                     "python-versions": "*",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {},
                 },
@@ -2266,7 +2185,6 @@ def test_exporter_handles_extras_next_to_non_extras(
                     "name": "another-thing",
                     "python-versions": "*",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {},
                 },
@@ -2323,7 +2241,6 @@ def test_exporter_handles_overlapping_python_versions(
                     "name": "ipython",
                     "python-versions": ">=3.6",
                     "version": "7.16.3",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {},
                 },
@@ -2331,7 +2248,6 @@ def test_exporter_handles_overlapping_python_versions(
                     "name": "ipython",
                     "python-versions": ">=3.7",
                     "version": "7.34.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {},
                 },
@@ -2339,7 +2255,6 @@ def test_exporter_handles_overlapping_python_versions(
                     "name": "slash",
                     "python-versions": ">=3.6.*",
                     "version": "1.13.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {
                         "ipython": [
@@ -2437,7 +2352,6 @@ def test_exporter_omits_unwanted_extras(
                     "name": "foo",
                     "python-versions": ">=3.6",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {"pytest": {"version": "^6.2.4", "optional": True}},
                     "extras": {"test": ["pytest (>=6.2.4,<7.0.0)"]},
@@ -2446,7 +2360,6 @@ def test_exporter_omits_unwanted_extras(
                     "name": "pytest",
                     "python-versions": ">=3.6",
                     "version": "6.24.0",
-                    "category": "dev",
                     "optional": False,
                     "dependencies": {},
                 },
@@ -2521,7 +2434,6 @@ def test_exporter_omits_and_includes_extras_for_txt_formats(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -2534,7 +2446,6 @@ def test_exporter_omits_and_includes_extras_for_txt_formats(
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -2549,7 +2460,6 @@ def test_exporter_omits_and_includes_extras_for_txt_formats(
                 {
                     "name": "baz",
                     "version": "7.8.9",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
@@ -2581,7 +2491,6 @@ def test_exporter_prints_warning_for_constraints_txt_with_editable_packages(
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -2594,14 +2503,12 @@ def test_exporter_prints_warning_for_constraints_txt_with_editable_packages(
                 {
                     "name": "bar",
                     "version": "7.8.9",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
                 {
                     "name": "baz",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "source": {
@@ -2648,7 +2555,6 @@ def test_exporter_respects_package_sources(tmp_path: Path, poetry: Poetry) -> No
                     "name": "foo",
                     "python-versions": ">=3.6",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {},
                     "source": {
@@ -2660,7 +2566,6 @@ def test_exporter_respects_package_sources(tmp_path: Path, poetry: Poetry) -> No
                     "name": "foo",
                     "python-versions": ">=3.6",
                     "version": "1.0.0",
-                    "category": "main",
                     "optional": False,
                     "dependencies": {},
                     "source": {
@@ -2724,7 +2629,6 @@ def test_exporter_tolerates_non_existent_extra(tmp_path: Path, poetry: Poetry) -
                 {
                     "name": "foo",
                     "version": "1.2.3",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                     "dependencies": {
@@ -2739,7 +2643,6 @@ def test_exporter_tolerates_non_existent_extra(tmp_path: Path, poetry: Poetry) -
                 {
                     "name": "bar",
                     "version": "4.5.6",
-                    "category": "main",
                     "optional": False,
                     "python-versions": "*",
                 },
