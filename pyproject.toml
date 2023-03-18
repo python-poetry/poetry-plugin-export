@@ -17,7 +17,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 poetry = "^1.5.0"
 poetry-core = "^1.6.0"
 
@@ -45,7 +45,7 @@ fix = true
 unfixable = [
     "ERA", # do not autoremove commented out code
 ]
-target-version = "py37"
+target-version = "py38"
 line-length = 88
 extend-select = [
     "B",   # flake8-bugbear
@@ -79,7 +79,7 @@ required-imports = ["from __future__ import annotations"]
 
 
 [tool.black]
-target-version = ['py37']
+target-version = ['py38']
 preview = true
 
 [tool.mypy]
@@ -94,9 +94,9 @@ strict = true
 files = ["src", "tests"]
 exclude = ["^tests/fixtures/"]
 
-# use of importlib-metadata backport at python3.7 makes it impossible to
-# satisfy mypy without some ignores: but we get a different set of ignores at
-# different python versions.
+# use of importlib-metadata backport makes it impossible to satisfy mypy
+# without some ignores: but we get a different set of ignores at different
+# python versions.
 #
 # <https://github.com/python/mypy/issues/8823>, meanwhile suppress that
 # warning.
