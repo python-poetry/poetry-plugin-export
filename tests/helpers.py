@@ -39,7 +39,7 @@ class PoetryTestApplication(Application):
 
 
 class TestLocker(Locker):
-    def __init__(self, lock: str | Path, local_config: dict[str, Any]) -> None:
+    def __init__(self, lock: Path, local_config: dict[str, Any]) -> None:
         super().__init__(lock, local_config)
         self._locked = False
         self._write = False
