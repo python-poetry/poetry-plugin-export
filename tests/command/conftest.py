@@ -81,7 +81,6 @@ def command_tester_factory(
                 executor=executor
                 or TestExecutor(env, poetry.pool, poetry.config, tester.io),
             )
-            installer.use_executor(True)
             cmd.set_installer(installer)
 
         return tester
