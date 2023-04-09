@@ -199,7 +199,12 @@ class Exporter:
 
                 parsed_url = urllib.parse.urlsplit(url)
                 if parsed_url.scheme == "http":
-                    trusted_hosts.append(parsed_url.netloc)
+                    netloc = (
+                        parsed_url.netloc.split("@")[1]
+                        if "@" in parsed_url
+                        else parsed_url.netloc
+                    )
+                    trusted_hosts.append(netloc)
 
                 if repository is not self._poetry.pool.repositories[0]:
                     indexes_header += f"--extra-index-url {url}\n"
