@@ -39,6 +39,37 @@ pytest-github-actions-annotate-failures = "^0.1.7"
 [tool.poetry.plugins."poetry.application.plugin"]
 export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
 
+
+[tool.ruff]
+fix = true
+unfixable = [
+    "ERA",  # do not autoremove commented out code
+]
+target-version = "py37"
+line-length = 88
+extend-select = [
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "ERA",  # flake8-eradicate/eradicate
+    "PIE",  # flake8-pie
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "TCH",  # flake8-type-checking
+    "N",  # pep8-naming
+    "RUF",  # ruff checks
+]
+ignore = [
+    "B904",  # use 'raise ... from err'
+    "B905",  # use explicit 'strict=' parameter with 'zip()'
+    "N818"  #  Exception name should be named with an Error suffix
+]
+extend-exclude = [
+    "docs/*",
+    # External to the project's coding standards
+    "tests/**/fixtures/*",
+]
+
+
 [tool.black]
 target-version = ['py37']
 preview = true
