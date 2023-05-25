@@ -173,7 +173,7 @@ class Exporter:
             for index in sorted(indexes):
                 repositories = [
                     r
-                    for r in self._poetry.pool.repositories
+                    for r in self._poetry.pool.all_repositories
                     if isinstance(r, HTTPRepository) and r.url == index.rstrip("/")
                 ]
                 if not repositories:

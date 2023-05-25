@@ -2663,3 +2663,60 @@ def test_exporter_tolerates_non_existent_extra(tmp_path: Path, poetry: Poetry) -
 foo[baz]==1.2.3 ; {MARKER_PY27} or {MARKER_PY36}
 """
     assert content == expected
+
+
+def test_exporter_exports_extra_index_url_and_trusted_host(
+    tmp_path: Path, poetry: Poetry
+) -> None:
+    poetry.pool.add_repository(
+        LegacyRepository(
+            "custom",
+            "http://example.com/simple",
+        ),
+        priority=Priority.EXPLICIT,
+    )
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "optional": False,
+                    "python-versions": "*",
+                    "dependencies": {"bar": "*"},
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "legacy",
+                        "url": "http://example.com/simple",
+                        "reference": "",
+                    },
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "files": {"foo": [], "bar": []},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry, NullIO())
+    exporter.export("requirements.txt", tmp_path, "requirements.txt")
+
+    with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = f"""\
+--trusted-host example.com
+--extra-index-url http://example.com/simple
+
+bar==4.5.6 ; {MARKER_PY}
+foo==1.2.3 ; {MARKER_PY}
+"""
+    assert content == expected
