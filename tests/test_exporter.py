@@ -2720,3 +2720,79 @@ bar==4.5.6 ; {MARKER_PY}
 foo==1.2.3 ; {MARKER_PY}
 """
     assert content == expected
+
+
+def test_exporter_not_confused_by_extras_in_sub_dependencies(
+    tmp_path: Path, poetry: Poetry
+) -> None:
+    # Testcase derived from
+    # https://github.com/python-poetry/poetry-plugin-export/issues/208
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "typer",
+                    "python-versions": ">=3.6",
+                    "version": "0.9.0",
+                    "optional": False,
+                    "files": [],
+                    "dependencies": {
+                        "click": ">=7.1.1,<9.0.0",
+                        "colorama": {
+                            "version": ">=0.4.3,<0.5.0",
+                            "optional": True,
+                            "markers": 'extra == "all"',
+                        },
+                    },
+                    "extras": {"all": ["colorama (>=0.4.3,<0.5.0)"]},
+                },
+                {
+                    "name": "click",
+                    "python-versions": ">=3.7",
+                    "version": "8.1.3",
+                    "optional": False,
+                    "files": [],
+                    "dependencies": {
+                        "colorama": {
+                            "version": "*",
+                            "markers": 'platform_system == "Windows"',
+                        }
+                    },
+                },
+                {
+                    "name": "colorama",
+                    "python-versions": ">=3.7",
+                    "version": "0.4.6",
+                    "optional": False,
+                    "files": [],
+                },
+            ],
+            "metadata": {
+                "lock-version": "2.0",
+                "python-versions": "^3.11",
+                "content-hash": (
+                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+                ),
+            },
+        }
+    )
+    root = poetry.package.with_dependency_groups([], only=True)
+    root.python_versions = "^3.11"
+    root.add_dependency(
+        Factory.create_dependency(
+            name="typer",
+            constraint={"version": "^0.9.0", "extras": ["all"]},
+        )
+    )
+    poetry._package = root
+
+    io = BufferedIO()
+    exporter = Exporter(poetry, NullIO())
+    exporter.export("requirements.txt", tmp_path, io)
+
+    expected = """\
+click==8.1.3 ; python_version >= "3.11" and python_version < "4.0"
+colorama==0.4.6 ; python_version >= "3.11" and python_version < "4.0"
+typer[all]==0.9.0 ; python_version >= "3.11" and python_version < "4.0"
+"""
+    assert io.fetch_output() == expected
