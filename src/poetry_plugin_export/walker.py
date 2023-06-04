@@ -173,7 +173,7 @@ def walk_dependencies(
             ):
                 continue
 
-            base_marker = require.marker.intersect(requirement.marker.without_extras())
+            base_marker = require.marker.intersect(requirement.marker).without_extras()
 
             if not base_marker.is_empty():
                 # So as to give ourselves enough flexibility in choosing a solution,
