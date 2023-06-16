@@ -40,7 +40,7 @@ class ExportCommand(GroupCommand):
         option(
             "with",
             None,
-            # note: unlike poetry install, the default excludes all groups (including non-optional)
+            # note: unlike poetry install, the default excludes non-optional groups
             (
                 "The optional and non-optional dependency groups to include."
                 " By default, only the main dependencies are included."
@@ -58,7 +58,7 @@ class ExportCommand(GroupCommand):
         option(
             "without",
             None,
-            # deprecated: since groups are always excluded by default, this option serves no purpose.
+            # deprecated: groups are always excluded by default
             "The dependency groups to ignore. (<warning>Deprecated</warning>)",
             flag=False,
             multiple=True,
