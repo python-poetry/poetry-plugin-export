@@ -69,8 +69,8 @@ poetry export --only test,docs
 * `--output (-o)`: The name of the output file.  If omitted, print to standard output.
 * `--with`: The optional and non-optional dependency groups to include. By default, only the main dependencies are included.
 * `--only`: The only dependency groups to include.
-* * `--without`: The dependency groups to ignore. (**Deprecated**)
-* `--default`: Only export the main dependencies. (**Deprecated**)
+* {{< option name="without" deprecated=true >}}The dependency groups to ignore.{{< /option >}}
+* {{< option name="default" deprecated=true >}}Only export the main dependencies.{{< /option >}}
 * {{< option name="dev" deprecated=true >}}Include development dependencies.{{< /option >}}
 * `--extras (-E)`: Extra sets of dependencies to include.
 * `--without-hashes`: Exclude hashes from the exported file.
