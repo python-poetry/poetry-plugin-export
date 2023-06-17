@@ -946,6 +946,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages(
                         "type": "git",
                         "url": "https://github.com/foo/foo.git",
                         "reference": "123456",
+                        "resolved_reference": "abcdef",
                     },
                 }
             ],
@@ -965,7 +966,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages(
         content = f.read()
 
     expected = f"""\
-foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY}
+foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
 """
 
     assert content == expected
@@ -986,6 +987,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
                         "type": "git",
                         "url": "https://github.com/foo/foo.git",
                         "reference": "123456",
+                        "resolved_reference": "abcdef",
                     },
                 },
                 {
@@ -1018,7 +1020,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
 
     expected = f"""\
 bar==4.5.6 ; {MARKER_PY}
-foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY}
+foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
 """
 
     assert content == expected
@@ -1199,6 +1201,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
                         "type": "git",
                         "url": "https://github.com/foo/foo.git",
                         "reference": "123456",
+                        "resolved_reference": "abcdef",
                     },
                 }
             ],
@@ -1218,7 +1221,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
         content = f.read()
 
     expected = f"""\
-foo @ git+https://github.com/foo/foo.git@123456 ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
+foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
 """
 
     assert content == expected

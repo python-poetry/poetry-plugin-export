@@ -118,7 +118,7 @@ class Exporter:
                     continue
                 line += "-e "
 
-            requirement = dependency.to_pep_508(with_extras=False)
+            requirement = dependency.to_pep_508(with_extras=False, resolved=True)
             is_direct_local_reference = (
                 dependency.is_file() or dependency.is_directory()
             )
