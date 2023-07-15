@@ -1,5 +1,7 @@
 # Poetry Plugin: Export
 
+[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
+
 This package is a plugin that allows the export of locked packages to various formats.
 
 **Note**: For now, only the `constraints.txt` and `requirements.txt` formats are available.
