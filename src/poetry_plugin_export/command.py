@@ -39,10 +39,8 @@ class ExportCommand(GroupCommand):
             "with",
             None,
             # note: unlike poetry install, the default excludes non-optional groups
-            (
-                "The optional and non-optional dependency groups to include."
-                " By default, only the main dependencies are included."
-            ),
+            "The optional and non-optional dependency groups to include."
+            " By default, only the main dependencies are included.",
             flag=False,
             multiple=True,
         ),
