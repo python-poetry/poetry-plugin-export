@@ -14,14 +14,12 @@ class ExportCommand(GroupCommand):
     name = "export"
     description = "Exports the lock file to alternative formats."
 
-    options = [
+    options = [  # noqa: RUF012
         option(
             "format",
             "f",
-            (
-                "Format to export to. Currently, only constraints.txt and"
-                " requirements.txt are supported."
-            ),
+            "Format to export to. Currently, only constraints.txt and"
+            " requirements.txt are supported.",
             flag=False,
             default=Exporter.FORMAT_REQUIREMENTS_TXT,
         ),
@@ -106,10 +104,9 @@ class ExportCommand(GroupCommand):
         if not locker.is_fresh():
             self.line_error(
                 "<warning>"
-                "Warning: The lock file is not up to date with "
-                "the latest changes in pyproject.toml. "
-                "You may be getting outdated dependencies. "
-                "Run update to update them."
+                "Warning: poetry.lock is not consistent with pyproject.toml. "
+                "You may be getting improper dependencies. "
+                "Run `poetry lock [--no-update]` to fix it."
                 "</warning>"
             )
 

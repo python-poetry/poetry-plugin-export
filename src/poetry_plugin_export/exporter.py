@@ -16,6 +16,7 @@ from poetry_plugin_export.walker import get_project_dependency_packages
 if TYPE_CHECKING:
     from collections.abc import Collection
     from pathlib import Path
+    from typing import ClassVar
 
     from packaging.utils import NormalizedName
     from poetry.poetry import Poetry
@@ -30,7 +31,7 @@ class Exporter:
     FORMAT_REQUIREMENTS_TXT = "requirements.txt"
     ALLOWED_HASH_ALGORITHMS = ("sha256", "sha384", "sha512")
 
-    EXPORT_METHODS = {
+    EXPORT_METHODS: ClassVar[dict[str, str]] = {
         FORMAT_CONSTRAINTS_TXT: "_export_constraints_txt",
         FORMAT_REQUIREMENTS_TXT: "_export_requirements_txt",
     }
