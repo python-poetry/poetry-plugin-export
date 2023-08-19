@@ -1,6 +1,18 @@
 # Change Log
 
 
+## [1.5.0] - 2023-08-20
+
+### Changed
+
+- Drop support for Python 3.7 ([#189](https://github.com/python-poetry/poetry-plugin-export/pull/189)).
+- Improve warning when the lock file is not consistent with pyproject.toml ([#215](https://github.com/python-poetry/poetry-plugin-export/pull/215)).
+
+### Fixed
+
+- Fix an issue where markers for dependencies required by an extra were not generated correctly ([#209](https://github.com/python-poetry/poetry-plugin-export/pull/209)).
+
+
 ## [1.4.0] - 2023-05-29
 
 ### Changed
@@ -156,7 +168,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.4.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.5.0...main
+[1.5.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.5.0
 [1.4.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.4.0
 [1.3.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.3.1
 [1.3.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.3.0
