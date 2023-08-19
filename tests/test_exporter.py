@@ -447,7 +447,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
         "b": Dependency.create_from_pep_508(f"b==4.5.6 ; {marker_py_windows}"),
         "c": Dependency.create_from_pep_508(f"c==7.8.9 ; {marker_py_win32}"),
         "d": Dependency.create_from_pep_508(
-            f"d==0.0.1 ; {marker_py_win32.union(marker_py_windows)}"
+            f"d==0.0.1 ; {marker_py_windows.union(marker_py_win32)}"
         ),
     }
 
