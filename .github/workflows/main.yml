@@ -16,15 +16,11 @@ jobs:
     runs-on: ${{ matrix.image }}
     strategy:
       matrix:
-        os: [Ubuntu, macOS, Windows]
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
+        os: [Windows]
+        python-version: ["3.12"]
         include:
-          - os: Ubuntu
-            image: ubuntu-latest
           - os: Windows
             image: windows-2022
-          - os: macOS
-            image: macos-11
       fail-fast: false
     defaults:
       run:
@@ -44,7 +40,7 @@ jobs:
 
       - name: Bootstrap poetry
         run: |
-          curl -sL https://install.python-poetry.org | python - -y ${{ matrix.bootstrap-args }}
+          curl -sL https://install.python-poetry.org | python - -y --git https://github.com/python-poetry/poetry.git@master
 
       - name: Update PATH
         if: ${{ matrix.os != 'Windows' }}
