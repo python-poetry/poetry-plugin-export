@@ -25,6 +25,7 @@ MARKER_PY36_ONLY = parse_marker('python_version >= "3.6" and python_version < "3
 MARKER_PY37 = parse_marker('python_version >= "3.7" and python_version < "4.0"')
 
 MARKER_PY = MARKER_PY27.union(MARKER_PY36)
+MARKER_PY27_PY36_ONLY = MARKER_PY27.union(MARKER_PY36_ONLY)
 
 MARKER_PY_WIN32 = MARKER_PY.intersect(MARKER_WIN32)
 MARKER_PY_WINDOWS = MARKER_PY.intersect(MARKER_WINDOWS)

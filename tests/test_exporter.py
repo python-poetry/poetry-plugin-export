@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from textwrap import dedent
 from typing import TYPE_CHECKING
 from typing import Any
 
@@ -21,6 +22,7 @@ from tests.markers import MARKER_DARWIN
 from tests.markers import MARKER_LINUX
 from tests.markers import MARKER_PY
 from tests.markers import MARKER_PY27
+from tests.markers import MARKER_PY27_PY36_ONLY
 from tests.markers import MARKER_PY36
 from tests.markers import MARKER_PY36_38
 from tests.markers import MARKER_PY36_ONLY
@@ -132,10 +134,10 @@ def test_exporter_can_export_requirements_txt_with_standard_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-foo==1.2.3 ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY}
+        foo==1.2.3 ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -183,11 +185,11 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-baz==7.8.9 ; {MARKER_PY_WIN32}
-foo==1.2.3 ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY}
+        baz==7.8.9 ; {MARKER_PY_WIN32}
+        foo==1.2.3 ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
+        """)
 
     assert content == expected
 
@@ -566,12 +568,12 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -619,14 +621,14 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_sorted_
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:12345 \\
-    --hash=sha256:67890
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345 \\
-    --hash=sha256:67890
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:12345 \\
+            --hash=sha256:67890
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345 \\
+            --hash=sha256:67890
+        """)
 
     assert content == expected
 
@@ -669,10 +671,10 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-foo==1.2.3 ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY}
+        foo==1.2.3 ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -714,10 +716,10 @@ def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+    expected = dedent(f"""\
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -760,12 +762,12 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -849,10 +851,10 @@ def test_exporter_exports_requirements_txt_without_optional_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+    expected = dedent(f"""\
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -965,9 +967,9 @@ def test_exporter_can_export_requirements_txt_with_git_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1018,10 +1020,10 @@ def test_exporter_can_export_requirements_txt_with_nested_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY}
+        foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1069,11 +1071,11 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-baz==7.8.9 ; {MARKER_PY}
-foo==1.2.3 ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY}
+        baz==7.8.9 ; {MARKER_PY}
+        foo==1.2.3 ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1107,9 +1109,9 @@ def test_exporter_can_export_requirements_txt_with_circular_root_dependency(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo==1.2.3 ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        foo==1.2.3 ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1176,11 +1178,11 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_
     marker_py_not_windows = MARKER_PY.intersect(
         parse_marker('platform_system != "Windows"')
     )
-    expected = f"""\
-bar==7.8.9 ; {marker_py_not_windows.union(MARKER_PY_WINDOWS)}
-baz==10.11.13 ; {MARKER_PY_WINDOWS}
-foo==1.2.3 ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        bar==7.8.9 ; {marker_py_not_windows.union(MARKER_PY_WINDOWS)}
+        baz==10.11.13 ; {MARKER_PY_WINDOWS}
+        foo==1.2.3 ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1220,9 +1222,9 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
-"""
+    expected = dedent(f"""\
+        foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY27_PY36_ONLY}
+        """)
 
     assert content == expected
 
@@ -1260,9 +1262,9 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1322,11 +1324,11 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar @ {fixture_root_uri}/project_with_nested_local/bar ; {MARKER_PY}
-baz @ {fixture_root_uri}/project_with_nested_local ; {MARKER_PY}
-foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        bar @ {fixture_root_uri}/project_with_nested_local/bar ; {MARKER_PY}
+        baz @ {fixture_root_uri}/project_with_nested_local ; {MARKER_PY}
+        foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1365,10 +1367,9 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo @ {fixture_root_uri}/sample_project ;\
- {MARKER_PY27.union(MARKER_PY36_ONLY)}
-"""
+    expected = dedent(f"""\
+        foo @ {fixture_root_uri}/sample_project ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
+        """)
 
     assert content == expected
 
@@ -1406,10 +1407,9 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo @ {fixture_root_uri}/distributions/demo-0.1.0.tar.gz ;\
- {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        foo @ {fixture_root_uri}/distributions/demo-0.1.0.tar.gz ; {MARKER_PY}
+        """)
 
     assert content == expected
 
@@ -1449,9 +1449,9 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
         content = f.read()
 
     uri = f"{fixture_root_uri}/distributions/demo-0.1.0.tar.gz"
-    expected = f"""\
-foo @ {uri} ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
-"""
+    expected = dedent(f"""\
+        foo @ {uri} ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
+        """)
 
     assert content == expected
 
@@ -1505,14 +1505,14 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
---extra-index-url https://example.com/simple
+    expected = dedent(f"""\
+        --extra-index-url https://example.com/simple
 
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -1567,12 +1567,12 @@ def test_exporter_exports_requirements_txt_with_url_false(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -1618,13 +1618,13 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
---trusted-host example.com
---extra-index-url http://example.com/simple
+    expected = dedent(f"""\
+        --trusted-host example.com
+        --extra-index-url http://example.com/simple
 
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-"""
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        """)
 
     assert content == expected
 
@@ -1774,17 +1774,17 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
---extra-index-url https://example.com/simple
---extra-index-url https://foobaz.com/simple
+    expected = dedent(f"""\
+        --extra-index-url https://example.com/simple
+        --extra-index-url https://foobaz.com/simple
 
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-baz==7.8.9 ; {MARKER_PY} \\
-    --hash=sha256:24680
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        baz==7.8.9 ; {MARKER_PY} \\
+            --hash=sha256:24680
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -1879,17 +1879,17 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
---extra-index-url https://foo:bar@a.example.com/simple
---index-url https://baz:qux@b.example.com/simple
+    expected = dedent(f"""\
+        --extra-index-url https://foo:bar@a.example.com/simple
+        --index-url https://baz:qux@b.example.com/simple
 
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-baz==7.8.9 ; {MARKER_PY} \\
-    --hash=sha256:24680
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        baz==7.8.9 ; {MARKER_PY} \\
+            --hash=sha256:24680
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -1951,14 +1951,14 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
---extra-index-url https://foo:bar@example.com/simple
+    expected = dedent(f"""\
+        --extra-index-url https://foo:bar@example.com/simple
 
-bar==4.5.6 ; {MARKER_PY} \\
-    --hash=sha256:67890
-foo==1.2.3 ; {MARKER_PY} \\
-    --hash=sha256:12345
-"""
+        bar==4.5.6 ; {MARKER_PY} \\
+            --hash=sha256:67890
+        foo==1.2.3 ; {MARKER_PY} \\
+            --hash=sha256:12345
+        """)
 
     assert content == expected
 
@@ -1995,10 +1995,10 @@ def test_exporter_exports_requirements_txt_to_standard_output(
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
-    expected = f"""\
-bar==4.5.6 ; {MARKER_PY}
-foo==1.2.3 ; {MARKER_PY}
-"""
+    expected = dedent(f"""\
+        bar==4.5.6 ; {MARKER_PY}
+        foo==1.2.3 ; {MARKER_PY}
+        """)
 
     assert io.fetch_output() == expected
 
@@ -2103,15 +2103,15 @@ def test_exporter_doesnt_confuse_repeated_packages(
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
-    expected = f"""\
-celery==5.1.2 ; {MARKER_PY36_ONLY}
-celery==5.2.3 ; {MARKER_PY37}
-click-didyoumean==0.0.3 ; {MARKER_PY36_PY362}
-click-didyoumean==0.3.0 ; {MARKER_PY362_PY40}
-click-plugins==1.1.1 ; {MARKER_PY36}
-click==7.1.2 ; {MARKER_PY36_ONLY}
-click==8.0.3 ; {MARKER_PY37}
-"""
+    expected = dedent(f"""\
+        celery==5.1.2 ; {MARKER_PY36_ONLY}
+        celery==5.2.3 ; {MARKER_PY37}
+        click-didyoumean==0.0.3 ; {MARKER_PY36_PY362}
+        click-didyoumean==0.3.0 ; {MARKER_PY362_PY40}
+        click-plugins==1.1.1 ; {MARKER_PY36}
+        click==7.1.2 ; {MARKER_PY36_ONLY}
+        click==8.0.3 ; {MARKER_PY37}
+        """)
 
     assert io.fetch_output() == expected
 
@@ -2212,13 +2212,13 @@ def test_exporter_handles_extras_next_to_non_extras(
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
-    expected = f"""\
-localstack-ext==1.0.0 ; {MARKER_PY36}
-localstack-ext[bar]==1.0.0 ; {MARKER_PY36}
-localstack[foo]==1.0.0 ; {MARKER_PY36}
-something-else==1.0.0 ; {MARKER_PY36}
-something==1.0.0 ; {MARKER_PY36}
-"""
+    expected = dedent(f"""\
+        localstack-ext==1.0.0 ; {MARKER_PY36}
+        localstack-ext[bar]==1.0.0 ; {MARKER_PY36}
+        localstack[foo]==1.0.0 ; {MARKER_PY36}
+        something-else==1.0.0 ; {MARKER_PY36}
+        something==1.0.0 ; {MARKER_PY36}
+        """)
 
     assert io.fetch_output() == expected
 
@@ -2312,11 +2312,11 @@ def test_exporter_handles_overlapping_python_versions(
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
-    expected = f"""\
-ipython==7.16.3 ; {MARKER_PY36_ONLY}
-ipython==7.34.0 ; {MARKER_PY37}
-slash==1.13.0 ; {MARKER_PY36} and {MARKER_CPYTHON}
-"""
+    expected = dedent(f"""\
+        ipython==7.16.3 ; {MARKER_PY36_ONLY}
+        ipython==7.34.0 ; {MARKER_PY37}
+        slash==1.13.0 ; {MARKER_PY36} and {MARKER_CPYTHON}
+        """)
 
     assert io.fetch_output() == expected
 
@@ -2606,10 +2606,10 @@ def test_exporter_respects_package_sources(tmp_path: Path, poetry: Poetry) -> No
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, io)
 
-    expected = f"""\
-foo @ https://example.com/foo-darwin.whl ; {MARKER_PY36} and {MARKER_DARWIN}
-foo @ https://example.com/foo-linux.whl ; {MARKER_PY36} and {MARKER_LINUX}
-"""
+    expected = dedent(f"""\
+        foo @ https://example.com/foo-darwin.whl ; {MARKER_PY36} and {MARKER_DARWIN}
+        foo @ https://example.com/foo-linux.whl ; {MARKER_PY36} and {MARKER_LINUX}
+        """)
 
     assert io.fetch_output() == expected
 
@@ -2662,9 +2662,9 @@ def test_exporter_tolerates_non_existent_extra(tmp_path: Path, poetry: Poetry) -
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
-foo[baz]==1.2.3 ; {MARKER_PY27} or {MARKER_PY36}
-"""
+    expected = dedent(f"""\
+        foo[baz]==1.2.3 ; {MARKER_PY27} or {MARKER_PY36}
+        """)
     assert content == expected
 
 
@@ -2715,13 +2715,13 @@ def test_exporter_exports_extra_index_url_and_trusted_host(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    expected = f"""\
---trusted-host example.com
---extra-index-url http://example.com/simple
+    expected = dedent(f"""\
+        --trusted-host example.com
+        --extra-index-url http://example.com/simple
 
-bar==4.5.6 ; {MARKER_PY}
-foo==1.2.3 ; {MARKER_PY}
-"""
+        bar==4.5.6 ; {MARKER_PY}
+        foo==1.2.3 ; {MARKER_PY}
+        """)
     assert content == expected
 
 
@@ -2793,9 +2793,87 @@ def test_exporter_not_confused_by_extras_in_sub_dependencies(
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, io)
 
-    expected = """\
-click==8.1.3 ; python_version >= "3.11" and python_version < "4.0"
-colorama==0.4.6 ; python_version >= "3.11" and python_version < "4.0"
-typer[all]==0.9.0 ; python_version >= "3.11" and python_version < "4.0"
-"""
+    expected = dedent("""\
+        click==8.1.3 ; python_version >= "3.11" and python_version < "4.0"
+        colorama==0.4.6 ; python_version >= "3.11" and python_version < "4.0"
+        typer[all]==0.9.0 ; python_version >= "3.11" and python_version < "4.0"
+        """)
+    assert io.fetch_output() == expected
+
+
+def set_package_requires2(
+    poetry: Poetry, skip: set[str] | None = None, dev: set[str] | None = None
+) -> None:
+    skip = skip or set()
+    dev = dev or set()
+    packages = poetry.locker.locked_repository().packages
+    package = poetry.package.with_dependency_groups([], only=True)
+    for pkg in packages:
+        if pkg.name not in skip:
+            dep = pkg.to_dependency()
+            package.add_dependency(dep)
+
+    poetry._package = package
+
+
+def test_exporter_exports_requirements_txt_with_mutually_exclusive_same_named_deps(
+    tmp_path: Path, poetry: Poetry
+):
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "optional": False,
+                    "python-versions": ">=3.6.0",
+                    "version": "1.0.0",
+                    "files": [],
+                    "platform": "darwin",
+                },
+                {
+                    "name": "foo",
+                    "optional": False,
+                    "python-versions": ">=3.6.0",
+                    "version": "1.0.0+bar",
+                    "files": [],
+                    "platform": "linux",
+                },
+            ],
+            "metadata": {
+                "lock-version": "2.0",
+                "python-versions": "^3.6",
+                "content-hash": "123456789",
+            },
+        }
+    )
+    root = poetry.package.with_dependency_groups([], only=True)
+    root.python_versions = "^3.6"
+    root.add_dependency(
+        Factory.create_dependency(
+            name="foo",
+            constraint={
+                "version": "^1.0.0",
+                "platform": "darwin",
+            },
+        )
+    )
+    root.add_dependency(
+        Factory.create_dependency(
+            name="foo",
+            constraint={
+                "version": "^1.0.0+bar",
+                "platform": "linux",
+            },
+        )
+    )
+    poetry._package = root
+
+    io = BufferedIO()
+    exporter = Exporter(poetry, NullIO())
+    exporter.export("requirements.txt", tmp_path, io)
+
+    expected = dedent(f"""\
+        foo==1.0.0 ; {MARKER_PY36.intersect(MARKER_DARWIN)}
+        foo==1.0.0+bar ; {MARKER_PY36.intersect(MARKER_LINUX)}
+        """)
     assert io.fetch_output() == expected

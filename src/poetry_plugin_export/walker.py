@@ -118,7 +118,7 @@ def get_project_dependencies(
     # Put higher versions first so that we prefer them.
     for packages in packages_by_name.values():
         packages.sort(
-            key=lambda package: package.version,
+            key=lambda package: package.version.without_local(),
             reverse=True,
         )
 
