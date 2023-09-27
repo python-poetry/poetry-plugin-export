@@ -2818,7 +2818,7 @@ def set_package_requires2(
 
 def test_exporter_exports_requirements_txt_with_mutually_exclusive_same_named_deps(
     tmp_path: Path, poetry: Poetry
-):
+) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
         {
             "package": [
