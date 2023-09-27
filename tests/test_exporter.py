@@ -2801,21 +2801,6 @@ def test_exporter_not_confused_by_extras_in_sub_dependencies(
     assert io.fetch_output() == expected
 
 
-def set_package_requires2(
-    poetry: Poetry, skip: set[str] | None = None, dev: set[str] | None = None
-) -> None:
-    skip = skip or set()
-    dev = dev or set()
-    packages = poetry.locker.locked_repository().packages
-    package = poetry.package.with_dependency_groups([], only=True)
-    for pkg in packages:
-        if pkg.name not in skip:
-            dep = pkg.to_dependency()
-            package.add_dependency(dep)
-
-    poetry._package = package
-
-
 def test_exporter_exports_requirements_txt_with_mutually_exclusive_same_named_deps(
     tmp_path: Path, poetry: Poetry
 ) -> None:
