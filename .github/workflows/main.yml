@@ -40,7 +40,7 @@ jobs:
 
       - name: Bootstrap poetry
         run: |
-          curl -sL https://install.python-poetry.org | python - -y --git https://github.com/python-poetry/poetry.git@master
+          curl -sL https://install.python-poetry.org | python - -y --git https://github.com/radoering/poetry.git@debug-build-error
 
       - name: Update PATH
         if: ${{ matrix.os != 'Windows' }}
