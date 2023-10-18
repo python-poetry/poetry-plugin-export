@@ -44,6 +44,7 @@ class ExportCommand(GroupCommand):
             multiple=True,
         ),
         option("with-credentials", None, "Include credentials for extra indices."),
+        option("all-extras", None, "Include all sets of extra dependencies."),
     ]
 
     @property
@@ -86,16 +87,27 @@ class ExportCommand(GroupCommand):
             )
 
         # Checking extras
-        extras = {
-            canonicalize_name(extra)
-            for extra_opt in self.option("extras")
-            for extra in extra_opt.split()
-        }
-        invalid_extras = extras - self.poetry.package.extras.keys()
-        if invalid_extras:
-            raise ValueError(
-                f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
+        if self.option("extras") and self.option("all-extras"):
+            self.line_error(
+                "<error>You cannot specify explicit"
+                " `<fg=yellow;options=bold>--extras</>` while exporting"
+                " using `<fg=yellow;options=bold>--all-extras</>`.</error>"
             )
+            return 1
+
+        if self.option("all-extras"):
+            extras = self.poetry.package.extras.keys()
+        else:
+            extras = {
+                canonicalize_name(extra)
+                for extra_opt in self.option("extras")
+                for extra in extra_opt.split()
+            }
+            invalid_extras = extras - self.poetry.package.extras.keys()
+            if invalid_extras:
+                raise ValueError(
+                    f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
+                )
 
         exporter = Exporter(self.poetry, self.io)
         exporter.only_groups(list(self.activated_groups))

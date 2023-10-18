@@ -220,6 +220,13 @@ def test_export_reports_invalid_extras(tester: CommandTester, do_lock: None) -> 
     assert str(error.value) == expected
 
 
+def test_export_with_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--format requirements.txt --all-extras")
+    output = tester.io.fetch_output()
+    assert f"bar==1.1.0 ; {MARKER_PY}" in output
+    assert f"qux==1.2.0 ; {MARKER_PY}" in output
+
+
 def test_export_with_urls(
     monkeypatch: MonkeyPatch, tester: CommandTester, poetry: Poetry
 ) -> None:
