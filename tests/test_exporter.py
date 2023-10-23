@@ -631,7 +631,7 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
-def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_disabled(  # noqa: E501
+def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_disabled(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
