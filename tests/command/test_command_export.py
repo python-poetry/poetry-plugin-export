@@ -220,6 +220,24 @@ def test_export_reports_invalid_extras(tester: CommandTester, do_lock: None) -> 
     assert str(error.value) == expected
 
 
+def test_export_with_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--format requirements.txt --all-extras")
+    output = tester.io.fetch_output()
+    assert f"bar==1.1.0 ; {MARKER_PY}" in output
+    assert f"qux==1.2.0 ; {MARKER_PY}" in output
+
+
+def test_extras_conflicts_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--extras bar --all-extras")
+
+    assert tester.status_code == 1
+    assert (
+        tester.io.fetch_error()
+        == "You cannot specify explicit `--extras` while exporting using"
+        " `--all-extras`.\n"
+    )
+
+
 def test_export_with_urls(
     monkeypatch: MonkeyPatch, tester: CommandTester, poetry: Poetry
 ) -> None:
