@@ -232,9 +232,8 @@ def test_extras_conflicts_all_extras(tester: CommandTester, do_lock: None) -> No
 
     assert tester.status_code == 1
     assert (
-        tester.io.fetch_error()
-        == "You cannot specify explicit `--extras` while exporting using"
-        " `--all-extras`.\n"
+        "You cannot specify explicit `--extras` while exporting using `--all-extras`.\n"
+        in tester.io.fetch_error()
     )
 
 

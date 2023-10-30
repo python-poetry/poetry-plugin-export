@@ -1,6 +1,17 @@
 # Change Log
 
 
+## [1.6.0] - 2023-10-30
+
+### Added
+
+- Add an `--all-extras` option ([#241](https://github.com/python-poetry/poetry-plugin-export/pull/241)).
+
+### Fixed
+
+- Fix an issue where git dependencies are exported with the branch name instead of the resolved commit hash ([#213](https://github.com/python-poetry/poetry-plugin-export/pull/213)).
+
+
 ## [1.5.0] - 2023-08-20
 
 ### Changed
@@ -168,7 +179,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.5.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.6.0...main
+[1.6.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.6.0
 [1.5.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.5.0
 [1.4.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.4.0
 [1.3.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.3.1
