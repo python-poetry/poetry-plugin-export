@@ -227,6 +227,17 @@ def test_export_with_all_extras(tester: CommandTester, do_lock: None) -> None:
     assert f"qux==1.2.0 ; {MARKER_PY}" in output
 
 
+def test_extras_conflicts_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--extras bar --all-extras")
+
+    assert tester.status_code == 1
+    assert (
+        tester.io.fetch_error()
+        == "You cannot specify explicit `--extras` while exporting using"
+        " `--all-extras`.\n"
+    )
+
+
 def test_export_with_urls(
     monkeypatch: MonkeyPatch, tester: CommandTester, poetry: Poetry
 ) -> None:
