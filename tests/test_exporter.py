@@ -101,29 +101,27 @@ def set_package_requires(
 def test_exporter_can_export_requirements_txt_with_standard_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": []},
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -143,38 +141,36 @@ foo==1.2.3 ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "python_version < '3.7'",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "extra =='foo'",
-                },
-                {
-                    "name": "baz",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "sys_platform == 'win32'",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
+                "marker": "python_version < '3.7'",
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "marker": "extra =='foo'",
+            },
+            {
+                "name": "baz",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+                "marker": "sys_platform == 'win32'",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": [], "baz": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -197,70 +193,68 @@ def test_exporter_can_export_requirements_txt_poetry(
 ) -> None:
     """Regression test for #3254"""
 
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "poetry",
-                    "version": "1.1.4",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"keyring": "*"},
-                },
-                {
-                    "name": "junit-xml",
-                    "version": "1.9",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"six": "*"},
-                },
-                {
-                    "name": "keyring",
-                    "version": "21.8.0",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "SecretStorage": {
-                            "version": "*",
-                            "markers": "sys_platform == 'linux'",
-                        }
-                    },
-                },
-                {
-                    "name": "secretstorage",
-                    "version": "3.3.0",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"cryptography": "*"},
-                },
-                {
-                    "name": "cryptography",
-                    "version": "3.2",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"six": "*"},
-                },
-                {
-                    "name": "six",
-                    "version": "1.15.0",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "poetry",
+                "version": "1.1.4",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "poetry": [],
-                    "keyring": [],
-                    "secretstorage": [],
-                    "cryptography": [],
-                    "six": [],
-                    "junit-xml": [],
+                "dependencies": {"keyring": "*"},
+            },
+            {
+                "name": "junit-xml",
+                "version": "1.9",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"six": "*"},
+            },
+            {
+                "name": "keyring",
+                "version": "21.8.0",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {
+                    "SecretStorage": {
+                        "version": "*",
+                        "markers": "sys_platform == 'linux'",
+                    }
                 },
             },
-        }
-    )
+            {
+                "name": "secretstorage",
+                "version": "3.3.0",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"cryptography": "*"},
+            },
+            {
+                "name": "cryptography",
+                "version": "3.2",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"six": "*"},
+            },
+            {
+                "name": "six",
+                "version": "1.15.0",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "poetry": [],
+                "keyring": [],
+                "secretstorage": [],
+                "cryptography": [],
+                "six": [],
+                "junit-xml": [],
+            },
+        },
+    })
     set_package_requires(
         poetry, skip={"keyring", "secretstorage", "cryptography", "six"}
     )
@@ -312,43 +306,41 @@ def test_exporter_can_export_requirements_txt_pyinstaller(
 ) -> None:
     """Regression test for #3254"""
 
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "pyinstaller",
-                    "version": "4.0",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "altgraph": "*",
-                        "macholib": {
-                            "version": "*",
-                            "markers": "sys_platform == 'darwin'",
-                        },
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "pyinstaller",
+                "version": "4.0",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {
+                    "altgraph": "*",
+                    "macholib": {
+                        "version": "*",
+                        "markers": "sys_platform == 'darwin'",
                     },
                 },
-                {
-                    "name": "altgraph",
-                    "version": "0.17",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "macholib",
-                    "version": "1.8",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"altgraph": ">=0.15"},
-                },
-            ],
-            "metadata": {
-                "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"pyinstaller": [], "altgraph": [], "macholib": []},
             },
-        }
-    )
+            {
+                "name": "altgraph",
+                "version": "0.17",
+                "optional": False,
+                "python-versions": "*",
+            },
+            {
+                "name": "macholib",
+                "version": "1.8",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"altgraph": ">=0.15"},
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"pyinstaller": [], "altgraph": [], "macholib": []},
+        },
+    })
     set_package_requires(poetry, skip={"altgraph", "macholib"})
 
     exporter = Exporter(poetry, NullIO())
@@ -389,47 +381,45 @@ def test_exporter_can_export_requirements_txt_pyinstaller(
 def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "a",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "python_version < '3.7'",
-                    "dependencies": {"b": ">=0.0.0", "c": ">=0.0.0"},
-                },
-                {
-                    "name": "b",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "platform_system == 'Windows'",
-                    "dependencies": {"d": ">=0.0.0"},
-                },
-                {
-                    "name": "c",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "sys_platform == 'win32'",
-                    "dependencies": {"d": ">=0.0.0"},
-                },
-                {
-                    "name": "d",
-                    "version": "0.0.1",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "a",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"a": [], "b": [], "c": [], "d": []},
+                "marker": "python_version < '3.7'",
+                "dependencies": {"b": ">=0.0.0", "c": ">=0.0.0"},
             },
-        }
-    )
+            {
+                "name": "b",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "marker": "platform_system == 'Windows'",
+                "dependencies": {"d": ">=0.0.0"},
+            },
+            {
+                "name": "c",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+                "marker": "sys_platform == 'win32'",
+                "dependencies": {"d": ">=0.0.0"},
+            },
+            {
+                "name": "d",
+                "version": "0.0.1",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"a": [], "b": [], "c": [], "d": []},
+        },
+    })
     set_package_requires(poetry, skip={"b", "c", "d"})
 
     exporter = Exporter(poetry, NullIO())
@@ -480,30 +470,28 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
 def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_any(
     tmp_path: Path, poetry: Poetry, dev: bool, lines: list[str]
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "a",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "b",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"a": ">=1.2.3"},
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "a",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"a": [], "b": []},
             },
-        }
-    )
+            {
+                "name": "b",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"a": ">=1.2.3"},
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"a": [], "b": []},
+        },
+    })
 
     root = poetry.package.with_dependency_groups([], only=True)
     root.add_dependency(
@@ -532,32 +520,30 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
 def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -579,38 +565,36 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_can_export_requirements_txt_with_standard_packages_and_sorted_hashes(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [
-                        {"name": "foo1.whl", "hash": "67890"},
-                        {"name": "foo2.whl", "hash": "12345"},
-                    ],
-                    "bar": [
-                        {"name": "bar1.whl", "hash": "67890"},
-                        {"name": "bar2.whl", "hash": "12345"},
-                    ],
-                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [
+                    {"name": "foo1.whl", "hash": "67890"},
+                    {"name": "foo2.whl", "hash": "12345"},
+                ],
+                "bar": [
+                    {"name": "bar1.whl", "hash": "67890"},
+                    {"name": "bar2.whl", "hash": "12345"},
+                ],
+            },
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -634,32 +618,30 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_can_export_requirements_txt_with_standard_packages_and_hashes_disabled(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -680,32 +662,30 @@ foo==1.2.3 ; {MARKER_PY}
 def test_exporter_exports_requirements_txt_without_dev_packages_by_default(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
@@ -725,32 +705,30 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
@@ -773,32 +751,30 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_exports_requirements_txt_without_groups_if_set_explicitly(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
@@ -814,32 +790,30 @@ def test_exporter_exports_requirements_txt_without_groups_if_set_explicitly(
 def test_exporter_exports_requirements_txt_without_optional_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": True,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": True,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
@@ -876,41 +850,39 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
     extras: Collection[NormalizedName],
     lines: list[str],
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": True,
-                    "python-versions": "*",
-                    "dependencies": {"spam": ">=0.1"},
-                },
-                {
-                    "name": "spam",
-                    "version": "0.1.0",
-                    "optional": True,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                    "spam": [{"name": "spam.whl", "hash": "abcde"}],
-                },
             },
-            "extras": {"feature_bar": ["bar"]},
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": True,
+                "python-versions": "*",
+                "dependencies": {"spam": ">=0.1"},
+            },
+            {
+                "name": "spam",
+                "version": "0.1.0",
+                "optional": True,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+                "spam": [{"name": "spam.whl", "hash": "abcde"}],
+            },
+        },
+        "extras": {"feature_bar": ["bar"]},
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -934,29 +906,27 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
 def test_exporter_can_export_requirements_txt_with_git_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "git",
-                        "url": "https://github.com/foo/foo.git",
-                        "reference": "123456",
-                        "resolved_reference": "abcdef",
-                    },
-                }
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": []},
-            },
-        }
-    )
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/foo/foo.git",
+                    "reference": "123456",
+                    "resolved_reference": "abcdef",
+                },
+            }
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -975,41 +945,39 @@ foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_nested_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "git",
-                        "url": "https://github.com/foo/foo.git",
-                        "reference": "123456",
-                        "resolved_reference": "abcdef",
-                    },
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "foo": {
-                            "git": "https://github.com/foo/foo.git",
-                            "rev": "123456",
-                        }
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": []},
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/foo/foo.git",
+                    "reference": "123456",
+                    "resolved_reference": "abcdef",
+                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {
+                    "foo": {
+                        "git": "https://github.com/foo/foo.git",
+                        "rev": "123456",
+                    }
+                },
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": []},
+        },
+    })
     set_package_requires(poetry, skip={"foo"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1029,38 +997,36 @@ foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_nested_packages_cyclic(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"bar": {"version": "4.5.6"}},
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"baz": {"version": "7.8.9"}},
-                },
-                {
-                    "name": "baz",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"foo": {"version": "1.2.3"}},
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
+                "dependencies": {"bar": {"version": "4.5.6"}},
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"baz": {"version": "7.8.9"}},
+            },
+            {
+                "name": "baz",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"foo": {"version": "1.2.3"}},
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": [], "baz": []},
+        },
+    })
     set_package_requires(poetry, skip={"bar", "baz"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1081,24 +1047,22 @@ foo==1.2.3 ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_circular_root_dependency(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {poetry.package.pretty_name: {"version": "1.2.3"}},
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": []},
+                "dependencies": {poetry.package.pretty_name: {"version": "1.2.3"}},
             },
-        }
-    )
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1117,53 +1081,51 @@ foo==1.2.3 ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_nested_packages_and_multiple_markers(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "bar": [
-                            {
-                                "version": ">=1.2.3,<7.8.10",
-                                "markers": 'platform_system != "Windows"',
-                            },
-                            {
-                                "version": ">=4.5.6,<7.8.10",
-                                "markers": 'platform_system == "Windows"',
-                            },
-                        ]
-                    },
-                },
-                {
-                    "name": "bar",
-                    "version": "7.8.9",
-                    "optional": True,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "baz": {
-                            "version": "!=10.11.12",
-                            "markers": 'platform_system == "Windows"',
-                        }
-                    },
-                },
-                {
-                    "name": "baz",
-                    "version": "10.11.13",
-                    "optional": True,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
+                "dependencies": {
+                    "bar": [
+                        {
+                            "version": ">=1.2.3,<7.8.10",
+                            "markers": 'platform_system != "Windows"',
+                        },
+                        {
+                            "version": ">=4.5.6,<7.8.10",
+                            "markers": 'platform_system == "Windows"',
+                        },
+                    ]
+                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "7.8.9",
+                "optional": True,
+                "python-versions": "*",
+                "dependencies": {
+                    "baz": {
+                        "version": "!=10.11.12",
+                        "markers": 'platform_system == "Windows"',
+                    }
+                },
+            },
+            {
+                "name": "baz",
+                "version": "10.11.13",
+                "optional": True,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": [], "baz": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1188,30 +1150,28 @@ foo==1.2.3 ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "python_version < '3.7'",
-                    "source": {
-                        "type": "git",
-                        "url": "https://github.com/foo/foo.git",
-                        "reference": "123456",
-                        "resolved_reference": "abcdef",
-                    },
-                }
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": []},
-            },
-        }
-    )
+                "marker": "python_version < '3.7'",
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/foo/foo.git",
+                    "reference": "123456",
+                    "resolved_reference": "abcdef",
+                },
+            }
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1230,28 +1190,26 @@ foo @ git+https://github.com/foo/foo.git@abcdef ; {MARKER_PY27.union(MARKER_PY36
 def test_exporter_can_export_requirements_txt_with_directory_packages(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "directory",
-                        "url": "sample_project",
-                        "reference": "",
-                    },
-                }
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": []},
-            },
-        }
-    )
+                "source": {
+                    "type": "directory",
+                    "url": "sample_project",
+                    "reference": "",
+                },
+            }
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1270,50 +1228,48 @@ foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "directory",
-                        "url": "sample_project",
-                        "reference": "",
-                    },
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "directory",
-                        "url": "sample_project/../project_with_nested_local/bar",
-                        "reference": "",
-                    },
-                },
-                {
-                    "name": "baz",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "directory",
-                        "url": "sample_project/../project_with_nested_local/bar/..",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
+                "source": {
+                    "type": "directory",
+                    "url": "sample_project",
+                    "reference": "",
+                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "directory",
+                    "url": "sample_project/../project_with_nested_local/bar",
+                    "reference": "",
+                },
+            },
+            {
+                "name": "baz",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "directory",
+                    "url": "sample_project/../project_with_nested_local/bar/..",
+                    "reference": "",
+                },
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": [], "baz": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1334,29 +1290,27 @@ foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
 def test_exporter_can_export_requirements_txt_with_directory_packages_and_markers(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "python_version < '3.7'",
-                    "source": {
-                        "type": "directory",
-                        "url": "sample_project",
-                        "reference": "",
-                    },
-                }
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": []},
-            },
-        }
-    )
+                "marker": "python_version < '3.7'",
+                "source": {
+                    "type": "directory",
+                    "url": "sample_project",
+                    "reference": "",
+                },
+            }
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1376,28 +1330,26 @@ foo @ {fixture_root_uri}/sample_project ;\
 def test_exporter_can_export_requirements_txt_with_file_packages(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "file",
-                        "url": "distributions/demo-0.1.0.tar.gz",
-                        "reference": "",
-                    },
-                }
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": []},
-            },
-        }
-    )
+                "source": {
+                    "type": "file",
+                    "url": "distributions/demo-0.1.0.tar.gz",
+                    "reference": "",
+                },
+            }
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1417,29 +1369,27 @@ foo @ {fixture_root_uri}/distributions/demo-0.1.0.tar.gz ;\
 def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "marker": "python_version < '3.7'",
-                    "source": {
-                        "type": "file",
-                        "url": "distributions/demo-0.1.0.tar.gz",
-                        "reference": "",
-                    },
-                }
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": []},
-            },
-        }
-    )
+                "marker": "python_version < '3.7'",
+                "source": {
+                    "type": "file",
+                    "url": "distributions/demo-0.1.0.tar.gz",
+                    "reference": "",
+                },
+            }
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -1465,37 +1415,35 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
             "https://example.com/simple",
         )
     )
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://example.com/simple",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "https://example.com/simple",
+                    "reference": "",
                 },
             },
-        }
-    )
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1526,37 +1474,35 @@ def test_exporter_exports_requirements_txt_with_url_false(
             "https://example.com/simple",
         )
     )
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://example.com/simple",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "https://example.com/simple",
+                    "reference": "",
                 },
             },
-        }
-    )
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1586,30 +1532,28 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
             "http://example.com/simple",
         )
     )
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "http://example.com/simple",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                "source": {
+                    "type": "legacy",
+                    "url": "http://example.com/simple",
+                    "reference": "",
                 },
             },
-        }
-    )
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
     exporter = Exporter(poetry, NullIO())
     exporter.only_groups([MAIN_GROUP, "dev"])
@@ -1652,43 +1596,41 @@ bar==4.5.6 ; {MARKER_PY} \\
 def test_exporter_exports_requirements_txt_with_dev_extras(
     tmp_path: Path, poetry: Poetry, dev: bool, expected: list[str]
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.1",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "1.2.2",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "baz": {
-                            "version": ">=0.1.0",
-                            "optional": True,
-                            "markers": "extra == 'baz'",
-                        }
-                    },
-                    "extras": {"baz": ["baz (>=0.1.0)"]},
-                },
-                {
-                    "name": "baz",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.1",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "1.2.2",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {
+                    "baz": {
+                        "version": ">=0.1.0",
+                        "optional": True,
+                        "markers": "extra == 'baz'",
+                    }
+                },
+                "extras": {"baz": ["baz (>=0.1.0)"]},
+            },
+            {
+                "name": "baz",
+                "version": "1.2.3",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": [], "baz": []},
+        },
+    })
     set_package_requires(poetry, dev={"baz"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1717,54 +1659,52 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
             "https://foobaz.com/simple",
         )
     )
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://example.com/simple",
-                        "reference": "",
-                    },
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://example.com/simple",
-                        "reference": "",
-                    },
-                },
-                {
-                    "name": "baz",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://foobaz.com/simple",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                    "baz": [{"name": "baz.whl", "hash": "24680"}],
+                "source": {
+                    "type": "legacy",
+                    "url": "https://example.com/simple",
+                    "reference": "",
                 },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "https://example.com/simple",
+                    "reference": "",
+                },
+            },
+            {
+                "name": "baz",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "https://foobaz.com/simple",
+                    "reference": "",
+                },
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+                "baz": [{"name": "baz.whl", "hash": "24680"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar", "baz"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1793,18 +1733,16 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     poetry.pool.remove_repository("PyPI")
-    poetry.config.merge(
-        {
-            "repositories": {
-                "custom-a": {"url": "https://a.example.com/simple"},
-                "custom-b": {"url": "https://b.example.com/simple"},
-            },
-            "http-basic": {
-                "custom-a": {"username": "foo", "password": "bar"},
-                "custom-b": {"username": "baz", "password": "qux"},
-            },
-        }
-    )
+    poetry.config.merge({
+        "repositories": {
+            "custom-a": {"url": "https://a.example.com/simple"},
+            "custom-b": {"url": "https://b.example.com/simple"},
+        },
+        "http-basic": {
+            "custom-a": {"username": "foo", "password": "bar"},
+            "custom-b": {"username": "baz", "password": "qux"},
+        },
+    })
     poetry.pool.add_repository(
         LegacyRepository(
             "custom-b",
@@ -1821,54 +1759,52 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
         ),
         priority=Priority.SECONDARY,
     )
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://a.example.com/simple",
-                        "reference": "",
-                    },
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://b.example.com/simple",
-                        "reference": "",
-                    },
-                },
-                {
-                    "name": "baz",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://b.example.com/simple",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
-                    "baz": [{"name": "baz.whl", "hash": "24680"}],
+                "source": {
+                    "type": "legacy",
+                    "url": "https://a.example.com/simple",
+                    "reference": "",
                 },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "https://b.example.com/simple",
+                    "reference": "",
+                },
+            },
+            {
+                "name": "baz",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "https://b.example.com/simple",
+                    "reference": "",
+                },
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+                "baz": [{"name": "baz.whl", "hash": "24680"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar", "baz"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1897,46 +1833,42 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     tmp_path: Path, poetry: Poetry, config: Config
 ) -> None:
-    poetry.config.merge(
-        {
-            "repositories": {"custom": {"url": "https://example.com/simple"}},
-            "http-basic": {"custom": {"username": "foo", "password": "bar"}},
-        }
-    )
+    poetry.config.merge({
+        "repositories": {"custom": {"url": "https://example.com/simple"}},
+        "http-basic": {"custom": {"username": "foo", "password": "bar"}},
+    })
     poetry.pool.add_repository(
         LegacyRepository("custom", "https://example.com/simple", config=poetry.config)
     )
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "https://example.com/simple",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {
-                    "foo": [{"name": "foo.whl", "hash": "12345"}],
-                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "https://example.com/simple",
+                    "reference": "",
                 },
             },
-        }
-    )
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {
+                "foo": [{"name": "foo.whl", "hash": "12345"}],
+                "bar": [{"name": "bar.whl", "hash": "67890"}],
+            },
+        },
+    })
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
@@ -1966,29 +1898,27 @@ foo==1.2.3 ; {MARKER_PY} \\
 def test_exporter_exports_requirements_txt_to_standard_output(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": []},
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -2007,83 +1937,79 @@ def test_exporter_doesnt_confuse_repeated_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     # Testcase derived from <https://github.com/python-poetry/poetry/issues/5141>.
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "celery",
-                    "version": "5.1.2",
-                    "optional": False,
-                    "python-versions": "<3.7",
-                    "dependencies": {
-                        "click": ">=7.0,<8.0",
-                        "click-didyoumean": ">=0.0.3",
-                        "click-plugins": ">=1.1.1",
-                    },
-                },
-                {
-                    "name": "celery",
-                    "version": "5.2.3",
-                    "optional": False,
-                    "python-versions": ">=3.7",
-                    "dependencies": {
-                        "click": ">=8.0.3,<9.0",
-                        "click-didyoumean": ">=0.0.3",
-                        "click-plugins": ">=1.1.1",
-                    },
-                },
-                {
-                    "name": "click",
-                    "version": "7.1.2",
-                    "optional": False,
-                    "python-versions": (
-                        ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-                    ),
-                },
-                {
-                    "name": "click",
-                    "version": "8.0.3",
-                    "optional": False,
-                    "python-versions": ">=3.6",
-                    "dependencies": {},
-                },
-                {
-                    "name": "click-didyoumean",
-                    "version": "0.0.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"click": "*"},
-                },
-                {
-                    "name": "click-didyoumean",
-                    "version": "0.3.0",
-                    "optional": False,
-                    "python-versions": ">=3.6.2,<4.0.0",
-                    "dependencies": {"click": ">=7"},
-                },
-                {
-                    "name": "click-plugins",
-                    "version": "1.1.1",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"click": ">=4.0"},
-                },
-            ],
-            "metadata": {
-                "lock-version": "1.1",
-                "python-versions": "^3.6",
-                "content-hash": (
-                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
-                ),
-                "files": {
-                    "celery": [],
-                    "click-didyoumean": [],
-                    "click-plugins": [],
-                    "click": [],
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "celery",
+                "version": "5.1.2",
+                "optional": False,
+                "python-versions": "<3.7",
+                "dependencies": {
+                    "click": ">=7.0,<8.0",
+                    "click-didyoumean": ">=0.0.3",
+                    "click-plugins": ">=1.1.1",
                 },
             },
-        }
-    )
+            {
+                "name": "celery",
+                "version": "5.2.3",
+                "optional": False,
+                "python-versions": ">=3.7",
+                "dependencies": {
+                    "click": ">=8.0.3,<9.0",
+                    "click-didyoumean": ">=0.0.3",
+                    "click-plugins": ">=1.1.1",
+                },
+            },
+            {
+                "name": "click",
+                "version": "7.1.2",
+                "optional": False,
+                "python-versions": ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*",
+            },
+            {
+                "name": "click",
+                "version": "8.0.3",
+                "optional": False,
+                "python-versions": ">=3.6",
+                "dependencies": {},
+            },
+            {
+                "name": "click-didyoumean",
+                "version": "0.0.3",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"click": "*"},
+            },
+            {
+                "name": "click-didyoumean",
+                "version": "0.3.0",
+                "optional": False,
+                "python-versions": ">=3.6.2,<4.0.0",
+                "dependencies": {"click": ">=7"},
+            },
+            {
+                "name": "click-plugins",
+                "version": "1.1.1",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {"click": ">=4.0"},
+            },
+        ],
+        "metadata": {
+            "lock-version": "1.1",
+            "python-versions": "^3.6",
+            "content-hash": (
+                "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+            ),
+            "files": {
+                "celery": [],
+                "click-didyoumean": [],
+                "click-plugins": [],
+                "click": [],
+            },
+        },
+    })
     root = poetry.package.with_dependency_groups([], only=True)
     root.python_versions = "^3.6"
     root.add_dependency(
@@ -2120,85 +2046,83 @@ def test_exporter_handles_extras_next_to_non_extras(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     # Testcase similar to the solver testcase added at #5305.
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "localstack",
-                    "python-versions": "*",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {
-                        "localstack-ext": [
-                            {"version": ">=1.0.0"},
-                            {
-                                "version": ">=1.0.0",
-                                "extras": ["bar"],
-                                "markers": 'extra == "foo"',
-                            },
-                        ]
-                    },
-                    "extras": {"foo": ["localstack-ext[bar] (>=1.0.0)"]},
-                },
-                {
-                    "name": "localstack-ext",
-                    "python-versions": "*",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {
-                        "something": "*",
-                        "something-else": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "localstack",
+                "python-versions": "*",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {
+                    "localstack-ext": [
+                        {"version": ">=1.0.0"},
+                        {
                             "version": ">=1.0.0",
-                            "markers": 'extra == "bar"',
+                            "extras": ["bar"],
+                            "markers": 'extra == "foo"',
                         },
-                        "another-thing": {
-                            "version": ">=1.0.0",
-                            "markers": 'extra == "baz"',
-                        },
+                    ]
+                },
+                "extras": {"foo": ["localstack-ext[bar] (>=1.0.0)"]},
+            },
+            {
+                "name": "localstack-ext",
+                "python-versions": "*",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {
+                    "something": "*",
+                    "something-else": {
+                        "version": ">=1.0.0",
+                        "markers": 'extra == "bar"',
                     },
-                    "extras": {
-                        "bar": ["something-else (>=1.0.0)"],
-                        "baz": ["another-thing (>=1.0.0)"],
+                    "another-thing": {
+                        "version": ">=1.0.0",
+                        "markers": 'extra == "baz"',
                     },
                 },
-                {
-                    "name": "something",
-                    "python-versions": "*",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {},
-                },
-                {
-                    "name": "something-else",
-                    "python-versions": "*",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {},
-                },
-                {
-                    "name": "another-thing",
-                    "python-versions": "*",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {},
-                },
-            ],
-            "metadata": {
-                "lock-version": "1.1",
-                "python-versions": "^3.6",
-                "content-hash": (
-                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
-                ),
-                "files": {
-                    "localstack": [],
-                    "localstack-ext": [],
-                    "something": [],
-                    "something-else": [],
-                    "another-thing": [],
+                "extras": {
+                    "bar": ["something-else (>=1.0.0)"],
+                    "baz": ["another-thing (>=1.0.0)"],
                 },
             },
-        }
-    )
+            {
+                "name": "something",
+                "python-versions": "*",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {},
+            },
+            {
+                "name": "something-else",
+                "python-versions": "*",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {},
+            },
+            {
+                "name": "another-thing",
+                "python-versions": "*",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {},
+            },
+        ],
+        "metadata": {
+            "lock-version": "1.1",
+            "python-versions": "^3.6",
+            "content-hash": (
+                "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+            ),
+            "files": {
+                "localstack": [],
+                "localstack-ext": [],
+                "something": [],
+                "something-else": [],
+                "another-thing": [],
+            },
+        },
+    })
     root = poetry.package.with_dependency_groups([], only=True)
     root.python_versions = "^3.6"
     root.add_dependency(
@@ -2228,61 +2152,59 @@ def test_exporter_handles_overlapping_python_versions(
 ) -> None:
     # Testcase derived from
     # https://github.com/python-poetry/poetry-plugin-export/issues/32.
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "ipython",
-                    "python-versions": ">=3.6",
-                    "version": "7.16.3",
-                    "optional": False,
-                    "dependencies": {},
-                },
-                {
-                    "name": "ipython",
-                    "python-versions": ">=3.7",
-                    "version": "7.34.0",
-                    "optional": False,
-                    "dependencies": {},
-                },
-                {
-                    "name": "slash",
-                    "python-versions": ">=3.6.*",
-                    "version": "1.13.0",
-                    "optional": False,
-                    "dependencies": {
-                        "ipython": [
-                            {
-                                "version": "*",
-                                "markers": (
-                                    'python_version >= "3.6" and implementation_name !='
-                                    ' "pypy"'
-                                ),
-                            },
-                            {
-                                "version": "<7.17.0",
-                                "markers": (
-                                    'python_version < "3.6" and implementation_name !='
-                                    ' "pypy"'
-                                ),
-                            },
-                        ],
-                    },
-                },
-            ],
-            "metadata": {
-                "lock-version": "1.1",
-                "python-versions": "^3.6",
-                "content-hash": (
-                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
-                ),
-                "files": {
-                    "ipython": [],
-                    "slash": [],
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "ipython",
+                "python-versions": ">=3.6",
+                "version": "7.16.3",
+                "optional": False,
+                "dependencies": {},
+            },
+            {
+                "name": "ipython",
+                "python-versions": ">=3.7",
+                "version": "7.34.0",
+                "optional": False,
+                "dependencies": {},
+            },
+            {
+                "name": "slash",
+                "python-versions": ">=3.6.*",
+                "version": "1.13.0",
+                "optional": False,
+                "dependencies": {
+                    "ipython": [
+                        {
+                            "version": "*",
+                            "markers": (
+                                'python_version >= "3.6" and implementation_name !='
+                                ' "pypy"'
+                            ),
+                        },
+                        {
+                            "version": "<7.17.0",
+                            "markers": (
+                                'python_version < "3.6" and implementation_name !='
+                                ' "pypy"'
+                            ),
+                        },
+                    ],
                 },
             },
-        }
-    )
+        ],
+        "metadata": {
+            "lock-version": "1.1",
+            "python-versions": "^3.6",
+            "content-hash": (
+                "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+            ),
+            "files": {
+                "ipython": [],
+                "slash": [],
+            },
+        },
+    })
     root = poetry.package.with_dependency_groups([], only=True)
     root.python_versions = "^3.6"
     root.add_dependency(
@@ -2339,38 +2261,36 @@ def test_exporter_omits_unwanted_extras(
 ) -> None:
     # Testcase derived from
     # https://github.com/python-poetry/poetry/issues/5779
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "python-versions": ">=3.6",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {"pytest": {"version": "^6.2.4", "optional": True}},
-                    "extras": {"test": ["pytest (>=6.2.4,<7.0.0)"]},
-                },
-                {
-                    "name": "pytest",
-                    "python-versions": ">=3.6",
-                    "version": "6.24.0",
-                    "optional": False,
-                    "dependencies": {},
-                },
-            ],
-            "metadata": {
-                "lock-version": "1.1",
-                "python-versions": "^3.6",
-                "content-hash": (
-                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
-                ),
-                "files": {
-                    "foo": [],
-                    "pytest": [],
-                },
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "python-versions": ">=3.6",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {"pytest": {"version": "^6.2.4", "optional": True}},
+                "extras": {"test": ["pytest (>=6.2.4,<7.0.0)"]},
             },
-        }
-    )
+            {
+                "name": "pytest",
+                "python-versions": ">=3.6",
+                "version": "6.24.0",
+                "optional": False,
+                "dependencies": {},
+            },
+        ],
+        "metadata": {
+            "lock-version": "1.1",
+            "python-versions": "^3.6",
+            "content-hash": (
+                "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+            ),
+            "files": {
+                "foo": [],
+                "pytest": [],
+            },
+        },
+    })
     root = poetry.package.with_dependency_groups([], only=True)
     root.python_versions = "^3.6"
     root.add_dependency(
@@ -2422,49 +2342,47 @@ def test_exporter_omits_unwanted_extras(
 def test_exporter_omits_and_includes_extras_for_txt_formats(
     tmp_path: Path, poetry: Poetry, fmt: str, expected: list[str]
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "bar": {
-                            "extras": ["baz"],
-                            "version": ">=0.1.0",
-                        }
-                    },
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "baz": {
-                            "version": ">=0.1.0",
-                            "optional": True,
-                            "markers": "extra == 'baz'",
-                        }
-                    },
-                    "extras": {"baz": ["baz (>=0.1.0)"]},
-                },
-                {
-                    "name": "baz",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
+                "dependencies": {
+                    "bar": {
+                        "extras": ["baz"],
+                        "version": ">=0.1.0",
+                    }
+                },
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {
+                    "baz": {
+                        "version": ">=0.1.0",
+                        "optional": True,
+                        "markers": "extra == 'baz'",
+                    }
+                },
+                "extras": {"baz": ["baz (>=0.1.0)"]},
+            },
+            {
+                "name": "baz",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": [], "baz": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -2479,47 +2397,45 @@ def test_exporter_omits_and_includes_extras_for_txt_formats(
 def test_exporter_prints_warning_for_constraints_txt_with_editable_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "git",
-                        "url": "https://github.com/foo/foo.git",
-                        "reference": "123456",
-                    },
-                    "develop": True,
-                },
-                {
-                    "name": "bar",
-                    "version": "7.8.9",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-                {
-                    "name": "baz",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "directory",
-                        "url": "sample_project",
-                        "reference": "",
-                    },
-                    "develop": True,
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": [], "baz": []},
+                "source": {
+                    "type": "git",
+                    "url": "https://github.com/foo/foo.git",
+                    "reference": "123456",
+                },
+                "develop": True,
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "7.8.9",
+                "optional": False,
+                "python-versions": "*",
+            },
+            {
+                "name": "baz",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "directory",
+                    "url": "sample_project",
+                    "reference": "",
+                },
+                "develop": True,
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": [], "baz": []},
+        },
+    })
     set_package_requires(poetry)
 
     io = BufferedIO()
@@ -2542,44 +2458,42 @@ def test_exporter_prints_warning_for_constraints_txt_with_editable_packages(
 
 
 def test_exporter_respects_package_sources(tmp_path: Path, poetry: Poetry) -> None:
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "python-versions": ">=3.6",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {},
-                    "source": {
-                        "type": "url",
-                        "url": "https://example.com/foo-darwin.whl",
-                    },
-                },
-                {
-                    "name": "foo",
-                    "python-versions": ">=3.6",
-                    "version": "1.0.0",
-                    "optional": False,
-                    "dependencies": {},
-                    "source": {
-                        "type": "url",
-                        "url": "https://example.com/foo-linux.whl",
-                    },
-                },
-            ],
-            "metadata": {
-                "lock-version": "1.1",
-                "python-versions": "^3.6",
-                "content-hash": (
-                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
-                ),
-                "files": {
-                    "foo": [],
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "python-versions": ">=3.6",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {},
+                "source": {
+                    "type": "url",
+                    "url": "https://example.com/foo-darwin.whl",
                 },
             },
-        }
-    )
+            {
+                "name": "foo",
+                "python-versions": ">=3.6",
+                "version": "1.0.0",
+                "optional": False,
+                "dependencies": {},
+                "source": {
+                    "type": "url",
+                    "url": "https://example.com/foo-linux.whl",
+                },
+            },
+        ],
+        "metadata": {
+            "lock-version": "1.1",
+            "python-versions": "^3.6",
+            "content-hash": (
+                "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+            ),
+            "files": {
+                "foo": [],
+            },
+        },
+    })
     root = poetry.package.with_dependency_groups([], only=True)
     root.python_versions = "^3.6"
     root.add_dependency(
@@ -2617,37 +2531,35 @@ foo @ https://example.com/foo-linux.whl ; {MARKER_PY36} and {MARKER_LINUX}
 def test_exporter_tolerates_non_existent_extra(tmp_path: Path, poetry: Poetry) -> None:
     # foo actually has a 'bar' extra, but pyproject.toml mistakenly references a 'baz'
     # extra.
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {
-                        "bar": {
-                            "version": ">=0.1.0",
-                            "optional": True,
-                            "markers": "extra == 'bar'",
-                        }
-                    },
-                    "extras": {"bar": ["bar (>=0.1.0)"]},
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": []},
+                "dependencies": {
+                    "bar": {
+                        "version": ">=0.1.0",
+                        "optional": True,
+                        "markers": "extra == 'bar'",
+                    }
+                },
+                "extras": {"bar": ["bar (>=0.1.0)"]},
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": []},
+        },
+    })
     root = poetry.package.with_dependency_groups([], only=True)
     root.add_dependency(
         Factory.create_dependency(
@@ -2678,35 +2590,33 @@ def test_exporter_exports_extra_index_url_and_trusted_host(
         ),
         priority=Priority.EXPLICIT,
     )
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "foo",
-                    "version": "1.2.3",
-                    "optional": False,
-                    "python-versions": "*",
-                    "dependencies": {"bar": "*"},
-                },
-                {
-                    "name": "bar",
-                    "version": "4.5.6",
-                    "optional": False,
-                    "python-versions": "*",
-                    "source": {
-                        "type": "legacy",
-                        "url": "http://example.com/simple",
-                        "reference": "",
-                    },
-                },
-            ],
-            "metadata": {
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
                 "python-versions": "*",
-                "content-hash": "123456789",
-                "files": {"foo": [], "bar": []},
+                "dependencies": {"bar": "*"},
             },
-        }
-    )
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "legacy",
+                    "url": "http://example.com/simple",
+                    "reference": "",
+                },
+            },
+        ],
+        "metadata": {
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"foo": [], "bar": []},
+        },
+    })
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
@@ -2730,55 +2640,53 @@ def test_exporter_not_confused_by_extras_in_sub_dependencies(
 ) -> None:
     # Testcase derived from
     # https://github.com/python-poetry/poetry-plugin-export/issues/208
-    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
-        {
-            "package": [
-                {
-                    "name": "typer",
-                    "python-versions": ">=3.6",
-                    "version": "0.9.0",
-                    "optional": False,
-                    "files": [],
-                    "dependencies": {
-                        "click": ">=7.1.1,<9.0.0",
-                        "colorama": {
-                            "version": ">=0.4.3,<0.5.0",
-                            "optional": True,
-                            "markers": 'extra == "all"',
-                        },
-                    },
-                    "extras": {"all": ["colorama (>=0.4.3,<0.5.0)"]},
-                },
-                {
-                    "name": "click",
-                    "python-versions": ">=3.7",
-                    "version": "8.1.3",
-                    "optional": False,
-                    "files": [],
-                    "dependencies": {
-                        "colorama": {
-                            "version": "*",
-                            "markers": 'platform_system == "Windows"',
-                        }
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": [
+            {
+                "name": "typer",
+                "python-versions": ">=3.6",
+                "version": "0.9.0",
+                "optional": False,
+                "files": [],
+                "dependencies": {
+                    "click": ">=7.1.1,<9.0.0",
+                    "colorama": {
+                        "version": ">=0.4.3,<0.5.0",
+                        "optional": True,
+                        "markers": 'extra == "all"',
                     },
                 },
-                {
-                    "name": "colorama",
-                    "python-versions": ">=3.7",
-                    "version": "0.4.6",
-                    "optional": False,
-                    "files": [],
-                },
-            ],
-            "metadata": {
-                "lock-version": "2.0",
-                "python-versions": "^3.11",
-                "content-hash": (
-                    "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
-                ),
+                "extras": {"all": ["colorama (>=0.4.3,<0.5.0)"]},
             },
-        }
-    )
+            {
+                "name": "click",
+                "python-versions": ">=3.7",
+                "version": "8.1.3",
+                "optional": False,
+                "files": [],
+                "dependencies": {
+                    "colorama": {
+                        "version": "*",
+                        "markers": 'platform_system == "Windows"',
+                    }
+                },
+            },
+            {
+                "name": "colorama",
+                "python-versions": ">=3.7",
+                "version": "0.4.6",
+                "optional": False,
+                "files": [],
+            },
+        ],
+        "metadata": {
+            "lock-version": "2.0",
+            "python-versions": "^3.11",
+            "content-hash": (
+                "832b13a88e5020c27cbcd95faa577bf0dbf054a65c023b45dc9442b640d414e6"
+            ),
+        },
+    })
     root = poetry.package.with_dependency_groups([], only=True)
     root.python_versions = "^3.11"
     root.add_dependency(
