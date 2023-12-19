@@ -74,7 +74,7 @@ class ExportCommand(GroupCommand):
             raise ValueError(f"Invalid export format: {fmt}")
 
         output = self.option("output")
-        output_path = Path(output)
+        output_path = Path(output) if output else None
 
         locker = self.poetry.locker
         if not locker.is_locked():
