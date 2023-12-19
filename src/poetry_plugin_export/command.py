@@ -51,6 +51,11 @@ class ExportCommand(GroupCommand):
         ),
         option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
+        option(
+            "check-change",
+            None,
+            "Return code 1 if file changed. Useful for pre-commit.",
+        ),
     ]
 
     @property
@@ -69,6 +74,7 @@ class ExportCommand(GroupCommand):
             raise ValueError(f"Invalid export format: {fmt}")
 
         output = self.option("output")
+        output_path = Path(output)
 
         locker = self.poetry.locker
         if not locker.is_locked():
@@ -101,6 +107,15 @@ class ExportCommand(GroupCommand):
             )
             return 1
 
+        check_change = self.option("check-change")
+        if check_change and not output:
+            self.line_error(
+                "<error>You must specify"
+                " `<fg=yellow;options=bold>--output</>` if"
+                " using `<fg=yellow;options=bold>--check-change</>`.</error>"
+            )
+            return 1
+
         extras: Iterable[NormalizedName]
         if self.option("all-extras"):
             extras = self.poetry.package.extras.keys()
@@ -116,6 +131,10 @@ class ExportCommand(GroupCommand):
                     f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
                 )
 
+        orig_content = None
+        if check_change:
+            orig_content = output_path.read_bytes() if output_path.exists() else None
+
         exporter = Exporter(self.poetry, self.io)
         exporter.only_groups(list(self.activated_groups))
         exporter.with_extras(list(extras))
@@ -123,5 +142,10 @@ class ExportCommand(GroupCommand):
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
         exporter.export(fmt, Path.cwd(), output or self.io)
+
+        if check_change:
+            new_content = output_path.read_bytes()
+            if new_content != orig_content:
+                return 1
 
         return 0
