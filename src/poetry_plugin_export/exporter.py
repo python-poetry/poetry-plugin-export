@@ -3,6 +3,7 @@ from __future__ import annotations
 import urllib.parse
 
 from functools import partialmethod
+from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Iterable
 
@@ -15,7 +16,6 @@ from poetry_plugin_export.walker import get_project_dependency_packages
 
 if TYPE_CHECKING:
     from collections.abc import Collection
-    from pathlib import Path
     from typing import ClassVar
 
     from packaging.utils import NormalizedName
@@ -79,6 +79,14 @@ class Exporter:
             raise ValueError(f"Invalid export format: {fmt}")
 
         getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
+
+    def export_and_check_change(self, fmt: str, cwd: Path, output: str) -> bool:
+        output_path = Path(output)
+        orig_content = output_path.read_bytes() if output_path.exists() else None
+        self.export(fmt, cwd, output)
+        new_content = output_path.read_bytes()
+        changed = new_content != orig_content
+        return changed
 
     def _export_generic_txt(
         self, cwd: Path, output: IO | str, with_extras: bool, allow_editable: bool

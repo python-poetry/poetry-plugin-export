@@ -74,7 +74,6 @@ class ExportCommand(GroupCommand):
             raise ValueError(f"Invalid export format: {fmt}")
 
         output = self.option("output")
-        output_path = Path(output) if output else None
 
         locker = self.poetry.locker
         if not locker.is_locked():
@@ -131,21 +130,16 @@ class ExportCommand(GroupCommand):
                     f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
                 )
 
-        orig_content = None
-        if check_change:
-            orig_content = output_path.read_bytes() if output_path.exists() else None
-
         exporter = Exporter(self.poetry, self.io)
         exporter.only_groups(list(self.activated_groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
-        exporter.export(fmt, Path.cwd(), output or self.io)
 
         if check_change:
-            new_content = output_path.read_bytes()
-            if new_content != orig_content:
-                return 1
-
-        return 0
+            changed = exporter.export_and_check_change(fmt, Path.cwd(), output)
+            return 1 if changed else 0
+        else:
+            exporter.export(fmt, Path.cwd(), output or self.io)
+            return 0
