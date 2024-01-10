@@ -907,20 +907,18 @@ def test_exporter_can_export_requirements_txt_with_git_packages(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
-        "package": [
-            {
-                "name": "foo",
-                "version": "1.2.3",
-                "optional": False,
-                "python-versions": "*",
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/foo/foo.git",
-                    "reference": "123456",
-                    "resolved_reference": "abcdef",
-                },
-            }
-        ],
+        "package": [{
+            "name": "foo",
+            "version": "1.2.3",
+            "optional": False,
+            "python-versions": "*",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/foo/foo.git",
+                "reference": "123456",
+                "resolved_reference": "abcdef",
+            },
+        }],
         "metadata": {
             "python-versions": "*",
             "content-hash": "123456789",
@@ -1151,21 +1149,19 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
-        "package": [
-            {
-                "name": "foo",
-                "version": "1.2.3",
-                "optional": False,
-                "python-versions": "*",
-                "marker": "python_version < '3.7'",
-                "source": {
-                    "type": "git",
-                    "url": "https://github.com/foo/foo.git",
-                    "reference": "123456",
-                    "resolved_reference": "abcdef",
-                },
-            }
-        ],
+        "package": [{
+            "name": "foo",
+            "version": "1.2.3",
+            "optional": False,
+            "python-versions": "*",
+            "marker": "python_version < '3.7'",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/foo/foo.git",
+                "reference": "123456",
+                "resolved_reference": "abcdef",
+            },
+        }],
         "metadata": {
             "python-versions": "*",
             "content-hash": "123456789",
@@ -1191,19 +1187,17 @@ def test_exporter_can_export_requirements_txt_with_directory_packages(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
-        "package": [
-            {
-                "name": "foo",
-                "version": "1.2.3",
-                "optional": False,
-                "python-versions": "*",
-                "source": {
-                    "type": "directory",
-                    "url": "sample_project",
-                    "reference": "",
-                },
-            }
-        ],
+        "package": [{
+            "name": "foo",
+            "version": "1.2.3",
+            "optional": False,
+            "python-versions": "*",
+            "source": {
+                "type": "directory",
+                "url": "sample_project",
+                "reference": "",
+            },
+        }],
         "metadata": {
             "python-versions": "*",
             "content-hash": "123456789",
@@ -1291,20 +1285,18 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
-        "package": [
-            {
-                "name": "foo",
-                "version": "1.2.3",
-                "optional": False,
-                "python-versions": "*",
-                "marker": "python_version < '3.7'",
-                "source": {
-                    "type": "directory",
-                    "url": "sample_project",
-                    "reference": "",
-                },
-            }
-        ],
+        "package": [{
+            "name": "foo",
+            "version": "1.2.3",
+            "optional": False,
+            "python-versions": "*",
+            "marker": "python_version < '3.7'",
+            "source": {
+                "type": "directory",
+                "url": "sample_project",
+                "reference": "",
+            },
+        }],
         "metadata": {
             "python-versions": "*",
             "content-hash": "123456789",
@@ -1331,19 +1323,17 @@ def test_exporter_can_export_requirements_txt_with_file_packages(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
-        "package": [
-            {
-                "name": "foo",
-                "version": "1.2.3",
-                "optional": False,
-                "python-versions": "*",
-                "source": {
-                    "type": "file",
-                    "url": "distributions/demo-0.1.0.tar.gz",
-                    "reference": "",
-                },
-            }
-        ],
+        "package": [{
+            "name": "foo",
+            "version": "1.2.3",
+            "optional": False,
+            "python-versions": "*",
+            "source": {
+                "type": "file",
+                "url": "distributions/demo-0.1.0.tar.gz",
+                "reference": "",
+            },
+        }],
         "metadata": {
             "python-versions": "*",
             "content-hash": "123456789",
@@ -1370,20 +1360,18 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
     poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
-        "package": [
-            {
-                "name": "foo",
-                "version": "1.2.3",
-                "optional": False,
-                "python-versions": "*",
-                "marker": "python_version < '3.7'",
-                "source": {
-                    "type": "file",
-                    "url": "distributions/demo-0.1.0.tar.gz",
-                    "reference": "",
-                },
-            }
-        ],
+        "package": [{
+            "name": "foo",
+            "version": "1.2.3",
+            "optional": False,
+            "python-versions": "*",
+            "marker": "python_version < '3.7'",
+            "source": {
+                "type": "file",
+                "url": "distributions/demo-0.1.0.tar.gz",
+                "reference": "",
+            },
+        }],
         "metadata": {
             "python-versions": "*",
             "content-hash": "123456789",
