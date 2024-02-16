@@ -171,6 +171,7 @@ class Exporter:
         if indexes and self._with_urls:
             # If we have extra indexes, we add them to the beginning of the output
             indexes_header = ""
+            trusted_hosts = []
             for index in sorted(indexes):
                 repositories = [
                     r
@@ -190,19 +191,30 @@ class Exporter:
                         else repository.url
                     )
                     indexes_header += f"--index-url {url}\n"
-                    continue
+                else:
+                    url = (
+                        repository.authenticated_url
+                        if self._with_credentials
+                        else repository.url
+                    )
 
-                url = (
-                    repository.authenticated_url
-                    if self._with_credentials
-                    else repository.url
-                )
                 parsed_url = urllib.parse.urlsplit(url)
                 if parsed_url.scheme == "http":
-                    indexes_header += f"--trusted-host {parsed_url.netloc}\n"
-                indexes_header += f"--extra-index-url {url}\n"
+                    netloc = (
+                        parsed_url.netloc.split("@")[1]
+                        if "@" in parsed_url
+                        else parsed_url.netloc
+                    )
+                    trusted_hosts.append(netloc)
 
-            content = indexes_header + "\n" + content
+                if repository is not self._poetry.pool.repositories[0]:
+                    indexes_header += f"--extra-index-url {url}\n"
+
+            trusted_cmdopts = ""
+            for host in trusted_hosts:
+                trusted_cmdopts += f"--trusted-host {host}\n"
+
+            content = trusted_cmdopts + indexes_header + "\n" + content
 
         if isinstance(output, IO):
             output.write(content)
