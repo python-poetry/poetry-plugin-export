@@ -1300,7 +1300,8 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
                     "version": "7.8.9",
                     "optional": False,
                     "python-versions": "*",
-                    "source": {
+                    "develop": True,
+                "source": {
                         "type": "directory",
                         "url": "sample_project/../project_with_nested_local/bar/..",
                         "reference": "",
@@ -1323,8 +1324,8 @@ def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
         content = f.read()
 
     expected = f"""\
+-e {fixture_root_uri}/project_with_nested_local ; {MARKER_PY}
 bar @ {fixture_root_uri}/project_with_nested_local/bar ; {MARKER_PY}
-baz @ {fixture_root_uri}/project_with_nested_local ; {MARKER_PY}
 foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
 """
 

@@ -116,7 +116,6 @@ class Exporter:
                         " constraints.txt format.</warning>"
                     )
                     continue
-                line += "-e "
 
             requirement = dependency.to_pep_508(with_extras=False, resolved=True)
             is_direct_local_reference = (
@@ -129,7 +128,10 @@ class Exporter:
             elif is_direct_local_reference:
                 assert dependency.source_url is not None
                 dependency_uri = path_to_url(dependency.source_url)
-                line = f"{package.complete_name} @ {dependency_uri}"
+                if package.develop:
+                    line = f"-e {dependency_uri}"
+                else:
+                    line = f"{package.complete_name} @ {dependency_uri}"
             else:
                 line = f"{package.complete_name}=={package.version}"
 
