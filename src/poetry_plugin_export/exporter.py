@@ -108,14 +108,13 @@ class Exporter:
             dependency = dependency_package.dependency
             package = dependency_package.package
 
-            if package.develop:
-                if not allow_editable:
-                    self._io.write_error_line(
-                        f"<warning>Warning: {package.pretty_name} is locked in develop"
-                        " (editable) mode, which is incompatible with the"
-                        " constraints.txt format.</warning>"
-                    )
-                    continue
+            if package.develop and not allow_editable:
+                self._io.write_error_line(
+                    f"<warning>Warning: {package.pretty_name} is locked in develop"
+                    " (editable) mode, which is incompatible with the"
+                    " constraints.txt format.</warning>"
+                )
+                continue
 
             requirement = dependency.to_pep_508(with_extras=False, resolved=True)
             is_direct_local_reference = (
