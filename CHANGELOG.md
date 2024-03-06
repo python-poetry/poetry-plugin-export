@@ -1,5 +1,11 @@
 # Change Log
 
+## [1.7.0] - 2024-03-06
+
+### Changed
+
+- Update poetry to 1.8.0 ([#262](https://github.com/python-poetry/poetry-plugin-export/pull/262)).
+- Update poetry-core to 1.9.0 ([#262](https://github.com/python-poetry/poetry-plugin-export/pull/262)).
 
 ## [1.6.0] - 2023-10-30
 
