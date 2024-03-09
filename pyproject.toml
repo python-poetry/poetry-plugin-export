@@ -20,7 +20,7 @@ include = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
-poetry = "^1.6.0"
+poetry = "^1.8.0"
 poetry-core = "^1.7.0"
 
 [tool.poetry.group.dev.dependencies]

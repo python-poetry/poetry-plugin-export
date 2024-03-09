@@ -180,10 +180,7 @@ class Exporter:
                 if not repositories:
                     continue
                 repository = repositories[0]
-                if (
-                    self._poetry.pool.has_default()
-                    and repository is self._poetry.pool.repositories[0]
-                ):
+                if repository is self._poetry.pool.repositories[0]:
                     url = (
                         repository.authenticated_url
                         if self._with_credentials
