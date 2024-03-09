@@ -1737,7 +1737,6 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
             "https://b.example.com/simple",
             config=poetry.config,
         ),
-        priority=Priority.DEFAULT,
     )
     poetry.pool.add_repository(
         LegacyRepository(
@@ -1745,7 +1744,6 @@ def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
             "https://a.example.com/simple",
             config=poetry.config,
         ),
-        priority=Priority.SECONDARY,
     )
     poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
         "package": [
