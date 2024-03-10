@@ -1789,7 +1789,7 @@ foo==1.2.3 ; {MARKER_PY} \\
     assert content == expected
 
 
-def test_exporter_exports_requirements_txt_with_default_and_secondary_sources(
+def test_exporter_exports_requirements_txt_with_two_primary_sources(
     tmp_path: Path, poetry: Poetry
 ) -> None:
     poetry.pool.remove_repository("PyPI")
