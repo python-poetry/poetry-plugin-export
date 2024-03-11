@@ -108,15 +108,13 @@ class Exporter:
             dependency = dependency_package.dependency
             package = dependency_package.package
 
-            if package.develop:
-                if not allow_editable:
-                    self._io.write_error_line(
-                        f"<warning>Warning: {package.pretty_name} is locked in develop"
-                        " (editable) mode, which is incompatible with the"
-                        " constraints.txt format.</warning>"
-                    )
-                    continue
-                line += "-e "
+            if package.develop and not allow_editable:
+                self._io.write_error_line(
+                    f"<warning>Warning: {package.pretty_name} is locked in develop"
+                    " (editable) mode, which is incompatible with the"
+                    " constraints.txt format.</warning>"
+                )
+                continue
 
             requirement = dependency.to_pep_508(with_extras=False, resolved=True)
             is_direct_local_reference = (
@@ -129,7 +127,10 @@ class Exporter:
             elif is_direct_local_reference:
                 assert dependency.source_url is not None
                 dependency_uri = path_to_url(dependency.source_url)
-                line = f"{package.complete_name} @ {dependency_uri}"
+                if package.develop:
+                    line = f"-e {dependency_uri}"
+                else:
+                    line = f"{package.complete_name} @ {dependency_uri}"
             else:
                 line = f"{package.complete_name}=={package.version}"
 
