@@ -1,5 +1,15 @@
 # Change Log
 
+## [1.7.0] - 2023-03-14
+
+### Changed
+
+- Bump minimum required poetry version to 1.8.0 ([#263](https://github.com/python-poetry/poetry-plugin-export/pull/263)).
+
+### Fixed
+
+- Fix an issue where all sources were exported with `--extra-index-url` even though PyPI was deactivated ([#263](https://github.com/python-poetry/poetry-plugin-export/pull/263)).
+
 
 ## [1.6.0] - 2023-10-30
 
@@ -179,7 +189,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.6.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.7.0...main
+[1.7.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.7.0
 [1.6.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.6.0
 [1.5.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.5.0
 [1.4.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.4.0

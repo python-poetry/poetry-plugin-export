@@ -1,14 +1,12 @@
 [tool.poetry]
 name = "poetry-plugin-export"
-version = "1.6.0"
+version = "1.7.0"
 description = "Poetry plugin to export the dependencies to various formats"
 authors = ["Sébastien Eustace <sebastien@eustace.io>"]
 license = "MIT"
 readme = "README.md"
 homepage = "https://python-poetry.org/"
 repository = "https://github.com/python-poetry/poetry-plugin-export"
-# Classifiers for Python 3.12 can be removed after Poetry 1.7.0 has been released.
-classifiers = ["Programming Language :: Python :: 3.12"]
 
 packages = [
     { include = "poetry_plugin_export", from = "src" }
