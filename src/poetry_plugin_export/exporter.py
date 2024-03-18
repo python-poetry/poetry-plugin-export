@@ -143,7 +143,7 @@ class Exporter:
                 and not is_direct_local_reference
                 and package.source_url
             ):
-                indexes.add(package.source_url)
+                indexes.add(package.source_url.rstrip("/"))
 
             if package.files and self._with_hashes:
                 hashes = []
@@ -171,22 +171,16 @@ class Exporter:
         if indexes and self._with_urls:
             # If we have extra indexes, we add them to the beginning of the output
             indexes_header = ""
-            for index in sorted(indexes):
-                repositories = [
-                    r
-                    for r in self._poetry.pool.all_repositories
-                    if isinstance(r, HTTPRepository) and r.url == index.rstrip("/")
-                ]
-                if not repositories:
-                    continue
-                repository = repositories[0]
-                if repository is self._poetry.pool.repositories[0]:
-                    url = (
-                        repository.authenticated_url
-                        if self._with_credentials
-                        else repository.url
-                    )
-                    indexes_header += f"--index-url {url}\n"
+            has_pypi_repository = any(
+                r.name.lower() == "pypi" for r in self._poetry.pool.all_repositories
+            )
+            # Iterate over repositories so that we get the repository with the highest
+            # priority first so that --index-url comes before --extra-index-url
+            for repository in self._poetry.pool.all_repositories:
+                if (
+                    not isinstance(repository, HTTPRepository)
+                    or repository.url not in indexes
+                ):
                     continue
 
                 url = (
@@ -197,7 +191,13 @@ class Exporter:
                 parsed_url = urllib.parse.urlsplit(url)
                 if parsed_url.scheme == "http":
                     indexes_header += f"--trusted-host {parsed_url.netloc}\n"
-                indexes_header += f"--extra-index-url {url}\n"
+                if (
+                    not has_pypi_repository
+                    and repository is self._poetry.pool.repositories[0]
+                ):
+                    indexes_header += f"--index-url {url}\n"
+                else:
+                    indexes_header += f"--extra-index-url {url}\n"
 
             content = indexes_header + "\n" + content
 
