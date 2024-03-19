@@ -1878,8 +1878,8 @@ def test_exporter_exports_requirements_txt_with_two_primary_sources(
         content = f.read()
 
     expected = f"""\
---extra-index-url https://foo:bar@a.example.com/simple
 --index-url https://baz:qux@b.example.com/simple
+--extra-index-url https://foo:bar@a.example.com/simple
 
 bar==4.5.6 ; {MARKER_PY} \\
     --hash=sha256:67890
@@ -2795,3 +2795,122 @@ colorama==0.4.6 ; python_version >= "3.11" and python_version < "4.0"
 typer[all]==0.9.0 ; python_version >= "3.11" and python_version < "4.0"
 """
     assert io.fetch_output() == expected
+
+
+@pytest.mark.parametrize(
+    ("priorities", "expected"),
+    [
+        ([("custom-a", Priority.PRIMARY), ("custom-b", Priority.PRIMARY)], ("a", "b")),
+        ([("custom-b", Priority.PRIMARY), ("custom-a", Priority.PRIMARY)], ("b", "a")),
+        (
+            [("custom-b", Priority.SUPPLEMENTAL), ("custom-a", Priority.PRIMARY)],
+            ("a", "b"),
+        ),
+        ([("custom-b", Priority.EXPLICIT), ("custom-a", Priority.PRIMARY)], ("a", "b")),
+        (
+            [
+                ("PyPI", Priority.PRIMARY),
+                ("custom-a", Priority.PRIMARY),
+                ("custom-b", Priority.PRIMARY),
+            ],
+            ("", "a", "b"),
+        ),
+        (
+            [
+                ("PyPI", Priority.EXPLICIT),
+                ("custom-a", Priority.PRIMARY),
+                ("custom-b", Priority.PRIMARY),
+            ],
+            ("", "a", "b"),
+        ),
+        (
+            [
+                ("custom-a", Priority.PRIMARY),
+                ("custom-b", Priority.PRIMARY),
+                ("PyPI", Priority.SUPPLEMENTAL),
+            ],
+            ("", "a", "b"),
+        ),
+    ],
+)
+def test_exporter_index_urls(
+    tmp_path: Path,
+    poetry: Poetry,
+    priorities: list[tuple[str, Priority]],
+    expected: tuple[str, ...],
+) -> None:
+    pypi = poetry.pool.repository("PyPI")
+    poetry.pool.remove_repository("PyPI")
+    for name, prio in priorities:
+        if name.lower() == "pypi":
+            repo = pypi
+        else:
+            repo = LegacyRepository(name, f"https://{name[-1]}.example.com/simple")
+        poetry.pool.add_repository(repo, priority=prio)
+
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "legacy",
+                        "url": "https://a.example.com/simple",
+                        "reference": "",
+                    },
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "optional": False,
+                    "python-versions": "*",
+                    "source": {
+                        "type": "legacy",
+                        "url": "https://b.example.com/simple",
+                        "reference": "",
+                    },
+                },
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "files": {
+                    "foo": [{"name": "foo.whl", "hash": "12345"}],
+                    "bar": [{"name": "bar.whl", "hash": "67890"}],
+                },
+            },
+        }
+    )
+    set_package_requires(poetry, dev={"bar"})
+
+    exporter = Exporter(poetry, NullIO())
+    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.export("requirements.txt", tmp_path, "requirements.txt")
+
+    with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected_urls = [
+        f"--extra-index-url https://{name[-1]}.example.com/simple"
+        for name in expected[1:]
+    ]
+    if expected[0]:
+        expected_urls = [
+            f"--index-url https://{expected[0]}.example.com/simple",
+            *expected_urls,
+        ]
+    url_string = "\n".join(expected_urls)
+
+    expected_content = f"""\
+{url_string}
+
+bar==4.5.6 ; {MARKER_PY} \\
+    --hash=sha256:67890
+foo==1.2.3 ; {MARKER_PY} \\
+    --hash=sha256:12345
+"""
+
+    assert content == expected_content
