@@ -289,3 +289,31 @@ develop = true }}
 
     assert develop_warning in tester.io.fetch_error()
     assert tester.io.fetch_output() == expected
+
+
+@pytest.mark.parametrize(
+    "excludes, expected",
+    [
+        (
+            ["foo"],
+            f"""\
+bar==1.1.0 ; {MARKER_PY}
+baz==2.0.0 ; {MARKER_PY}
+qux==1.2.0 ; {MARKER_PY}
+""",
+        ),
+        (
+            ["foo", "bar"],
+            f"""\
+baz==2.0.0 ; {MARKER_PY}
+qux==1.2.0 ; {MARKER_PY}
+""",
+        ),
+    ],
+)
+def test_export_excludes(
+    tester: CommandTester, do_lock: None, excludes: list[str], expected: str
+) -> None:
+    excludes_opts = " ".join([f"--exclude={exclude}" for exclude in excludes])
+    tester.execute(f"--format requirements.txt --with=dev --all-extras {excludes_opts}")
+    assert tester.io.fetch_output() == expected
