@@ -1267,6 +1267,47 @@ foo @ {fixture_root_uri}/sample_project ; {MARKER_PY}
     assert content == expected
 
 
+def test_exporter_can_export_requirements_txt_with_directory_packages_editable(
+    tmp_path: Path, poetry: Poetry, fixture_root_uri: str
+) -> None:
+    poetry.locker.mock_lock_data(  # type: ignore[attr-defined]
+        {
+            "package": [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "optional": False,
+                    "python-versions": "*",
+                    "develop": True,
+                    "source": {
+                        "type": "directory",
+                        "url": "sample_project",
+                        "reference": "",
+                    },
+                }
+            ],
+            "metadata": {
+                "python-versions": "*",
+                "content-hash": "123456789",
+                "files": {"foo": []},
+            },
+        }
+    )
+    set_package_requires(poetry)
+
+    exporter = Exporter(poetry, NullIO())
+    exporter.export("requirements.txt", tmp_path, "requirements.txt")
+
+    with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = f"""\
+-e {fixture_root_uri}/sample_project ; {MARKER_PY}
+"""
+
+    assert content == expected
+
+
 def test_exporter_can_export_requirements_txt_with_nested_directory_packages(
     tmp_path: Path, poetry: Poetry, fixture_root_uri: str
 ) -> None:
