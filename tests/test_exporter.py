@@ -82,7 +82,10 @@ def poetry(fixture_root: Path, locker: Locker) -> Poetry:
 
 
 def set_package_requires(
-    poetry: Poetry, skip: set[str] | None = None, dev: set[str] | None = None
+    poetry: Poetry,
+    skip: set[str] | None = None,
+    dev: set[str] | None = None,
+    markers: dict[str, str] | None = None,
 ) -> None:
     skip = skip or set()
     dev = dev or set()
@@ -93,6 +96,8 @@ def set_package_requires(
             dep = pkg.to_dependency()
             if pkg.name in dev:
                 dep._groups = frozenset(["dev"])
+            if markers and pkg.name in markers:
+                dep._marker = parse_marker(markers[pkg.name])
             package.add_dependency(dep)
 
     poetry._package = package
@@ -151,21 +156,18 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
                     "version": "1.2.3",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "python_version < '3.7'",
                 },
                 {
                     "name": "bar",
                     "version": "4.5.6",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "extra =='foo'",
                 },
                 {
                     "name": "baz",
                     "version": "7.8.9",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "sys_platform == 'win32'",
                 },
             ],
             "metadata": {
@@ -175,7 +177,12 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
             },
         }
     )
-    set_package_requires(poetry)
+    markers = {
+        "foo": "python_version < '3.7'",
+        "bar": "extra =='foo'",
+        "baz": "sys_platform == 'win32'",
+    }
+    set_package_requires(poetry, markers=markers)
 
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -397,15 +404,22 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
                     "version": "1.2.3",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "python_version < '3.7'",
-                    "dependencies": {"b": ">=0.0.0", "c": ">=0.0.0"},
+                    "dependencies": {
+                        "b": {
+                            "version": ">=0.0.0",
+                            "markers": "platform_system == 'Windows'",
+                        },
+                        "c": {
+                            "version": ">=0.0.0",
+                            "markers": "sys_platform == 'win32'",
+                        },
+                    },
                 },
                 {
                     "name": "b",
                     "version": "4.5.6",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "platform_system == 'Windows'",
                     "dependencies": {"d": ">=0.0.0"},
                 },
                 {
@@ -413,7 +427,6 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
                     "version": "7.8.9",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "sys_platform == 'win32'",
                     "dependencies": {"d": ">=0.0.0"},
                 },
                 {
@@ -430,7 +443,9 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
             },
         }
     )
-    set_package_requires(poetry, skip={"b", "c", "d"})
+    set_package_requires(
+        poetry, skip={"b", "c", "d"}, markers={"a": "python_version < '3.7'"}
+    )
 
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -1196,7 +1211,6 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
                     "version": "1.2.3",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "python_version < '3.7'",
                     "source": {
                         "type": "git",
                         "url": "https://github.com/foo/foo.git",
@@ -1212,7 +1226,7 @@ def test_exporter_can_export_requirements_txt_with_git_packages_and_markers(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, markers={"foo": "python_version < '3.7'"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -1383,7 +1397,6 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
                     "version": "1.2.3",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "python_version < '3.7'",
                     "source": {
                         "type": "directory",
                         "url": "sample_project",
@@ -1398,7 +1411,7 @@ def test_exporter_can_export_requirements_txt_with_directory_packages_and_marker
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, markers={"foo": "python_version < '3.7'"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
@@ -1466,7 +1479,6 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
                     "version": "1.2.3",
                     "optional": False,
                     "python-versions": "*",
-                    "marker": "python_version < '3.7'",
                     "source": {
                         "type": "file",
                         "url": "distributions/demo-0.1.0.tar.gz",
@@ -1481,7 +1493,7 @@ def test_exporter_can_export_requirements_txt_with_file_packages_and_markers(
             },
         }
     )
-    set_package_requires(poetry)
+    set_package_requires(poetry, markers={"foo": "python_version < '3.7'"})
 
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
