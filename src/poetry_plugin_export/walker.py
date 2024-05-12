@@ -264,5 +264,27 @@ def get_locked_package(
     return next(iter(compatible_candidates), None)
 
 
+def get_project_dependency_packages2(
+    locker: Locker,
+    project_python_marker: BaseMarker | None = None,
+    groups: Collection[str] = (),
+    extras: Collection[NormalizedName] = (),
+) -> Iterator[DependencyPackage]:
+    for package, info in locker.locked_packages().items():
+        if not info.groups.intersection(groups):
+            continue
+
+        marker = info.get_marker(groups)
+        if not marker.validate({"extra": extras}):
+            continue
+
+        if project_python_marker:
+            marker = project_python_marker.intersect(marker)
+
+        package.marker = marker
+
+        yield DependencyPackage(dependency=package.to_dependency(), package=package)
+
+
 class DependencyWalkerError(Exception):
     pass
