@@ -5,5 +5,5 @@
   language: python
   language_version: python3
   pass_filenames: false
-  files: ^poetry\.lock$
+  files: ^(.*/)?poetry\.lock$
   args: ["-f", "requirements.txt", "-o", "requirements.txt"]
