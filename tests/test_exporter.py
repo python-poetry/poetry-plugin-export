@@ -873,6 +873,106 @@ foo==1.2.3 ; {MARKER_PY} \\
 
 
 @pytest.mark.parametrize(
+    ["packages_data", "skip", "excludes", "lines"],
+    [
+        # two package without deps, exclude foo
+        (
+            [
+                {"name": "foo", "version": "1.2.3"},
+                {"name": "bar", "version": "4.5.6"},
+            ],
+            None,
+            ["foo"],
+            [f"bar==4.5.6 ; {MARKER_PY}"],
+        ),
+        # foo has baz dep, exclude foo with baz dep
+        (
+            [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "dependencies": {"baz": ">=7.8.9"},
+                },
+                {"name": "bar", "version": "4.5.6"},
+                {"name": "baz", "version": "7.8.9", "optional": True},
+            ],
+            {"baz"},
+            ["foo"],
+            [f"bar==4.5.6 ; {MARKER_PY}"],
+        ),
+        # foo has baz dep, baz also declared in main group, exclude only foo
+        (
+            [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "dependencies": {"baz": ">=7.8.9"},
+                },
+                {"name": "bar", "version": "4.5.6"},
+                {"name": "baz", "version": "7.8.9"},
+            ],
+            None,
+            ["foo"],
+            [f"bar==4.5.6 ; {MARKER_PY}", f"baz==7.8.9 ; {MARKER_PY}"],
+        ),
+        # foo has baz dep, bar also has baz dep, exclude only foo
+        (
+            [
+                {
+                    "name": "foo",
+                    "version": "1.2.3",
+                    "dependencies": {"baz": ">=7.8.9"},
+                },
+                {
+                    "name": "bar",
+                    "version": "4.5.6",
+                    "dependencies": {"baz": ">=7.8.9"},
+                },
+                {"name": "baz", "version": "7.8.9", "optional": True},
+            ],
+            {"baz"},
+            ["foo"],
+            [f"bar==4.5.6 ; {MARKER_PY}", f"baz==7.8.9 ; {MARKER_PY}"],
+        ),
+    ],
+)
+def test_exporter_exports_requirements_txt_with_excludes(
+    tmp_path: Path,
+    poetry: Poetry,
+    packages_data: list[dict[str, Any]],
+    excludes: Collection[NormalizedName],
+    skip: set[str] | None,
+    lines: list[str],
+) -> None:
+    for package_data in packages_data:
+        if "optional" not in package_data:
+            package_data["optional"] = False
+        if "python-versions" not in package_data:
+            package_data["python-versions"] = "*"
+
+    poetry.locker.mock_lock_data({  # type: ignore[attr-defined]
+        "package": packages_data,
+        "metadata": {
+            "content-hash": "123456789",
+            "files": {package["name"]: [] for package in packages_data},
+        },
+    })
+    set_package_requires(poetry, skip=skip)
+
+    exporter = Exporter(poetry, NullIO())
+    exporter.with_hashes(False)
+    exporter.with_excludes(excludes)
+    exporter.export("requirements.txt", tmp_path, "requirements.txt")
+
+    with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = "\n".join(lines) + "\n"
+
+    assert content == expected
+
+
+@pytest.mark.parametrize(
     ["extras", "lines"],
     [
         (

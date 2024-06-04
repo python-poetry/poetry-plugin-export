@@ -44,6 +44,7 @@ class Exporter:
         self._with_urls = True
         self._extras: Collection[NormalizedName] = ()
         self._groups: Iterable[str] = [MAIN_GROUP]
+        self._excludes: Collection[NormalizedName] = ()
 
     @classmethod
     def is_format_supported(cls, fmt: str) -> bool:
@@ -74,6 +75,11 @@ class Exporter:
 
         return self
 
+    def with_excludes(self, excludes: Collection[NormalizedName]) -> Exporter:
+        self._excludes = excludes
+
+        return self
+
     def export(self, fmt: str, cwd: Path, output: IO | str) -> None:
         if not self.is_format_supported(fmt):
             raise ValueError(f"Invalid export format: {fmt}")
@@ -99,6 +105,7 @@ class Exporter:
             root_package_name=root.name,
             project_python_marker=root.python_marker,
             extras=self._extras,
+            excludes=self._excludes,
         ):
             line = ""
 

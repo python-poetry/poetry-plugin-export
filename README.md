@@ -53,3 +53,4 @@ poetry export -f requirements.txt --output requirements.txt
 * `--all-extras`: Include all sets of extra dependencies.
 * `--without-hashes`: Exclude hashes from the exported file.
 * `--with-credentials`: Include credentials for extra indices.
+* `--exclude`: The names of dependencies to exclude along with nested dependencies when exporting.
