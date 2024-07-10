@@ -42,6 +42,7 @@ class Exporter:
         self._with_hashes = True
         self._with_credentials = False
         self._with_urls = True
+        self._resolve_path_dependencies = False
         self._extras: Collection[NormalizedName] = ()
         self._groups: Iterable[str] = [MAIN_GROUP]
 
