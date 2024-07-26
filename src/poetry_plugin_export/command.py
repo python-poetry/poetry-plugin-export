@@ -51,6 +51,14 @@ class ExportCommand(GroupCommand):
         ),
         option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
+        option(
+            "exclude",
+            None,
+            "The names of dependencies to exclude along with nested dependencies when"
+            " exporting.",
+            flag=False,
+            multiple=True,
+        ),
     ]
 
     @property
@@ -116,12 +124,19 @@ class ExportCommand(GroupCommand):
                     f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
                 )
 
+        excludes = {
+            canonicalize_name(exclude)
+            for exclude_opt in self.option("exclude")
+            for exclude in exclude_opt.split()
+        }
+
         exporter = Exporter(self.poetry, self.io)
         exporter.only_groups(list(self.activated_groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
+        exporter.with_excludes(list(excludes))
         exporter.export(fmt, Path.cwd(), output or self.io)
 
         return 0
