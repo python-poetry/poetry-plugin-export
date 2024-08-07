@@ -42,6 +42,7 @@ class Exporter:
         self._with_hashes = True
         self._with_credentials = False
         self._with_urls = True
+        self._resolve_path_dependencies = False
         self._extras: Collection[NormalizedName] = ()
         self._groups: Iterable[str] = [MAIN_GROUP]
 
@@ -74,6 +75,13 @@ class Exporter:
 
         return self
 
+    def resolve_path_dependencies(
+        self, resolve_path_dependencies: bool = False
+    ) -> Exporter:
+        self._resolve_path_dependencies = resolve_path_dependencies
+
+        return self
+
     def export(self, fmt: str, cwd: Path, output: IO | str) -> None:
         if not self.is_format_supported(fmt):
             raise ValueError(f"Invalid export format: {fmt}")
@@ -81,7 +89,11 @@ class Exporter:
         getattr(self, self.EXPORT_METHODS[fmt])(cwd, output)
 
     def _export_generic_txt(
-        self, cwd: Path, output: IO | str, with_extras: bool, allow_editable: bool
+        self,
+        cwd: Path,
+        output: IO | str,
+        with_extras: bool,
+        allow_editable: bool,
     ) -> None:
         from poetry.core.packages.utils.utils import path_to_url
 
@@ -117,8 +129,8 @@ class Exporter:
                 continue
 
             requirement = dependency.to_pep_508(with_extras=False, resolved=True)
-            is_direct_local_reference = (
-                dependency.is_file() or dependency.is_directory()
+            is_direct_local_reference = dependency.is_file() or (
+                dependency.is_directory() and not self._resolve_path_dependencies
             )
             is_direct_remote_reference = dependency.is_vcs() or dependency.is_url()
 

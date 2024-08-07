@@ -51,6 +51,11 @@ class ExportCommand(GroupCommand):
         ),
         option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
+        option(
+            "resolve-path-dependencies",
+            "P",
+            "Resolve path dependencies to package versions.",
+        ),
     ]
 
     @property
@@ -122,6 +127,7 @@ class ExportCommand(GroupCommand):
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
+        exporter.resolve_path_dependencies(self.option("resolve-path-dependencies"))
         exporter.export(fmt, Path.cwd(), output or self.io)
 
         return 0
