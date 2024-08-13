@@ -55,6 +55,7 @@ def get_project_dependency_packages(
     root_package_name: NormalizedName,
     project_python_marker: BaseMarker | None = None,
     extras: Collection[NormalizedName] = (),
+    excludes: Collection[NormalizedName] = (),
 ) -> Iterator[DependencyPackage]:
     # Apply the project python marker to all requirements.
     if project_python_marker is not None:
@@ -90,6 +91,9 @@ def get_project_dependency_packages(
 
         if package.optional and package.name not in extra_package_names:
             # a package is locked as optional, but is not activated via extras
+            continue
+
+        if excludes and package.name in excludes:
             continue
 
         selected.append(dependency)
