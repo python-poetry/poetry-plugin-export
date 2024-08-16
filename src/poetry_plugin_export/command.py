@@ -1,19 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 from cleo.helpers import option
-from packaging.utils import NormalizedName
-from packaging.utils import canonicalize_name
 from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 from poetry_plugin_export.exporter import Exporter
-
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
 
 
 class ExportCommand(GroupCommand):
@@ -41,7 +34,6 @@ class ExportCommand(GroupCommand):
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
-<<<<<<< HEAD
         option(
             "all",
             None,
@@ -52,10 +44,7 @@ class ExportCommand(GroupCommand):
             None,
             "Include all extras",
         ),
-        *InstallerCommand._group_dependency_options(),
-=======
         *GroupCommand._group_dependency_options(),
->>>>>>> c672530630d79c4c9f29dd54bca28f21a88dfff9
         option(
             "extras",
             "E",
