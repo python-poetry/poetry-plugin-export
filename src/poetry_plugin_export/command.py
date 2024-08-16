@@ -41,9 +41,8 @@ class ExportCommand(GroupCommand):
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
-        option("all-groups", None, "Include all groups"),
-        option("all-extras", None, "Include all extras"),
         *GroupCommand._group_dependency_options(),
+        option("all-groups", None, "Include all sets of extra groups"),
         option(
             "extras",
             "E",
@@ -51,6 +50,7 @@ class ExportCommand(GroupCommand):
             flag=False,
             multiple=True,
         ),
+        option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
     ]
 
