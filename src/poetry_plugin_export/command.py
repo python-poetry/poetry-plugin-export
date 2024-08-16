@@ -1,12 +1,19 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from cleo.helpers import option
+from packaging.utils import NormalizedName
+from packaging.utils import canonicalize_name
 from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 from poetry_plugin_export.exporter import Exporter
+
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 class ExportCommand(GroupCommand):
@@ -34,16 +41,8 @@ class ExportCommand(GroupCommand):
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
-        option(
-            "all",
-            None,
-            "Include all groups and extras",
-        ),
-        option(
-            "all-extras",
-            None,
-            "Include all extras",
-        ),
+        option("all-groups", None, "Include all groups"),
+        option("all-extras", None, "Include all extras"),
         *GroupCommand._group_dependency_options(),
         option(
             "extras",
@@ -52,7 +51,6 @@ class ExportCommand(GroupCommand):
             flag=False,
             multiple=True,
         ),
-        option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
     ]
 
@@ -95,28 +93,42 @@ class ExportCommand(GroupCommand):
                 "</warning>"
             )
 
-        groups = self.activated_groups
-
-        # Checking extras
-        extras = {
-            extra for extra_opt in self.option("extras") for extra in extra_opt.split()
-        }
-        invalid_extras = extras - self.poetry.package.extras.keys()
-        if invalid_extras:
-            raise ValueError(
-                f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
+        if self.option("extras") and self.option("all-extras"):
+            self.line_error(
+                "<error>You cannot specify explicit"
+                " `<fg=yellow;options=bold>--extras</>` while exporting"
+                " using `<fg=yellow;options=bold>--all-extras</>`.</error>"
             )
+            return 1
 
-        # handle 'all'
-        if self.option("all"):
-            extras = set(self.poetry.package.extras.keys())
-            groups = self.poetry.package.dependency_group_names(include_optional=True)
-
-        # handle 'all-extras'
+        extras: Iterable[NormalizedName]
         if self.option("all-extras"):
-            if self.option("extras"):
-                raise ValueError("Can't have --all-extras and --extras together.")
-            extras = set(self.poetry.package.extras.keys())
+            extras = self.poetry.package.extras.keys()
+        else:
+            extras = {
+                canonicalize_name(extra)
+                for extra_opt in self.option("extras")
+                for extra in extra_opt.split()
+            }
+            invalid_extras = extras - self.poetry.package.extras.keys()
+            if invalid_extras:
+                raise ValueError(
+                    f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
+                )
+
+        if self.option("with") and self.option("all-groups"):
+            self.line_error(
+                "<error>You cannot specify explicit"
+                " `<fg=yellow;options=bold>--with</>` while exporting"
+                " using `<fg=yellow;options=bold>--all-groups</>`.</error>"
+            )
+            return 1
+
+        groups = (
+            self.poetry.package.dependency_group_names(include_optional=True)
+            if self.option("all-groups")
+            else self.activated_groups
+        )
 
         exporter = Exporter(self.poetry, self.io)
         exporter.only_groups(list(groups))

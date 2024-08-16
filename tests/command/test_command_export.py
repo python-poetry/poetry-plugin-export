@@ -216,36 +216,42 @@ def test_export_includes_extras_by_flag(
 def test_export_reports_invalid_extras(tester: CommandTester, do_lock: None) -> None:
     with pytest.raises(ValueError) as error:
         tester.execute("--format requirements.txt --extras 'SUS AMONGUS'")
-    expected = "Extra [AMONGUS, SUS] is not specified."
+    expected = "Extra [amongus, sus] is not specified."
     assert str(error.value) == expected
 
 
-def test_all_option(tester: CommandTester, do_lock: None) -> None:
-    tester.execute("--all")
-    expected = f"""\
-bar==1.1.0 ; {MARKER_PY}
-baz==2.0.0 ; {MARKER_PY}
-foo==1.0.0 ; {MARKER_PY}
-opt==2.2.0 ; {MARKER_PY}
-qux==1.2.0 ; {MARKER_PY}
-"""
-    assert tester.io.fetch_output() == expected
+def test_export_with_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--format requirements.txt --all-extras")
+    output = tester.io.fetch_output()
+    assert f"bar==1.1.0 ; {MARKER_PY}" in output
+    assert f"qux==1.2.0 ; {MARKER_PY}" in output
 
 
-def test_all_extras_option(tester: CommandTester, do_lock: None) -> None:
-    tester.execute("--all-extras")
-    expected = f"""\
-bar==1.1.0 ; {MARKER_PY}
-foo==1.0.0 ; {MARKER_PY}
-qux==1.2.0 ; {MARKER_PY}
-"""
-    assert tester.io.fetch_output() == expected
+def test_extras_conflicts_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--extras bar --all-extras")
+
+    assert tester.status_code == 1
+    assert (
+        "You cannot specify explicit `--extras` while exporting using `--all-extras`.\n"
+        in tester.io.fetch_error()
+    )
 
 
-def test_all_extras_and_extras(tester: CommandTester, do_lock: None) -> None:
-    with pytest.raises(ValueError) as error:
-        tester.execute("--all-extras --extras 'feature_bar'")
-    assert str(error.value) == "Can't have --all-extras and --extras together."
+def test_export_with_all_groups(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--format requirements.txt --all-groups")
+    output = tester.io.fetch_output()
+    assert f"baz==2.0.0 ; {MARKER_PY}" in output
+    assert f"opt==2.2.0 ; {MARKER_PY}" in output
+
+
+def test_with_conflicts_all_groups(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--with=bar --all-groups")
+
+    assert tester.status_code == 1
+    assert (
+        "You cannot specify explicit `--with` while exporting using `--all-groups`.\n"
+        in tester.io.fetch_error()
+    )
 
 
 def test_export_with_urls(
