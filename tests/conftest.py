@@ -1,13 +1,10 @@
 from __future__ import annotations
 
-import shutil
 import sys
-import tempfile
 
 from pathlib import Path
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Iterator
 
 import pytest
 
@@ -16,8 +13,8 @@ from poetry.config.dict_config_source import DictConfigSource
 from poetry.core.packages.package import Package
 from poetry.factory import Factory
 from poetry.layouts import layout
-from poetry.repositories import Pool
 from poetry.repositories import Repository
+from poetry.repositories.repository_pool import RepositoryPool
 from poetry.utils.env import SystemEnv
 
 from tests.helpers import TestLocker
@@ -27,7 +24,6 @@ if TYPE_CHECKING:
     from poetry.poetry import Poetry
     from pytest_mock import MockerFixture
 
-    from tests.types import FixtureDirGetter
     from tests.types import ProjectFactory
 
 
@@ -52,15 +48,11 @@ class Config(BaseConfig):
 
 
 @pytest.fixture
-def config_cache_dir(tmp_dir: str) -> Path:
-    path = Path(tmp_dir) / ".cache" / "pypoetry"
+def config_cache_dir(tmp_path: Path) -> Path:
+    path = tmp_path / ".cache" / "pypoetry"
     path.mkdir(parents=True)
+
     return path
-
-
-@pytest.fixture
-def config_virtualenvs_path(config_cache_dir: Path) -> Path:
-    return config_cache_dir / "virtualenvs"
 
 
 @pytest.fixture
@@ -102,25 +94,13 @@ def config(
 
 
 @pytest.fixture
-def tmp_dir() -> Iterator[str]:
-    dir_ = tempfile.mkdtemp(prefix="poetry_")
-
-    yield dir_
-
-    shutil.rmtree(dir_)
+def fixture_root() -> Path:
+    return Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
-def fixture_base() -> Path:
-    return Path(__file__).parent.joinpath("fixtures")
-
-
-@pytest.fixture
-def fixture_dir(fixture_base: Path) -> FixtureDirGetter:
-    def _fixture_dir(name: str) -> Path:
-        return fixture_base / name
-
-    return _fixture_dir
+def fixture_root_uri(fixture_root: Path) -> str:
+    return fixture_root.as_uri()
 
 
 @pytest.fixture()
@@ -150,14 +130,12 @@ def default_python(current_python: tuple[int, int, int]) -> str:
 
 @pytest.fixture
 def project_factory(
-    tmp_dir: str,
+    tmp_path: Path,
     config: Config,
     repo: Repository,
     installed: Repository,
     default_python: str,
 ) -> ProjectFactory:
-    workspace = Path(tmp_dir)
-
     def _factory(
         name: str,
         dependencies: dict[str, str] | None = None,
@@ -166,7 +144,7 @@ def project_factory(
         poetry_lock_content: str | None = None,
         install_deps: bool = True,
     ) -> Poetry:
-        project_dir = workspace / f"poetry-fixture-{name}"
+        project_dir = tmp_path / f"poetry-fixture-{name}"
         dependencies = dependencies or {}
         dev_dependencies = dev_dependencies or {}
 
@@ -193,13 +171,21 @@ def project_factory(
 
         poetry = Factory().create_poetry(project_dir)
 
-        locker = TestLocker(poetry.locker.lock.path, poetry.locker._local_config)
+        try:
+            # with https://github.com/python-poetry/poetry/pull/9133
+            locker = TestLocker(
+                poetry.locker.lock,
+                poetry.locker._pyproject_data,  # type: ignore[attr-defined]
+            )
+        except AttributeError:
+            # before https://github.com/python-poetry/poetry/pull/9133
+            locker = TestLocker(poetry.locker.lock, poetry.locker._local_config)
         locker.write()
 
         poetry.set_locker(locker)
         poetry.set_config(config)
 
-        pool = Pool()
+        pool = RepositoryPool()
         pool.add_repository(repo)
 
         poetry.set_pool(pool)

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import shutil
+
 from typing import TYPE_CHECKING
 from unittest.mock import Mock
 
@@ -13,6 +15,8 @@ from tests.markers import MARKER_PY
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from _pytest.monkeypatch import MonkeyPatch
     from cleo.testers.command_tester import CommandTester
     from poetry.poetry import Poetry
@@ -89,10 +93,13 @@ def tester(
     return command_tester_factory("export", poetry=poetry)
 
 
-def _export_requirements(tester: CommandTester, poetry: Poetry) -> None:
-    tester.execute("--format requirements.txt --output requirements.txt")
+def _export_requirements(tester: CommandTester, poetry: Poetry, tmp_path: Path) -> None:
+    from tests.helpers import as_cwd
 
-    requirements = poetry.file.parent / "requirements.txt"
+    with as_cwd(tmp_path):
+        tester.execute("--format requirements.txt --output requirements.txt")
+
+    requirements = tmp_path / "requirements.txt"
     assert requirements.exists()
 
     with requirements.open(encoding="utf-8") as f:
@@ -108,17 +115,17 @@ foo==1.0.0 ; {MARKER_PY}
 
 
 def test_export_exports_requirements_txt_file_locks_if_no_lock_file(
-    tester: CommandTester, poetry: Poetry
+    tester: CommandTester, poetry: Poetry, tmp_path: Path
 ) -> None:
     assert not poetry.locker.lock.exists()
-    _export_requirements(tester, poetry)
+    _export_requirements(tester, poetry, tmp_path)
     assert "The lock file does not exist. Locking." in tester.io.fetch_error()
 
 
 def test_export_exports_requirements_txt_uses_lock_file(
-    tester: CommandTester, poetry: Poetry, do_lock: None
+    tester: CommandTester, poetry: Poetry, tmp_path: Path, do_lock: None
 ) -> None:
-    _export_requirements(tester, poetry)
+    _export_requirements(tester, poetry, tmp_path)
     assert "The lock file does not exist. Locking." not in tester.io.fetch_error()
 
 
@@ -155,8 +162,10 @@ foo==1.0.0 ; {MARKER_PY}
         ("--with opt", f"foo==1.0.0 ; {MARKER_PY}\nopt==2.2.0 ; {MARKER_PY}\n"),
         (
             "--with dev,opt",
-            f"baz==2.0.0 ; {MARKER_PY}\nfoo==1.0.0 ; {MARKER_PY}\nopt==2.2.0 ;"
-            f" {MARKER_PY}\n",
+            (
+                f"baz==2.0.0 ; {MARKER_PY}\nfoo==1.0.0 ; {MARKER_PY}\nopt==2.2.0 ;"
+                f" {MARKER_PY}\n"
+            ),
         ),
         (f"--without {MAIN_GROUP}", "\n"),
         ("--without dev", f"foo==1.0.0 ; {MARKER_PY}\n"),
@@ -250,3 +259,44 @@ def test_export_with_urls(
     monkeypatch.setattr(Exporter, "with_urls", mock_export)
     tester.execute("--without-urls")
     mock_export.assert_called_once_with(False)
+
+
+def test_export_exports_constraints_txt_with_warnings(
+    tmp_path: Path,
+    fixture_root: Path,
+    project_factory: ProjectFactory,
+    command_tester_factory: CommandTesterFactory,
+) -> None:
+    # On Windows we have to make sure that the path dependency and the pyproject.toml
+    # are on the same drive, otherwise locking fails.
+    # (in our CI fixture_root is on D:\ but temp_path is on C:\)
+    editable_dep_path = tmp_path / "project_with_nested_local"
+    shutil.copytree(fixture_root / "project_with_nested_local", editable_dep_path)
+
+    pyproject_content = f"""\
+[tool.poetry]
+name = "simple-project"
+version = "1.2.3"
+description = "Some description."
+authors = [
+    "Sébastien Eustace <sebastien@eustace.io>"
+]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+baz = ">1.0"
+project-with-nested-local = {{ path = "{editable_dep_path.as_posix()}", \
+develop = true }}
+"""
+    poetry = project_factory(name="export", pyproject_content=pyproject_content)
+    tester = command_tester_factory("export", poetry=poetry)
+    tester.execute("--format constraints.txt")
+
+    develop_warning = (
+        "Warning: project-with-nested-local is locked in develop (editable) mode, which"
+        " is incompatible with the constraints.txt format.\n"
+    )
+    expected = 'baz==2.0.0 ; python_version >= "3.6" and python_version < "4.0"\n'
+
+    assert develop_warning in tester.io.fetch_error()
+    assert tester.io.fetch_output() == expected

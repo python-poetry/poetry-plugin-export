@@ -1,21 +1,31 @@
 from __future__ import annotations
 
+from pathlib import Path
+from typing import TYPE_CHECKING
+
 from cleo.helpers import option
-from poetry.console.commands.installer_command import InstallerCommand
+from packaging.utils import NormalizedName
+from packaging.utils import canonicalize_name
+from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 from poetry_plugin_export.exporter import Exporter
 
 
-class ExportCommand(InstallerCommand):
+if TYPE_CHECKING:
+    from collections.abc import Iterable
+
+
+class ExportCommand(GroupCommand):
     name = "export"
     description = "Exports the lock file to alternative formats."
 
-    options = [
+    options = [  # noqa: RUF012
         option(
             "format",
             "f",
-            "Format to export to. Currently, only requirements.txt is supported.",
+            "Format to export to. Currently, only constraints.txt and"
+            " requirements.txt are supported.",
             flag=False,
             default=Exporter.FORMAT_REQUIREMENTS_TXT,
         ),
@@ -31,6 +41,7 @@ class ExportCommand(InstallerCommand):
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
+<<<<<<< HEAD
         option(
             "all",
             None,
@@ -42,6 +53,9 @@ class ExportCommand(InstallerCommand):
             "Include all extras",
         ),
         *InstallerCommand._group_dependency_options(),
+=======
+        *GroupCommand._group_dependency_options(),
+>>>>>>> c672530630d79c4c9f29dd54bca28f21a88dfff9
         option(
             "extras",
             "E",
@@ -49,6 +63,7 @@ class ExportCommand(InstallerCommand):
             flag=False,
             multiple=True,
         ),
+        option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
     ]
 
@@ -61,7 +76,7 @@ class ExportCommand(InstallerCommand):
     def default_groups(self) -> set[str]:
         return {MAIN_GROUP}
 
-    def handle(self) -> None:
+    def handle(self) -> int:
         fmt = self.option("format")
 
         if not Exporter.is_format_supported(fmt):
@@ -85,10 +100,9 @@ class ExportCommand(InstallerCommand):
         if not locker.is_fresh():
             self.line_error(
                 "<warning>"
-                "Warning: The lock file is not up to date with "
-                "the latest changes in pyproject.toml. "
-                "You may be getting outdated dependencies. "
-                "Run update to update them."
+                "Warning: poetry.lock is not consistent with pyproject.toml. "
+                "You may be getting improper dependencies. "
+                "Run `poetry lock [--no-update]` to fix it."
                 "</warning>"
             )
 
@@ -115,10 +129,12 @@ class ExportCommand(InstallerCommand):
                 raise ValueError("Can't have --all-extras and --extras together.")
             extras = set(self.poetry.package.extras.keys())
 
-        exporter = Exporter(self.poetry)
+        exporter = Exporter(self.poetry, self.io)
         exporter.only_groups(list(groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
-        exporter.export(fmt, self.poetry.file.parent, output or self.io)
+        exporter.export(fmt, Path.cwd(), output or self.io)
+
+        return 0

@@ -1,8 +1,10 @@
 # Poetry Plugin: Export
 
+[![Poetry](https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json)](https://python-poetry.org/)
+
 This package is a plugin that allows the export of locked packages to various formats.
 
-**Note**: For now, only the `requirements.txt` format is available.
+**Note**: For now, only the `constraints.txt` and `requirements.txt` formats are available.
 
 This plugin provides the same features as the existing `export` command of Poetry which it will eventually replace.
 
@@ -36,11 +38,11 @@ The plugin provides an `export` command to export to the desired format.
 poetry export -f requirements.txt --output requirements.txt
 ```
 
-**Note**: Only the `requirements.txt` format is currently supported.
+**Note**: Only the `constraints.txt` and `requirements.txt` formats are currently supported.
 
 ### Available options
 
-* `--format (-f)`: The format to export to (default: `requirements.txt`). Currently, only `requirements.txt` is supported.
+* `--format (-f)`: The format to export to (default: `requirements.txt`). Currently, only `constraints.txt` and `requirements.txt` are supported.
 * `--output (-o)`: The name of the output file.  If omitted, print to standard output.
 * `--without`: The dependency groups to ignore when exporting.
 * `--with`: The optional dependency groups to include when exporting.
@@ -48,5 +50,6 @@ poetry export -f requirements.txt --output requirements.txt
 * `--default`: Only export the main dependencies. (**Deprecated**)
 * `--dev`: Include development dependencies. (**Deprecated**)
 * `--extras (-E)`: Extra sets of dependencies to include.
+* `--all-extras`: Include all sets of extra dependencies.
 * `--without-hashes`: Exclude hashes from the exported file.
 * `--with-credentials`: Include credentials for extra indices.

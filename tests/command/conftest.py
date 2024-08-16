@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 
 from cleo.io.null_io import NullIO
 from cleo.testers.command_tester import CommandTester
+from poetry.console.commands.env_command import EnvCommand
+from poetry.console.commands.installer_command import InstallerCommand
 from poetry.installation import Installer
 from poetry.utils.env import MockEnv
 
@@ -15,6 +16,8 @@ from tests.helpers import TestExecutor
 
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from poetry.installation.executor import Executor
     from poetry.poetry import Poetry
     from poetry.utils.env import Env
@@ -30,8 +33,8 @@ def app(poetry: Poetry) -> PoetryTestApplication:
 
 
 @pytest.fixture
-def env(tmp_dir: str) -> MockEnv:
-    path = Path(tmp_dir) / ".venv"
+def env(tmp_path: Path) -> MockEnv:
+    path = tmp_path / ".venv"
     path.mkdir(parents=True)
     return MockEnv(path=path, is_venv=True)
 
@@ -63,12 +66,11 @@ def command_tester_factory(
             app._poetry = poetry
 
         poetry = app.poetry
-        cmd._pool = poetry.pool
 
-        if hasattr(cmd, "set_env"):
+        if isinstance(cmd, EnvCommand):
             cmd.set_env(environment or env)
 
-        if hasattr(cmd, "set_installer"):
+        if isinstance(cmd, InstallerCommand):
             installer = installer or Installer(
                 tester.io,
                 env,
@@ -79,7 +81,6 @@ def command_tester_factory(
                 executor=executor
                 or TestExecutor(env, poetry.pool, poetry.config, tester.io),
             )
-            installer.use_executor(True)
             cmd.set_installer(installer)
 
         return tester

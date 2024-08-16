@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from poetry.core.semver.util import constraint_regions
+from packaging.utils import canonicalize_name
+from poetry.core.constraints.version.util import constraint_regions
 from poetry.core.version.markers import AnyMarker
 from poetry.core.version.markers import SingleMarker
 from poetry.packages import DependencyPackage
@@ -10,10 +11,11 @@ from poetry.utils.extras import get_extra_package_names
 
 
 if TYPE_CHECKING:
+    from collections.abc import Collection
     from collections.abc import Iterable
     from collections.abc import Iterator
-    from collections.abc import Sequence
 
+    from packaging.utils import NormalizedName
     from poetry.core.packages.dependency import Dependency
     from poetry.core.packages.package import Package
     from poetry.core.version.markers import BaseMarker
@@ -50,8 +52,9 @@ def get_python_version_region_markers(packages: list[Package]) -> list[BaseMarke
 def get_project_dependency_packages(
     locker: Locker,
     project_requires: list[Dependency],
+    root_package_name: NormalizedName,
     project_python_marker: BaseMarker | None = None,
-    extras: bool | Sequence[str] | None = None,
+    extras: Collection[NormalizedName] = (),
 ) -> Iterator[DependencyPackage]:
     # Apply the project python marker to all requirements.
     if project_python_marker is not None:
@@ -65,16 +68,17 @@ def get_project_dependency_packages(
     repository = locker.locked_repository()
 
     # Build a set of all packages required by our selected extras
-    extra_package_names: set[str] | None = None
-
-    if extras is not True:
-        extra_package_names = set(
-            get_extra_package_names(
-                repository.packages,
-                locker.lock_data.get("extras", {}),
-                extras or (),
-            )
-        )
+    locked_extras = {
+        canonicalize_name(extra): [
+            canonicalize_name(dependency) for dependency in dependencies
+        ]
+        for extra, dependencies in locker.lock_data.get("extras", {}).items()
+    }
+    extra_package_names = get_extra_package_names(
+        repository.packages,
+        locked_extras,
+        extras,
+    )
 
     # If a package is optional and we haven't opted in to it, do not select
     selected = []
@@ -84,9 +88,7 @@ def get_project_dependency_packages(
         except IndexError:
             continue
 
-        if extra_package_names is not None and (
-            package.optional and package.name not in extra_package_names
-        ):
+        if package.optional and package.name not in extra_package_names:
             # a package is locked as optional, but is not activated via extras
             continue
 
@@ -95,6 +97,7 @@ def get_project_dependency_packages(
     for package, dependency in get_project_dependencies(
         project_requires=selected,
         locked_packages=repository.packages,
+        root_package_name=root_package_name,
     ):
         yield DependencyPackage(dependency=dependency, package=package)
 
@@ -102,6 +105,7 @@ def get_project_dependency_packages(
 def get_project_dependencies(
     project_requires: list[Dependency],
     locked_packages: list[Package],
+    root_package_name: NormalizedName,
 ) -> Iterable[tuple[Package, Dependency]]:
     # group packages entries by name, this is required because requirement might use
     # different constraints.
@@ -121,6 +125,7 @@ def get_project_dependencies(
     nested_dependencies = walk_dependencies(
         dependencies=project_requires,
         packages_by_name=packages_by_name,
+        root_package_name=root_package_name,
     )
 
     return nested_dependencies.items()
@@ -129,6 +134,7 @@ def get_project_dependencies(
 def walk_dependencies(
     dependencies: list[Dependency],
     packages_by_name: dict[str, list[Package]],
+    root_package_name: NormalizedName,
 ) -> dict[Package, Dependency]:
     nested_dependencies: dict[Package, Dependency] = {}
 
@@ -136,6 +142,8 @@ def walk_dependencies(
     while dependencies:
         requirement = dependencies.pop(0)
         if (requirement, requirement.marker) in visited:
+            continue
+        if requirement.name == root_package_name:
             continue
         visited.add((requirement, requirement.marker))
 
@@ -160,12 +168,12 @@ def walk_dependencies(
 
         for require in locked_package.requires:
             if require.is_optional() and not any(
-                require in locked_package.extras[feature]
+                require in locked_package.extras.get(feature, ())
                 for feature in locked_package.features
             ):
                 continue
 
-            base_marker = require.marker.intersect(requirement.marker.without_extras())
+            base_marker = require.marker.intersect(requirement.marker).without_extras()
 
             if not base_marker.is_empty():
                 # So as to give ourselves enough flexibility in choosing a solution,
@@ -229,14 +237,32 @@ def get_locked_package(
         for package in candidates
         if package.python_constraint.allows_all(dependency.python_constraint)
         and dependency.constraint.allows(package.version)
+        and (dependency.source_type is None or dependency.is_same_source_as(package))
     ]
 
     # If we have an overlapping candidate, we must use it.
     if overlapping_candidates:
-        compatible_candidates = [
+        filtered_compatible_candidates = [
             package
             for package in compatible_candidates
             if package in overlapping_candidates
         ]
 
+        if not filtered_compatible_candidates:
+            # TODO: Support this case:
+            # https://github.com/python-poetry/poetry-plugin-export/issues/183
+            raise DependencyWalkerError(
+                f"The `{dependency.name}` package has the following compatible"
+                f" candidates `{compatible_candidates}`;  but, the exporter dependency"
+                f" walker previously elected `{overlapping_candidates.pop()}` which is"
+                f" not compatible with the dependency `{dependency}`. Please contribute"
+                " to `poetry-plugin-export` to solve this problem."
+            )
+
+        compatible_candidates = filtered_compatible_candidates
+
     return next(iter(compatible_candidates), None)
+
+
+class DependencyWalkerError(Exception):
+    pass
