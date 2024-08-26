@@ -74,5 +74,6 @@ poetry export --only test,docs
 * {{< option name="dev" deprecated=true >}}Include development dependencies.{{< /option >}}
 * `--extras (-E)`: Extra sets of dependencies to include.
 * `--all-extras`: Include all sets of extra dependencies.
+* `--all-groups`: Include all dependency groups when exporting.
 * `--without-hashes`: Exclude hashes from the exported file.
 * `--with-credentials`: Include credentials for extra indices.

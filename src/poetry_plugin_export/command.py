@@ -42,7 +42,7 @@ class ExportCommand(GroupCommand):
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
         *GroupCommand._group_dependency_options(),
-        option("all-groups", None, "Include all sets of extra groups"),
+        option("all-groups", None, "Include all dependency groups"),
         option(
             "extras",
             "E",
@@ -116,11 +116,15 @@ class ExportCommand(GroupCommand):
                     f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
                 )
 
-        if self.option("with") and self.option("all-groups"):
+        if (
+            self.option("with") or self.option("without") or self.option("only")
+        ) and self.option("all-groups"):
             self.line_error(
                 "<error>You cannot specify explicit"
-                " `<fg=yellow;options=bold>--with</>` while exporting"
-                " using `<fg=yellow;options=bold>--all-groups</>`.</error>"
+                " `<fg=yellow;options=bold>--with</>`, "
+                "`<fg=yellow;options=bold>--without</>`, "
+                "or `<fg=yellow;options=bold>--only</>` "
+                "while exporting using `<fg=yellow;options=bold>--all-groups</>`.</error>"
             )
             return 1
 

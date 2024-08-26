@@ -249,7 +249,23 @@ def test_with_conflicts_all_groups(tester: CommandTester, do_lock: None) -> None
 
     assert tester.status_code == 1
     assert (
-        "You cannot specify explicit `--with` while exporting using `--all-groups`.\n"
+        "You cannot specify explicit `--with`, `--without`, or `--only` while exporting using `--all-groups`.\n"
+        in tester.io.fetch_error()
+    )
+
+    tester.execute("--without=bar --all-groups")
+
+    assert tester.status_code == 1
+    assert (
+        "You cannot specify explicit `--with`, `--without`, or `--only` while exporting using `--all-groups`.\n"
+        in tester.io.fetch_error()
+    )
+
+    tester.execute("--only=bar --all-groups")
+
+    assert tester.status_code == 1
+    assert (
+        "You cannot specify explicit `--with`, `--without`, or `--only` while exporting using `--all-groups`.\n"
         in tester.io.fetch_error()
     )
 
