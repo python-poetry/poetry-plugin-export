@@ -42,6 +42,7 @@ class ExportCommand(GroupCommand):
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
         *GroupCommand._group_dependency_options(),
+        option("all-groups", None, "Include all dependency groups"),
         option(
             "extras",
             "E",
@@ -92,7 +93,6 @@ class ExportCommand(GroupCommand):
                 "</warning>"
             )
 
-        # Checking extras
         if self.option("extras") and self.option("all-extras"):
             self.line_error(
                 "<error>You cannot specify explicit"
@@ -116,8 +116,26 @@ class ExportCommand(GroupCommand):
                     f"Extra [{', '.join(sorted(invalid_extras))}] is not specified."
                 )
 
+        if (
+            self.option("with") or self.option("without") or self.option("only")
+        ) and self.option("all-groups"):
+            self.line_error(
+                "<error>You cannot specify explicit"
+                " `<fg=yellow;options=bold>--with</>`, "
+                "`<fg=yellow;options=bold>--without</>`, "
+                "or `<fg=yellow;options=bold>--only</>` "
+                "while exporting using `<fg=yellow;options=bold>--all-groups</>`.</error>"
+            )
+            return 1
+
+        groups = (
+            self.poetry.package.dependency_group_names(include_optional=True)
+            if self.option("all-groups")
+            else self.activated_groups
+        )
+
         exporter = Exporter(self.poetry, self.io)
-        exporter.only_groups(list(self.activated_groups))
+        exporter.only_groups(list(groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
