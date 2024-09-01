@@ -244,28 +244,16 @@ def test_export_with_all_groups(tester: CommandTester, do_lock: None) -> None:
     assert f"opt==2.2.0 ; {MARKER_PY}" in output
 
 
-def test_with_conflicts_all_groups(tester: CommandTester, do_lock: None) -> None:
-    tester.execute("--with=bar --all-groups")
+@pytest.mark.parametrize("flag", ["--with", "--without", "--only"])
+def test_with_conflicts_all_groups(
+    tester: CommandTester, do_lock: None, flag: str
+) -> None:
+    tester.execute(f"{flag}=bar --all-groups")
 
     assert tester.status_code == 1
     assert (
-        "You cannot specify explicit `--with`, `--without`, or `--only` while exporting using `--all-groups`.\n"
-        in tester.io.fetch_error()
-    )
-
-    tester.execute("--without=bar --all-groups")
-
-    assert tester.status_code == 1
-    assert (
-        "You cannot specify explicit `--with`, `--without`, or `--only` while exporting using `--all-groups`.\n"
-        in tester.io.fetch_error()
-    )
-
-    tester.execute("--only=bar --all-groups")
-
-    assert tester.status_code == 1
-    assert (
-        "You cannot specify explicit `--with`, `--without`, or `--only` while exporting using `--all-groups`.\n"
+        "You cannot specify explicit `--with`, `--without`,"
+        " or `--only` while exporting using `--all-groups`.\n"
         in tester.io.fetch_error()
     )
 
