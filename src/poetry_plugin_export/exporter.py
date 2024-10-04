@@ -97,7 +97,7 @@ class Exporter:
 
         python_marker = parse_marker(
             create_nested_marker(
-                "python_version", self._poetry.package._python_constraint
+                "python_version", self._poetry.package.python_constraint
             )
         )
 
