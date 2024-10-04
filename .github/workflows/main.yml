@@ -76,3 +76,10 @@ jobs:
 
       - name: Run pytest
         run: poetry run pytest -v
+
+      - name: Switch to poetry and poetry-core from main
+        run: |
+          poetry add git+https://github.com/python-poetry/poetry.git git+https://github.com/python-poetry/poetry-core.git
+
+      - name: Run pytest with poetry and poetry-core from main
+        run: poetry run pytest
