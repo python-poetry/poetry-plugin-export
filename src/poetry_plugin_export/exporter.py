@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import urllib.parse
 
+from collections.abc import Iterable
 from functools import partialmethod
 from typing import TYPE_CHECKING
-from typing import Iterable
 
 from cleo.io.io import IO
 from poetry.core.packages.dependency_group import MAIN_GROUP
