@@ -4,7 +4,6 @@ import urllib.parse
 
 from functools import partialmethod
 from typing import TYPE_CHECKING
-from typing import Iterable
 
 from cleo.io.io import IO
 from poetry.core.packages.dependency_group import MAIN_GROUP
@@ -17,6 +16,7 @@ from poetry_plugin_export.walker import get_project_dependency_packages
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from collections.abc import Iterable
     from pathlib import Path
     from typing import ClassVar
 
