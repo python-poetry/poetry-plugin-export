@@ -76,14 +76,9 @@ def config(
     auth_config_source: DictConfigSource,
     mocker: MockerFixture,
 ) -> Config:
-    import keyring
-
-    from keyring.backends.fail import Keyring
-
-    keyring.set_keyring(Keyring())  # type: ignore[no-untyped-call]
-
     c = Config()
     c.merge(config_source.config)
+    c.config["keyring"]["enabled"] = False
     c.set_config_source(config_source)
     c.set_auth_config_source(auth_config_source)
 
