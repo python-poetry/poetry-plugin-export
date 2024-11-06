@@ -4,10 +4,11 @@ import urllib.parse
 
 from functools import partialmethod
 from typing import TYPE_CHECKING
-from typing import Iterable
 
 from cleo.io.io import IO
 from poetry.core.packages.dependency_group import MAIN_GROUP
+from poetry.core.packages.utils.utils import create_nested_marker
+from poetry.core.version.markers import parse_marker
 from poetry.repositories.http_repository import HTTPRepository
 
 from poetry_plugin_export.walker import get_project_dependency_packages
@@ -15,6 +16,7 @@ from poetry_plugin_export.walker import get_project_dependency_packages
 
 if TYPE_CHECKING:
     from collections.abc import Collection
+    from collections.abc import Iterable
     from pathlib import Path
     from typing import ClassVar
 
@@ -93,11 +95,17 @@ class Exporter:
             list(self._groups), only=True
         )
 
+        python_marker = parse_marker(
+            create_nested_marker(
+                "python_version", self._poetry.package.python_constraint
+            )
+        )
+
         for dependency_package in get_project_dependency_packages(
             self._poetry.locker,
             project_requires=root.all_requires,
             root_package_name=root.name,
-            project_python_marker=root.python_marker,
+            project_python_marker=python_marker,
             extras=self._extras,
         ):
             line = ""
@@ -108,17 +116,15 @@ class Exporter:
             dependency = dependency_package.dependency
             package = dependency_package.package
 
-            if package.develop:
-                if not allow_editable:
-                    self._io.write_error_line(
-                        f"<warning>Warning: {package.pretty_name} is locked in develop"
-                        " (editable) mode, which is incompatible with the"
-                        " constraints.txt format.</warning>"
-                    )
-                    continue
-                line += "-e "
+            if package.develop and not allow_editable:
+                self._io.write_error_line(
+                    f"<warning>Warning: {package.pretty_name} is locked in develop"
+                    " (editable) mode, which is incompatible with the"
+                    " constraints.txt format.</warning>"
+                )
+                continue
 
-            requirement = dependency.to_pep_508(with_extras=False)
+            requirement = dependency.to_pep_508(with_extras=False, resolved=True)
             is_direct_local_reference = (
                 dependency.is_file() or dependency.is_directory()
             )
@@ -129,7 +135,10 @@ class Exporter:
             elif is_direct_local_reference:
                 assert dependency.source_url is not None
                 dependency_uri = path_to_url(dependency.source_url)
-                line = f"{package.complete_name} @ {dependency_uri}"
+                if package.develop:
+                    line = f"-e {dependency_uri}"
+                else:
+                    line = f"{package.complete_name} @ {dependency_uri}"
             else:
                 line = f"{package.complete_name}=={package.version}"
 
@@ -143,7 +152,7 @@ class Exporter:
                 and not is_direct_local_reference
                 and package.source_url
             ):
-                indexes.add(package.source_url)
+                indexes.add(package.source_url.rstrip("/"))
 
             if package.files and self._with_hashes:
                 hashes = []
@@ -171,25 +180,16 @@ class Exporter:
         if indexes and self._with_urls:
             # If we have extra indexes, we add them to the beginning of the output
             indexes_header = ""
-            for index in sorted(indexes):
-                repositories = [
-                    r
-                    for r in self._poetry.pool.all_repositories
-                    if isinstance(r, HTTPRepository) and r.url == index.rstrip("/")
-                ]
-                if not repositories:
-                    continue
-                repository = repositories[0]
+            has_pypi_repository = any(
+                r.name.lower() == "pypi" for r in self._poetry.pool.all_repositories
+            )
+            # Iterate over repositories so that we get the repository with the highest
+            # priority first so that --index-url comes before --extra-index-url
+            for repository in self._poetry.pool.all_repositories:
                 if (
-                    self._poetry.pool.has_default()
-                    and repository is self._poetry.pool.repositories[0]
+                    not isinstance(repository, HTTPRepository)
+                    or repository.url not in indexes
                 ):
-                    url = (
-                        repository.authenticated_url
-                        if self._with_credentials
-                        else repository.url
-                    )
-                    indexes_header += f"--index-url {url}\n"
                     continue
 
                 url = (
@@ -200,7 +200,13 @@ class Exporter:
                 parsed_url = urllib.parse.urlsplit(url)
                 if parsed_url.scheme == "http":
                     indexes_header += f"--trusted-host {parsed_url.netloc}\n"
-                indexes_header += f"--extra-index-url {url}\n"
+                if (
+                    not has_pypi_repository
+                    and repository is self._poetry.pool.repositories[0]
+                ):
+                    indexes_header += f"--index-url {url}\n"
+                else:
+                    indexes_header += f"--extra-index-url {url}\n"
 
             content = indexes_header + "\n" + content
 

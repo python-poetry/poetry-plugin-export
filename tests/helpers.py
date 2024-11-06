@@ -5,7 +5,6 @@ import os
 from contextlib import contextmanager
 from typing import TYPE_CHECKING
 from typing import Any
-from typing import Iterator
 
 from poetry.console.application import Application
 from poetry.factory import Factory
@@ -14,6 +13,7 @@ from poetry.packages import Locker
 
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
     from poetry.core.packages.package import Package

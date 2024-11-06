@@ -220,6 +220,44 @@ def test_export_reports_invalid_extras(tester: CommandTester, do_lock: None) -> 
     assert str(error.value) == expected
 
 
+def test_export_with_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--format requirements.txt --all-extras")
+    output = tester.io.fetch_output()
+    assert f"bar==1.1.0 ; {MARKER_PY}" in output
+    assert f"qux==1.2.0 ; {MARKER_PY}" in output
+
+
+def test_extras_conflicts_all_extras(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--extras bar --all-extras")
+
+    assert tester.status_code == 1
+    assert (
+        "You cannot specify explicit `--extras` while exporting using `--all-extras`.\n"
+        in tester.io.fetch_error()
+    )
+
+
+def test_export_with_all_groups(tester: CommandTester, do_lock: None) -> None:
+    tester.execute("--format requirements.txt --all-groups")
+    output = tester.io.fetch_output()
+    assert f"baz==2.0.0 ; {MARKER_PY}" in output
+    assert f"opt==2.2.0 ; {MARKER_PY}" in output
+
+
+@pytest.mark.parametrize("flag", ["--with", "--without", "--only"])
+def test_with_conflicts_all_groups(
+    tester: CommandTester, do_lock: None, flag: str
+) -> None:
+    tester.execute(f"{flag}=bar --all-groups")
+
+    assert tester.status_code == 1
+    assert (
+        "You cannot specify explicit `--with`, `--without`,"
+        " or `--only` while exporting using `--all-groups`.\n"
+        in tester.io.fetch_error()
+    )
+
+
 def test_export_with_urls(
     monkeypatch: MonkeyPatch, tester: CommandTester, poetry: Poetry
 ) -> None:

@@ -50,5 +50,7 @@ poetry export -f requirements.txt --output requirements.txt
 * `--default`: Only export the main dependencies. (**Deprecated**)
 * `--dev`: Include development dependencies. (**Deprecated**)
 * `--extras (-E)`: Extra sets of dependencies to include.
+* `--all-extras`: Include all sets of extra dependencies.
+* `--all-groups`: Include all dependency groups.
 * `--without-hashes`: Exclude hashes from the exported file.
 * `--with-credentials`: Include credentials for extra indices.

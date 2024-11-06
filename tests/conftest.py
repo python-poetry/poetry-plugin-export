@@ -171,7 +171,15 @@ def project_factory(
 
         poetry = Factory().create_poetry(project_dir)
 
-        locker = TestLocker(poetry.locker.lock, poetry.locker._local_config)
+        try:
+            # with https://github.com/python-poetry/poetry/pull/9133
+            locker = TestLocker(
+                poetry.locker.lock,
+                poetry.locker._pyproject_data,  # type: ignore[attr-defined]
+            )
+        except AttributeError:
+            # before https://github.com/python-poetry/poetry/pull/9133
+            locker = TestLocker(poetry.locker.lock, poetry.locker._local_config)
         locker.write()
 
         poetry.set_locker(locker)
