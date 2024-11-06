@@ -44,7 +44,7 @@ poetry export -f requirements.txt --output requirements.txt
 
 * `--format (-f)`: The format to export to (default: `requirements.txt`). Currently, only `constraints.txt` and `requirements.txt` are supported.
 * `--output (-o)`: The name of the output file.  If omitted, print to standard output.
-* `--with`: Additional dependency groups to include. The `main` group is included by default.
+* `--with`: The optional and non-optional dependency groups to include. By default, only the main dependencies are included.
 * `--only`: The only dependency group to include. It is possible to exclude the `main` group this way.
 * `--without`: The dependency groups to ignore. (**Deprecated**)
 * `--default`: Only export the main dependencies. (**Deprecated**)

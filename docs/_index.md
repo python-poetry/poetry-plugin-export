@@ -68,7 +68,7 @@ poetry export --only test,docs
 * `--format (-f)`: The format to export to (default: `requirements.txt`). Currently, only `constraints.txt` and `requirements.txt` are supported.
 * `--output (-o)`: The name of the output file.  If omitted, print to standard output.
 * `--with`: The optional and non-optional dependency groups to include. By default, only the main dependencies are included.
-* `--only`: The only dependency groups to include.
+* `--only`: The only dependency groups to include. It is possible to exclude the `main` group this way.
 * {{< option name="without" deprecated=true >}}The dependency groups to ignore.{{< /option >}}
 * {{< option name="default" deprecated=true >}}Only export the main dependencies.{{< /option >}}
 * {{< option name="dev" deprecated=true >}}Include development dependencies.{{< /option >}}
