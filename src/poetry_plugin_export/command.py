@@ -41,8 +41,31 @@ class ExportCommand(GroupCommand):
             None,
             "Include development dependencies. (<warning>Deprecated</warning>)",
         ),
-        *GroupCommand._group_dependency_options(),
         option("all-groups", None, "Include all dependency groups"),
+        option(
+            "with",
+            None,
+            # note: unlike poetry install, the default excludes non-optional groups
+            "The optional and non-optional dependency groups to include."
+            " By default, only the main dependencies are included.",
+            flag=False,
+            multiple=True,
+        ),
+        option(
+            "only",
+            None,
+            "The only dependency groups to include.",
+            flag=False,
+            multiple=True,
+        ),
+        option(
+            "without",
+            None,
+            # deprecated: groups are always excluded by default
+            "The dependency groups to ignore. (<warning>Deprecated</warning>)",
+            flag=False,
+            multiple=True,
+        ),
         option(
             "extras",
             "E",
