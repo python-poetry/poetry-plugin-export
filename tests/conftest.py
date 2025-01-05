@@ -166,14 +166,7 @@ def project_factory(
 
         poetry = Factory().create_poetry(project_dir)
 
-        try:
-            locker = TestLocker(poetry.locker.lock, poetry.locker._pyproject_data)
-        except AttributeError:
-            # poetry < 2.0
-            locker = TestLocker(
-                poetry.locker.lock,
-                poetry.locker._local_config,  # type: ignore[attr-defined]
-            )
+        locker = TestLocker(poetry.locker.lock, poetry.locker._pyproject_data)
         locker.write()
 
         poetry.set_locker(locker)
