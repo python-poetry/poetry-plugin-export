@@ -78,11 +78,6 @@ class ExportCommand(GroupCommand):
     ]
 
     @property
-    def non_optional_groups(self) -> set[str]:
-        # method only required for poetry <= 1.2.0-beta.2.dev0
-        return {MAIN_GROUP}
-
-    @property
     def default_groups(self) -> set[str]:
         return {MAIN_GROUP}
 
