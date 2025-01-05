@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from cleo.testers.command_tester import CommandTester
     from poetry.poetry import Poetry
     from poetry.repositories import Repository
+    from pytest_mock import MockerFixture
 
     from tests.types import CommandTesterFactory
     from tests.types import ProjectFactory
@@ -132,6 +133,18 @@ def test_export_exports_requirements_txt_uses_lock_file(
 def test_export_fails_on_invalid_format(tester: CommandTester, do_lock: None) -> None:
     with pytest.raises(ValueError):
         tester.execute("--format invalid")
+
+
+def test_export_fails_if_lockfile_is_not_fresh(
+    tester: CommandTester,
+    poetry: Poetry,
+    tmp_path: Path,
+    do_lock: None,
+    mocker: MockerFixture,
+) -> None:
+    mocker.patch.object(poetry.locker, "is_fresh", return_value=False)
+    assert tester.execute() == 1
+    assert "pyproject.toml changed significantly" in tester.io.fetch_error()
 
 
 def test_export_prints_to_stdout_by_default(

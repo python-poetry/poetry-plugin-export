@@ -104,12 +104,12 @@ class ExportCommand(GroupCommand):
 
         if not locker.is_fresh():
             self.line_error(
-                "<warning>"
-                "Warning: poetry.lock is not consistent with pyproject.toml. "
-                "You may be getting improper dependencies. "
-                "Run `poetry lock [--no-update]` to fix it."
-                "</warning>"
+                "<error>"
+                "pyproject.toml changed significantly since poetry.lock was last"
+                " generated. Run `poetry lock` to fix the lock file."
+                "</error>"
             )
+            return 1
 
         if self.option("extras") and self.option("all-extras"):
             self.line_error(
