@@ -11,7 +11,14 @@ This plugin provides the same features as the existing `export` command of Poetr
 
 ## Installation
 
-The easiest way to install the `export` plugin is via the `self add` command of Poetry.
+On Poetry 2.0 and newer, the easiest way to add the `export` plugin is to declare it as a required Poetry plugin.
+
+```toml
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+```
+
+Otherwise, install the plugin via the `self add` command of Poetry.
 
 ```bash
 poetry self add poetry-plugin-export
