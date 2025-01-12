@@ -1,5 +1,24 @@
 # Change Log
 
+## [1.9.0] - 2025-01-12
+
+### Added
+
+- Add an `--all-groups` option to export dependencies from all groups ([#294](https://github.com/python-poetry/poetry-plugin-export/pull/294)).
+
+### Changed
+
+- Drop support for Python 3.8 ([#300](https://github.com/python-poetry/poetry-plugin-export/pull/300)).
+- Clarify the help text of `--with` and `--only` and deprecate `--without` ([#212](https://github.com/python-poetry/poetry-plugin-export/pull/212)).
+- Fail if the `poetry.lock` file is not consistent with the `pyproject.toml` file ([#310](https://github.com/python-poetry/poetry-plugin-export/pull/310)).
+
+### Fixed
+
+- Fix an issue where the export failed with the message `"dependency walk failed"`.
+  This fix requires a `poetry.lock` file created with Poetry 2.x ([#286](https://github.com/python-poetry/poetry-plugin-export/pull/286)).
+- Fix an issue where the `pre-commit` hook regex matched wrong files ([#285](https://github.com/python-poetry/poetry-plugin-export/pull/285)).
+
+
 ## [1.8.0] - 2024-05-11
 
 ### Changed
@@ -211,7 +230,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.8.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.9.0...main
+[1.9.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.9.0
 [1.8.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.8.0
 [1.7.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.7.1
 [1.7.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.7.0
