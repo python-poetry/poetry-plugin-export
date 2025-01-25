@@ -10,6 +10,7 @@ from cleo.io.null_io import NullIO
 from poetry.core.constraints.version import Version
 from poetry.core.packages.dependency import Dependency
 from poetry.core.packages.dependency_group import MAIN_GROUP
+from poetry.core.version.markers import MarkerUnion
 from poetry.core.version.markers import parse_marker
 from poetry.factory import Factory
 from poetry.packages import Locker as BaseLocker
@@ -27,6 +28,7 @@ from tests.markers import MARKER_PY36
 from tests.markers import MARKER_PY36_38
 from tests.markers import MARKER_PY36_ONLY
 from tests.markers import MARKER_PY36_PY362
+from tests.markers import MARKER_PY36_PY362_ALT
 from tests.markers import MARKER_PY37
 from tests.markers import MARKER_PY362_PY40
 from tests.markers import MARKER_PY_DARWIN
@@ -212,7 +214,7 @@ def test_exporter_can_export_requirements_txt_with_standard_packages_and_markers
     expected = f"""\
 bar==4.5.6 ; {MARKER_PY}
 baz==7.8.9 ; {MARKER_PY_WIN32}
-foo==1.2.3 ; {MARKER_PY27.union(MARKER_PY36_ONLY)}
+foo==1.2.3 ; {MarkerUnion(MARKER_PY27, MARKER_PY36_ONLY)}
 """
 
     assert content == expected
@@ -495,7 +497,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
-    marker_py = MARKER_PY27.union(MARKER_PY36_ONLY)
+    marker_py = MarkerUnion(MARKER_PY27, MARKER_PY36_ONLY)
     marker_py_win32 = marker_py.intersect(MARKER_WIN32)
     marker_py_windows = marker_py.intersect(MARKER_WINDOWS)
 
@@ -523,12 +525,12 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
     [
         (
             False,
-            [f"a==1.2.3 ; {MARKER_PY27.union(MARKER_PY36_38)}"],
+            [f"a==1.2.3 ; {MarkerUnion(MARKER_PY27, MARKER_PY36_38)}"],
         ),
         (
             True,
             [
-                f"a==1.2.3 ; {MARKER_PY27.union(MARKER_PY36_38).union(MARKER_PY36)}",
+                f"a==1.2.3 ; {MarkerUnion(MARKER_PY27, MARKER_PY36_38.union(MARKER_PY36))}",
                 f"b==4.5.6 ; {MARKER_PY}",
             ],
         ),
@@ -2304,7 +2306,7 @@ def test_exporter_doesnt_confuse_repeated_packages(
     expected = f"""\
 celery==5.1.2 ; {MARKER_PY36_ONLY}
 celery==5.2.3 ; {MARKER_PY37}
-click-didyoumean==0.0.3 ; {MARKER_PY36_PY362}
+click-didyoumean==0.0.3 ; {MARKER_PY36_PY362 if lock_version == "2.1" else MARKER_PY36_PY362_ALT}
 click-didyoumean==0.3.0 ; {MARKER_PY362_PY40}
 click-plugins==1.1.1 ; {MARKER_PY36}
 click==7.1.2 ; {MARKER_PY36_ONLY}
@@ -3272,9 +3274,9 @@ def test_dependency_walk_error(
         content = f.read()
 
     expected = """\
-bar==1 ; python_version >= "3.8" and python_version < "3.9"
+bar==1 ; python_version == "3.8"
 bar==2 ; python_version >= "3.9" and python_version < "4.0"
-foo==1 ; python_version >= "3.8" and python_version < "3.9"
+foo==1 ; python_version == "3.8"
 foo==2 ; python_version >= "3.9" and python_version < "4.0"
 """
 
