@@ -1,26 +1,32 @@
-[tool.poetry]
+[project]
 name = "poetry-plugin-export"
 version = "1.9.0"
 description = "Poetry plugin to export the dependencies to various formats"
-authors = ["Sébastien Eustace <sebastien@eustace.io>"]
-license = "MIT"
+authors = [{ name = "Sébastien Eustace", email = "sebastien@eustace.io" }]
+license = { text = "MIT" }
 readme = "README.md"
+requires-python = ">=3.9,<4.0"
+dependencies = [
+    "poetry>=2.0.0,<3.0.0",
+    # "poetry-core>=1.7.0,<3.0.0",
+    "poetry-core @ git+https://github.com/python-poetry/poetry-core.git",
+]
+dynamic = ["classifiers"]
+
+[project.urls]
 homepage = "https://python-poetry.org/"
 repository = "https://github.com/python-poetry/poetry-plugin-export"
 
+[project.entry-points."poetry.application.plugin"]
+export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
+
+[tool.poetry]
 packages = [
     { include = "poetry_plugin_export", from = "src" }
 ]
-
 include = [
     { path = "tests", format = "sdist" }
 ]
-
-[tool.poetry.dependencies]
-python = "^3.9"
-poetry = ">=2.0.0,<3.0.0"
-# poetry-core = ">=1.7.0,<3.0.0"
-poetry-core = { git = "git+https://github.com/python-poetry/poetry-core.git" }
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = ">=2.18"
@@ -36,9 +42,6 @@ mypy = ">=0.971"
 optional = true
 [tool.poetry.group.github-actions.dependencies]
 pytest-github-actions-annotate-failures = "^0.1.7"
-
-[tool.poetry.plugins."poetry.application.plugin"]
-export = "poetry_plugin_export.plugins:ExportApplicationPlugin"
 
 
 [tool.ruff]
@@ -114,5 +117,5 @@ testpaths = [
 
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0"]
 build-backend = "poetry.core.masonry.api"
