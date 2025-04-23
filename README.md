@@ -61,3 +61,4 @@ poetry export -f requirements.txt --output requirements.txt
 * `--all-groups`: Include all dependency groups.
 * `--without-hashes`: Exclude hashes from the exported file.
 * `--with-credentials`: Include credentials for extra indices.
+* `--without-markers`: Exclude markers in the exported file.
