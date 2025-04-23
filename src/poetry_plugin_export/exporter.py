@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import urllib.parse
-
 from functools import partialmethod
 from typing import TYPE_CHECKING
 
@@ -11,13 +10,11 @@ from poetry.core.packages.utils.utils import create_nested_marker
 from poetry.core.version.markers import parse_marker
 from poetry.repositories.http_repository import HTTPRepository
 
-from poetry_plugin_export.walker import get_project_dependency_packages
-from poetry_plugin_export.walker import get_project_dependency_packages2
-
+from poetry_plugin_export.walker import (get_project_dependency_packages,
+                                         get_project_dependency_packages2)
 
 if TYPE_CHECKING:
-    from collections.abc import Collection
-    from collections.abc import Iterable
+    from collections.abc import Collection, Iterable
     from pathlib import Path
     from typing import ClassVar
 
@@ -73,14 +70,13 @@ class Exporter:
 
         return self
 
-    def with_markers(self, with_markers: bool = True) -> Exporter:
-        # This is a no-op for now, but we can implement it in the future
-        # if needed.
-        self._with_markers = with_markers
-        return self
-
     def with_credentials(self, with_credentials: bool = True) -> Exporter:
         self._with_credentials = with_credentials
+
+        return self
+
+    def with_markers(self, with_markers: bool = True) -> Exporter:
+        self._with_markers = with_markers
 
         return self
 

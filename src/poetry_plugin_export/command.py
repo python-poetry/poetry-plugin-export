@@ -4,13 +4,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from cleo.helpers import option
-from packaging.utils import NormalizedName
-from packaging.utils import canonicalize_name
+from packaging.utils import NormalizedName, canonicalize_name
 from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 from poetry_plugin_export.exporter import Exporter
-
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -21,10 +19,6 @@ class ExportCommand(GroupCommand):
     description = "Exports the lock file to alternative formats."
 
     options = [  # noqa: RUF012
-        option("without-markers",
-               None,
-               "Include markers in the exported file (default - True).",
-               flag=True),
         option(
             "format",
             "f",
@@ -79,6 +73,10 @@ class ExportCommand(GroupCommand):
         ),
         option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
+        option("without-markers",
+               None,
+               "Include markers in the exported file (default - True).",
+               flag=True),
     ]
 
     @property
@@ -161,12 +159,12 @@ class ExportCommand(GroupCommand):
         )
 
         exporter = Exporter(self.poetry, self.io)
-        exporter.with_markers(not without_markers)
         exporter.only_groups(list(groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
+        exporter.with_markers(not without_markers)
         exporter.export(fmt, Path.cwd(), output or self.io)
 
         return 0
