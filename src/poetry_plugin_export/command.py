@@ -21,6 +21,10 @@ class ExportCommand(GroupCommand):
     description = "Exports the lock file to alternative formats."
 
     options = [  # noqa: RUF012
+        option("without-markers",
+               None,
+               "Include markers in the exported file (default - True).",
+               flag=True),
         option(
             "format",
             "f",
@@ -146,6 +150,10 @@ class ExportCommand(GroupCommand):
             )
             return 1
 
+        without_markers = False
+        if self.option("without-markers"):
+            without_markers = self.option("without-markers")
+
         groups = (
             self.poetry.package.dependency_group_names(include_optional=True)
             if self.option("all-groups")
@@ -153,6 +161,7 @@ class ExportCommand(GroupCommand):
         )
 
         exporter = Exporter(self.poetry, self.io)
+        exporter.with_markers(not without_markers)
         exporter.only_groups(list(groups))
         exporter.with_extras(list(extras))
         exporter.with_hashes(not self.option("without-hashes"))
