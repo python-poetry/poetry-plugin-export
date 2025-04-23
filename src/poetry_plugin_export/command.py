@@ -4,11 +4,13 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 from cleo.helpers import option
-from packaging.utils import NormalizedName, canonicalize_name
+from packaging.utils import NormalizedName
+from packaging.utils import canonicalize_name
 from poetry.console.commands.group_command import GroupCommand
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 from poetry_plugin_export.exporter import Exporter
+
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
@@ -73,10 +75,12 @@ class ExportCommand(GroupCommand):
         ),
         option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
-        option("without-markers",
-               None,
-               "Include markers in the exported file (default - True).",
-               flag=True),
+        option(
+            "without-markers",
+            None,
+            "Include markers in the exported file (default - True).",
+            flag=True,
+        ),
     ]
 
     @property

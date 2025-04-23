@@ -519,8 +519,11 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
 
     assert expected == {}
 
+
 @pytest.mark.parametrize("lock_version", ["2.1"])
-def test_exporter_with_no_markers_flag(tmp_path: Path, poetry: Poetry, lock_version: str) -> None:
+def test_exporter_with_no_markers_flag(
+    tmp_path: Path, poetry: Poetry, lock_version: str
+) -> None:
     lock_data = {
         "package": [
             {
@@ -544,19 +547,15 @@ def test_exporter_with_no_markers_flag(tmp_path: Path, poetry: Poetry, lock_vers
                 "dependencies": {
                     "greenlet": {
                         "version": ">=1",
-                        "markers": 'python_version < "3.14" and (platform_machine == "aarch64" or platform_machine == "ppc64le" or platform_machine == "x86_64" or platform_machine == "amd64" or platform_machine == "AMD64" or platform_machine == "win32" or platform_machine == "WIN32")'
+                        "markers": 'python_version < "3.14" and (platform_machine == "aarch64" or platform_machine == "ppc64le" or platform_machine == "x86_64" or platform_machine == "amd64" or platform_machine == "AMD64" or platform_machine == "win32" or platform_machine == "WIN32")',
                     },
-                    "typing-extensions": ">=4.6.0"
+                    "typing-extensions": ">=4.6.0",
                 },
-            }
+            },
         ],
         "metadata": {
             "lock-version": lock_version,
-            "files": {
-                "greenlet": [],
-                "typing-extensions": [],
-                "sqlalchemy": []
-            }
+            "files": {"greenlet": [], "typing-extensions": [], "sqlalchemy": []},
         },
     }
 
@@ -571,12 +570,13 @@ def test_exporter_with_no_markers_flag(tmp_path: Path, poetry: Poetry, lock_vers
         lines = set(f.read().strip().splitlines())
 
     expected = {
-        'greenlet==3.2.1',
-        'sqlalchemy==2.0.40',
-        'typing-extensions==4.13.2',
+        "greenlet==3.2.1",
+        "sqlalchemy==2.0.40",
+        "typing-extensions==4.13.2",
     }
 
     assert lines == expected
+
 
 @pytest.mark.parametrize(
     ["dev", "lines"],

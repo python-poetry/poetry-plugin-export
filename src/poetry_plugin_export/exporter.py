@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import urllib.parse
+
 from functools import partialmethod
 from typing import TYPE_CHECKING
 
@@ -10,11 +11,13 @@ from poetry.core.packages.utils.utils import create_nested_marker
 from poetry.core.version.markers import parse_marker
 from poetry.repositories.http_repository import HTTPRepository
 
-from poetry_plugin_export.walker import (get_project_dependency_packages,
-                                         get_project_dependency_packages2)
+from poetry_plugin_export.walker import get_project_dependency_packages
+from poetry_plugin_export.walker import get_project_dependency_packages2
+
 
 if TYPE_CHECKING:
-    from collections.abc import Collection, Iterable
+    from collections.abc import Collection
+    from collections.abc import Iterable
     from pathlib import Path
     from typing import ClassVar
 
