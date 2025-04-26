@@ -45,7 +45,15 @@ The plugin provides an `export` command to export to the desired format.
 poetry export -f requirements.txt --output requirements.txt
 ```
 
-**Note**: Only the `constraints.txt` and `requirements.txt` formats are currently supported.
+> [!IMPORTANT]
+> When installing an exported `requirements.txt` via `pip`, you should always pass `--no-deps`
+> because Poetry has already resolved the dependencies so that all direct and transitive
+> requirements are included and it is not necessary to resolve again via `pip`.
+> `pip` may even fail to resolve dependencies, especially if `git` dependencies,
+> which are exported with their resolved hashes, are included.
+
+> [!NOTE]
+> Only the `constraints.txt` and `requirements.txt` formats are currently supported.
 
 ### Available options
 
