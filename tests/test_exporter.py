@@ -7,6 +7,7 @@ import pytest
 
 from cleo.io.buffered_io import BufferedIO
 from cleo.io.null_io import NullIO
+from packaging.utils import canonicalize_name
 from poetry.core.constraints.version import Version
 from poetry.core.packages.dependency import Dependency
 from poetry.core.packages.dependency_group import MAIN_GROUP
@@ -99,7 +100,10 @@ def set_package_requires(
         if pkg.name not in skip:
             dep = pkg.to_dependency()
             if pkg.name in dev:
-                dep._groups = frozenset(["dev"])
+                try:
+                    dep.groups = frozenset([canonicalize_name("dev")])  # type: ignore[misc]
+                except AttributeError:
+                    dep._groups = frozenset(["dev"])
             if markers and pkg.name in markers:
                 dep._marker = parse_marker(markers[pkg.name])
             package.add_dependency(dep)
