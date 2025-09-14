@@ -267,7 +267,7 @@ def get_locked_package(
 def get_project_dependency_packages2(
     locker: Locker,
     project_python_marker: BaseMarker | None = None,
-    groups: Collection[str] = (),
+    groups: Collection[NormalizedName] = (),
     extras: Collection[NormalizedName] = (),
 ) -> Iterator[DependencyPackage]:
     for package, info in locker.locked_packages().items():

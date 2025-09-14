@@ -46,7 +46,7 @@ class Exporter:
         self._with_credentials = False
         self._with_urls = True
         self._extras: Collection[NormalizedName] = ()
-        self._groups: Iterable[str] = [MAIN_GROUP]
+        self._groups: Iterable[NormalizedName] = [MAIN_GROUP]
 
     @classmethod
     def is_format_supported(cls, fmt: str) -> bool:
@@ -57,7 +57,7 @@ class Exporter:
 
         return self
 
-    def only_groups(self, groups: Iterable[str]) -> Exporter:
+    def only_groups(self, groups: Iterable[NormalizedName]) -> Exporter:
         self._groups = groups
 
         return self
