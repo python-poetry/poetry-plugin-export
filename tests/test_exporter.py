@@ -50,6 +50,9 @@ if TYPE_CHECKING:
     from tests.conftest import Config
 
 
+DEV_GROUP = canonicalize_name("dev")
+
+
 class Locker(BaseLocker):
     def __init__(self, fixture_root: Path) -> None:
         super().__init__(fixture_root / "poetry.lock", {})
@@ -101,9 +104,9 @@ def set_package_requires(
             dep = pkg.to_dependency()
             if pkg.name in dev:
                 try:
-                    dep.groups = frozenset([canonicalize_name("dev")])  # type: ignore[misc]
+                    dep.groups = frozenset([canonicalize_name("dev")])
                 except AttributeError:
-                    dep._groups = frozenset(["dev"])
+                    dep._groups = frozenset(["dev"])  # type: ignore[attr-defined]
             if markers and pkg.name in markers:
                 dep._marker = parse_marker(markers[pkg.name])
             package.add_dependency(dep)
@@ -589,7 +592,7 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers_a
 
     exporter = Exporter(poetry, NullIO())
     if dev:
-        exporter.only_groups([MAIN_GROUP, "dev"])
+        exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -837,7 +840,7 @@ def test_exporter_exports_requirements_txt_with_dev_packages_if_opted_in(
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -935,7 +938,7 @@ def test_exporter_exports_requirements_txt_without_optional_packages(
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1012,7 +1015,7 @@ def test_exporter_exports_requirements_txt_with_optional_packages(
     set_package_requires(poetry)
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.with_hashes(False)
     exporter.with_extras(extras)
     exporter.export(
@@ -1671,7 +1674,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages(
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1736,7 +1739,7 @@ def test_exporter_exports_requirements_txt_with_url_false(
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.with_urls(False)
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -1792,7 +1795,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_trusted_host(
     poetry.locker.mock_lock_data(lock_data)  # type: ignore[attr-defined]
     set_package_requires(poetry, dev={"bar"})
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1877,7 +1880,7 @@ def test_exporter_exports_requirements_txt_with_dev_extras(
 
     exporter = Exporter(poetry, NullIO())
     if dev:
-        exporter.only_groups([MAIN_GROUP, "dev"])
+        exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -1957,7 +1960,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_duplicate_so
     set_package_requires(poetry, dev={"bar", "baz"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
@@ -2064,7 +2067,7 @@ def test_exporter_exports_requirements_txt_with_two_primary_sources(
     set_package_requires(poetry, dev={"bar", "baz"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.with_credentials()
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
@@ -2136,7 +2139,7 @@ def test_exporter_exports_requirements_txt_with_legacy_packages_and_credentials(
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.with_credentials()
     exporter.export(
         "requirements.txt",
@@ -2303,7 +2306,7 @@ def test_exporter_doesnt_confuse_repeated_packages(
     poetry._package = root
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     io = BufferedIO()
     exporter.export("requirements.txt", tmp_path, io)
 
@@ -2614,7 +2617,7 @@ def test_exporter_omits_unwanted_extras(
     io = BufferedIO()
     exporter = Exporter(poetry, NullIO())
     if with_extras:
-        exporter.only_groups(["with-extras"])
+        exporter.only_groups([canonicalize_name("with-extras")])
         # It does not matter whether packages are exported with extras or not
         # because all dependencies are listed explicitly.
         if lock_version == "2.1":
@@ -3152,7 +3155,7 @@ def test_exporter_index_urls(
     set_package_requires(poetry, dev={"bar"})
 
     exporter = Exporter(poetry, NullIO())
-    exporter.only_groups([MAIN_GROUP, "dev"])
+    exporter.only_groups([MAIN_GROUP, DEV_GROUP])
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
