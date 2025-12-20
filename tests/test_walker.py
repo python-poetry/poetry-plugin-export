@@ -11,8 +11,6 @@ from poetry_plugin_export.walker import walk_dependencies
 
 
 def test_walk_dependencies_multiple_versions_when_latest_is_not_compatible() -> None:
-    # TODO: Support this case:
-    # https://github.com/python-poetry/poetry-plugin-export/issues/183
     with pytest.raises(DependencyWalkerError):
         walk_dependencies(
             dependencies=[

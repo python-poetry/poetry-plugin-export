@@ -249,14 +249,12 @@ def get_locked_package(
         ]
 
         if not filtered_compatible_candidates:
-            # TODO: Support this case:
-            # https://github.com/python-poetry/poetry-plugin-export/issues/183
             raise DependencyWalkerError(
                 f"The `{dependency.name}` package has the following compatible"
                 f" candidates `{compatible_candidates}`;  but, the exporter dependency"
                 f" walker previously elected `{overlapping_candidates.pop()}` which is"
-                f" not compatible with the dependency `{dependency}`. Please contribute"
-                " to `poetry-plugin-export` to solve this problem."
+                f" not compatible with the dependency `{dependency}`. Please relock"
+                " with Poetry 2.0 or later to solve this issue."
             )
 
         compatible_candidates = filtered_compatible_candidates
