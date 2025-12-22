@@ -276,14 +276,12 @@ def get_project_dependency_packages2(
         if not marker.validate({"extra": extras}):
             continue
 
+        marker = marker.without_extras()
+
         if project_python_marker:
             marker = project_python_marker.intersect(marker)
 
         package.marker = marker
-        # Set python_versions to any because they are already incorporated
-        # in the locked marker and only cause additional computing without
-        # actually changing anything.
-        package.python_versions = "*"
 
         yield DependencyPackage(dependency=package.to_dependency(), package=package)
 
