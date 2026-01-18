@@ -1,6 +1,6 @@
 [project]
 name = "poetry-plugin-export"
-version = "1.9.0"
+version = "1.10.0"
 description = "Poetry plugin to export the dependencies to various formats"
 authors = [{ name = "Sébastien Eustace", email = "sebastien@eustace.io" }]
 license = "MIT"
