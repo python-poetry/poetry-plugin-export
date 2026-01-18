@@ -72,7 +72,7 @@ class Locker(BaseLocker):
     def is_fresh(self) -> bool:
         return True
 
-    def _get_content_hash(self) -> str:
+    def _get_content_hash(self, *, with_dependency_groups: bool = True) -> str:
         return "123456789"
 
 
