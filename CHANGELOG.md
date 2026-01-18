@@ -1,5 +1,20 @@
 # Change Log
 
+## [1.10.0] - 2026-01-18
+
+### Added
+
+- Add support for exporting `pylock.toml` files ([#357](https://github.com/python-poetry/poetry-plugin-export/pull/357)).
+
+### Changed
+
+- Drop support for Python 3.9 ([#349](https://github.com/python-poetry/poetry-plugin-export/pull/349)).
+
+### Fixed
+
+- Fix an issue where a `"dependency walk failed"` error message gave an outdated advice ([#353](https://github.com/python-poetry/poetry-plugin-export/pull/353)).
+
+
 ## [1.9.0] - 2025-01-12
 
 ### Added
@@ -230,7 +245,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.9.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.10.0...main
+[1.10.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.10.0
 [1.9.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.9.0
 [1.8.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.8.0
 [1.7.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.7.1
