@@ -9,6 +9,7 @@ import pytest
 
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.packages.package import Package
+from poetry.repositories import Repository
 
 from poetry_plugin_export.exporter import Exporter
 from tests.markers import MARKER_PY
@@ -20,7 +21,6 @@ if TYPE_CHECKING:
     from _pytest.monkeypatch import MonkeyPatch
     from cleo.testers.command_tester import CommandTester
     from poetry.poetry import Poetry
-    from poetry.repositories import Repository
     from pytest_mock import MockerFixture
 
     from tests.types import CommandTesterFactory
@@ -323,3 +323,64 @@ develop = true }}
 
     assert develop_warning in tester.io.fetch_error()
     assert tester.io.fetch_output() == expected
+
+
+def test_export_pylock_toml(
+    mocker: MockerFixture, poetry: Poetry, tester: CommandTester, do_lock: None
+) -> None:
+    mocker.patch(
+        "poetry_plugin_export.exporter.Exporter._get_poetry_version",
+        return_value="2.3.0",
+    )
+    poetry.package.python_versions = "*"
+    repo = Repository("PyPI")
+    poetry.pool.add_repository(repo)
+    repo.add_package(Package("foo", "1.0"))
+
+    assert tester.execute("--format pylock.toml") == 0
+    expected = """\
+lock-version = "1.0"
+created-by = "poetry-plugin-export"
+
+[[packages]]
+name = "foo"
+version = "1.0.0"
+index = "https://pypi.org/simple"
+
+[tool.poetry-plugin-export]
+groups = ["main"]
+extras = []
+"""
+    assert tester.io.fetch_output() == expected
+
+
+@pytest.mark.parametrize("name", ["pylock.toml", "pylock.dev.toml"])
+def test_export_pylock_toml_valid_file_names(
+    mocker: MockerFixture,
+    poetry: Poetry,
+    tester: CommandTester,
+    do_lock: None,
+    name: str,
+) -> None:
+    export_mock = mocker.patch("poetry_plugin_export.command.Exporter.export")
+
+    assert tester.execute(f"--format pylock.toml --output somedir/{name}") == 0
+    assert export_mock.call_count == 1
+
+
+@pytest.mark.parametrize("name", ["pylock-dev.toml", "pylock.dev.test.toml"])
+def test_export_pylock_toml_invalid_file_names(
+    mocker: MockerFixture,
+    poetry: Poetry,
+    tester: CommandTester,
+    do_lock: None,
+    name: str,
+) -> None:
+    export_mock = mocker.patch("poetry_plugin_export.command.Exporter.export")
+
+    assert tester.execute(f"--format pylock.toml --output somedir/{name}") == 1
+    assert export_mock.call_count == 0
+    assert (
+        "The output file for pylock.toml export must be named"
+        in tester.io.fetch_error()
+    )

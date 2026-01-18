@@ -53,11 +53,14 @@ poetry export -f requirements.txt --output requirements.txt
 > which are exported with their resolved hashes, are included.
 
 > [!NOTE]
-> Only the `constraints.txt` and `requirements.txt` formats are currently supported.
+> The following formats are currently supported:
+> * `requirements.txt`
+> * `constraints.txt`
+> * `pylock.toml`
 
 ### Available options
 
-* `--format (-f)`: The format to export to (default: `requirements.txt`). Currently, only `constraints.txt` and `requirements.txt` are supported.
+* `--format (-f)`: The format to export to (default: `requirements.txt`). Additionally, `constraints.txt` and `pylock.toml` are supported.
 * `--output (-o)`: The name of the output file.  If omitted, print to standard output.
 * `--with`: The optional and non-optional dependency groups to include. By default, only the main dependencies are included.
 * `--only`: The only dependency groups to include. It is possible to exclude the `main` group this way.
