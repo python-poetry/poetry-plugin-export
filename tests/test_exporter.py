@@ -527,6 +527,64 @@ def test_exporter_can_export_requirements_txt_with_nested_packages_and_markers(
     assert expected == {}
 
 
+@pytest.mark.parametrize("lock_version", ["2.1"])
+def test_exporter_with_no_markers_flag(
+    tmp_path: Path, poetry: Poetry, lock_version: str
+) -> None:
+    lock_data = {
+        "package": [
+            {
+                "name": "greenlet",
+                "version": "3.2.1",
+                "optional": False,
+                "python-versions": ">=3.9",
+                "markers": 'python_version < "3.14" and (platform_machine == "aarch64" or platform_machine == "ppc64le" or platform_machine == "x86_64" or platform_machine == "amd64" or platform_machine == "AMD64" or platform_machine == "win32" or platform_machine == "WIN32")',
+            },
+            {
+                "name": "typing-extensions",
+                "version": "4.13.2",
+                "optional": False,
+                "python-versions": ">=3.8",
+            },
+            {
+                "name": "sqlalchemy",
+                "version": "2.0.40",
+                "optional": False,
+                "python-versions": ">=3.7",
+                "dependencies": {
+                    "greenlet": {
+                        "version": ">=1",
+                        "markers": 'python_version < "3.14" and (platform_machine == "aarch64" or platform_machine == "ppc64le" or platform_machine == "x86_64" or platform_machine == "amd64" or platform_machine == "AMD64" or platform_machine == "win32" or platform_machine == "WIN32")',
+                    },
+                    "typing-extensions": ">=4.6.0",
+                },
+            },
+        ],
+        "metadata": {
+            "lock-version": lock_version,
+            "files": {"greenlet": [], "typing-extensions": [], "sqlalchemy": []},
+        },
+    }
+
+    fix_lock_data(lock_data)
+    poetry.locker.mock_lock_data(lock_data)  # type: ignore[attr-defined]
+
+    exporter = Exporter(poetry, NullIO())
+    exporter.with_markers(False)
+    exporter.export("requirements.txt", tmp_path, "requirements.txt")
+
+    with open(tmp_path / "requirements.txt") as f:
+        lines = set(f.read().strip().splitlines())
+
+    expected = {
+        "greenlet==3.2.1",
+        "sqlalchemy==2.0.40",
+        "typing-extensions==4.13.2",
+    }
+
+    assert lines == expected
+
+
 @pytest.mark.parametrize(
     ["dev", "lines"],
     [
