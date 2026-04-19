@@ -392,9 +392,9 @@ class Exporter:
                         for k, v in itertools.groupby(
                             package.files,
                             key=(
-                                lambda x: "wheel"
-                                if x["file"].endswith(".whl")
-                                else "sdist"
+                                lambda x: (
+                                    "wheel" if x["file"].endswith(".whl") else "sdist"
+                                )
                             ),
                         )
                     }
