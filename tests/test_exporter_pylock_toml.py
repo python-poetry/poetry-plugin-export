@@ -10,6 +10,7 @@ from packaging.utils import canonicalize_name
 from poetry.core.constraints.version import Version
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.packages.package import Package
+from poetry.core.version.markers import BaseMarker
 from poetry.factory import Factory
 from poetry.packages import Locker as BaseLocker
 from poetry.repositories import Repository
@@ -974,7 +975,7 @@ extras = []
             {"main"},
             {"extra1"},
             'python_version >= "3.6" or extra == "extra1"',
-            'python_version >= "3.6"',
+            "*" if hasattr(BaseMarker, "apply") else 'python_version >= "3.6"',
         ),
         ({"main"}, {"extra1"}, 'python_version >= "3.6" and extra != "extra1"', ""),
     ],
