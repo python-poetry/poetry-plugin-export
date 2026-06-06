@@ -273,10 +273,18 @@ def get_project_dependency_packages2(
             continue
 
         marker = info.get_marker(groups)
-        if not marker.validate({"extra": extras}):
-            continue
+        try:
+            marker = marker.apply({"extra": extras})  # type: ignore[attr-defined]
+        except AttributeError:
+            # poetry-core <= 1.4.2
+            if not marker.validate({"extra": extras}):
+                continue
 
-        marker = marker.without_extras()
+            marker = marker.without_extras()
+
+        else:
+            if marker.is_empty():
+                continue
 
         if project_python_marker:
             marker = project_python_marker.intersect(marker)
