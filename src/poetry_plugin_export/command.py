@@ -76,6 +76,12 @@ class ExportCommand(GroupCommand):
         ),
         option("all-extras", None, "Include all sets of extra dependencies."),
         option("with-credentials", None, "Include credentials for extra indices."),
+        option(
+            "without-markers",
+            None,
+            "Exclude markers in the exported file.",
+            flag=True,
+        ),
     ]
 
     @property
@@ -162,6 +168,10 @@ class ExportCommand(GroupCommand):
             )
             return 1
 
+        without_markers = False
+        if self.option("without-markers"):
+            without_markers = self.option("without-markers")
+
         groups = (
             self.poetry.package.dependency_group_names(include_optional=True)
             if self.option("all-groups")
@@ -174,6 +184,7 @@ class ExportCommand(GroupCommand):
         exporter.with_hashes(not self.option("without-hashes"))
         exporter.with_credentials(self.option("with-credentials"))
         exporter.with_urls(not self.option("without-urls"))
+        exporter.with_markers(not without_markers)
         exporter.export(fmt, Path.cwd(), output or self.io)
 
         return 0
