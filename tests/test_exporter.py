@@ -157,6 +157,8 @@ def test_exporter_can_export_requirements_txt_with_standard_packages(
     exporter = Exporter(poetry, NullIO())
     exporter.export("requirements.txt", tmp_path, "requirements.txt")
 
+    assert b"\r\n" not in (tmp_path / "requirements.txt").read_bytes()
+
     with (tmp_path / "requirements.txt").open(encoding="utf-8") as f:
         content = f.read()
 
