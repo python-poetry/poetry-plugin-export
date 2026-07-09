@@ -102,7 +102,7 @@ class Exporter:
         if isinstance(output, IO):
             output.write(content)
         else:
-            with (cwd / output).open("w", encoding="utf-8") as txt:
+            with (cwd / output).open("w", encoding="utf-8", newline="\n") as txt:
                 txt.write(content)
 
     def _export_generic_txt(
