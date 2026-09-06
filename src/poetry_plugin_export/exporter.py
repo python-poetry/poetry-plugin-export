@@ -416,11 +416,11 @@ class Exporter:
         lock["packages"] = packages if packages else []
 
         lock["tool"] = {}
-        lock["tool"]["poetry-plugin-export"] = {}  # type: ignore[index]
-        lock["tool"]["poetry-plugin-export"]["groups"] = sorted(  # type: ignore[index]
+        lock["tool"]["poetry-plugin-export"] = {}
+        lock["tool"]["poetry-plugin-export"]["groups"] = sorted(
             self._groups, key=lambda x: (x != "main", x)
         )
-        lock["tool"]["poetry-plugin-export"]["extras"] = sorted(self._extras)  # type: ignore[index]
+        lock["tool"]["poetry-plugin-export"]["extras"] = sorted(self._extras)
 
         # Poetry writes invalid requires-python for "or" relations.
         # Though Poetry could parse it, other tools would fail.
