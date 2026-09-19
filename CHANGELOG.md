@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.10.1] - 2026-09-19
+
+### Fixed
+
+- Fix export of marker unions with extras (requires poetry-core 1.5.0) ([#365](https://github.com/python-poetry/poetry-plugin-export/pull/365)).
+
+
 ## [1.10.0] - 2026-01-18
 
 ### Added
@@ -245,7 +252,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.10.0...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.10.1...main
+[1.10.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.10.1
 [1.10.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.10.0
 [1.9.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.9.0
 [1.8.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.8.0
