@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fix export of marker unions with extras (requires poetry-core 1.5.0) ([#365](https://github.com/python-poetry/poetry-plugin-export/pull/365)).
+- Fix export of marker unions with extras (requires poetry-core 2.5.0) ([#365](https://github.com/python-poetry/poetry-plugin-export/pull/365)).
 
 
 ## [1.10.0] - 2026-01-18
