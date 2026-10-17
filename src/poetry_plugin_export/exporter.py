@@ -306,7 +306,11 @@ class Exporter:
         lock["lock-version"] = "1.0"
         if self._poetry.package.python_versions != "*":
             lock["environments"] = [str(python_marker)]
-            lock["requires-python"] = str(python_constraint)
+            lock["requires-python"] = (
+                f"=={python_constraint}"
+                if isinstance(python_constraint, Version)
+                else str(python_constraint)
+            )
         lock["created-by"] = "poetry-plugin-export"
 
         packages = aot()
@@ -323,7 +327,11 @@ class Exporter:
             if not package.marker.is_any():
                 data["marker"] = str(package.marker)
             if not package.python_constraint.is_any():
-                data["requires-python"] = str(package.python_constraint)
+                data["requires-python"] = (
+                    f"=={package.python_constraint}"
+                    if isinstance(package.python_constraint, Version)
+                    else str(package.python_constraint)
+                )
             packages.append(data)
             match dependency:
                 case VCSDependency():
