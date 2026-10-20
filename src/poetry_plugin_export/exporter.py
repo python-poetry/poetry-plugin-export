@@ -141,11 +141,11 @@ class Exporter:
         for dependency_package in dependency_package_iterator:
             line = ""
 
-            if not with_extras:
-                dependency_package = dependency_package.without_features()
-
             dependency = dependency_package.dependency
             package = dependency_package.package
+            if not with_extras:
+                dependency = dependency.without_features()
+                package = package.without_features()
 
             if package.develop and not allow_editable:
                 self._io.write_error_line(

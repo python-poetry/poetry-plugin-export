@@ -2713,6 +2713,75 @@ def test_exporter_omits_and_includes_extras_for_txt_formats(
 
 
 @pytest.mark.parametrize("lock_version", ("1.1", "2.1"))
+@pytest.mark.parametrize("fmt", ("constraints.txt", "requirements.txt"))
+def test_exporter_strips_vcs_extras_only_from_constraints(
+    tmp_path: Path, poetry: Poetry, lock_version: str, fmt: str
+) -> None:
+    lock_data = {
+        "package": [
+            {
+                "name": "parent",
+                "version": "1.0.0",
+                "optional": False,
+                "python-versions": "*",
+                "dependencies": {
+                    "foo": {
+                        "git": "https://example.invalid/foo.git",
+                        "rev": "123456",
+                        "extras": ["feature"],
+                    }
+                },
+            },
+            {
+                "name": "foo",
+                "version": "1.2.3",
+                "optional": False,
+                "python-versions": "*",
+                "source": {
+                    "type": "git",
+                    "url": "https://example.invalid/foo.git",
+                    "reference": "123456",
+                    "resolved_reference": "abcdef",
+                },
+                "dependencies": {
+                    "bar": {
+                        "version": "*",
+                        "optional": True,
+                        "markers": "extra == 'feature'",
+                    }
+                },
+                "extras": {"feature": ["bar"]},
+            },
+            {
+                "name": "bar",
+                "version": "4.5.6",
+                "optional": True,
+                "python-versions": "*",
+            },
+        ],
+        "metadata": {
+            "lock-version": lock_version,
+            "python-versions": "*",
+            "content-hash": "123456789",
+            "files": {"parent": [], "foo": [], "bar": []},
+        },
+    }
+    fix_lock_data(lock_data)
+    poetry.locker.mock_lock_data(lock_data)  # type: ignore[attr-defined]
+    set_package_requires(poetry, skip={"foo", "bar"})
+
+    Exporter(poetry, NullIO()).export(fmt, tmp_path, "exported.txt")
+
+    # Modern locks already list the selected extra's dependencies explicitly.
+    extras = "[feature]" if fmt == "requirements.txt" and lock_version == "1.1" else ""
+    assert (tmp_path / "exported.txt").read_text(encoding="utf-8") == (
+        f"bar==4.5.6 ; {MARKER_PY}\n"
+        f"foo{extras} @ git+https://example.invalid/foo.git@abcdef ; {MARKER_PY}\n"
+        f"parent==1.0.0 ; {MARKER_PY}\n"
+    )
+
+
+@pytest.mark.parametrize("lock_version", ("1.1", "2.1"))
 def test_exporter_prints_warning_for_constraints_txt_with_editable_packages(
     tmp_path: Path, poetry: Poetry, lock_version: str
 ) -> None:
