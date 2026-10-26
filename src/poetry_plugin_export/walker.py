@@ -274,7 +274,7 @@ def get_project_dependency_packages2(
 
         marker = info.get_marker(groups)
         try:
-            marker = marker.apply({"extra": extras})  # type: ignore[attr-defined]
+            marker = marker.apply({"extra": extras})
         except AttributeError:
             # poetry-core <= 1.4.2
             if not marker.validate({"extra": extras}):
