@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import contextlib
-import itertools
 import urllib.parse
 
 from datetime import datetime
@@ -387,24 +386,16 @@ class Exporter:
                             package.source_reference or "PyPI",
                         ).files
                     }
-                    artifacts = {
-                        k: list(v)
-                        for k, v in itertools.groupby(
-                            package.files,
-                            key=(
-                                lambda x: (
-                                    "wheel" if x["file"].endswith(".whl") else "sdist"
-                                )
-                            ),
-                        )
-                    }
-
-                    sdist_files = list(artifacts.get("sdist", []))
+                    sdist_files = [
+                        f for f in package.files if not f["file"].endswith(".whl")
+                    ]
                     for sdist in sdist_files:
                         sdist_table = inline_table()
                         data["sdist"] = sdist_table
                         add_file_info(sdist_table, sdist, pool_info[sdist["file"]])
-                    if wheels := list(artifacts.get("wheel", [])):
+                    if wheels := [
+                        f for f in package.files if f["file"].endswith(".whl")
+                    ]:
                         wheel_array = array()
                         data["wheels"] = wheel_array
                         wheel_array.multiline(True)
