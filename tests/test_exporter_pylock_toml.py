@@ -832,6 +832,88 @@ extras = []
     assert content == expected
 
 
+def test_export_pypi_dependencies_sdist_sorted_between_wheels(
+    tmp_path: Path, poetry: Poetry
+) -> None:
+    # The lock file sorts files by name, so the sdist can end up between wheels,
+    # e.g. if the distribution name of some wheels is normalized differently.
+    lock_data = {
+        "package": [
+            {
+                "name": "foo.bar",
+                "version": "1.0",
+                "optional": False,
+                "python-versions": "*",
+                "groups": [MAIN_GROUP],
+                "files": [
+                    {
+                        "file": "foo.bar-1.0-py2-none-any.whl",
+                        "hash": "sha256:abcdef1234567891",
+                    },
+                    {
+                        "file": "foo.bar-1.0.tar.gz",
+                        "hash": "sha256:0123456789abcdef",
+                    },
+                    {
+                        "file": "foo_bar-1.0-py3-none-any.whl",
+                        "hash": "sha256:abcdef1234567890",
+                    },
+                ],
+            },
+        ],
+        "metadata": {"lock-version": "2.1"},
+    }
+    poetry.locker.mock_lock_data(lock_data)  # type: ignore[attr-defined]
+
+    foo_bar = Package("foo.bar", "1.0")
+    foo_bar.files = [
+        {
+            "file": "foo.bar-1.0-py2-none-any.whl",
+            "hash": "sha256:abcdef1234567891",
+            "url": "https://example.org/foo.bar-1.0-py2-none-any.whl",
+        },
+        {
+            "file": "foo.bar-1.0.tar.gz",
+            "hash": "sha256:0123456789abcdef",
+            "url": "https://example.org/foo.bar-1.0.tar.gz",
+        },
+        {
+            "file": "foo_bar-1.0-py3-none-any.whl",
+            "hash": "sha256:abcdef1234567890",
+            "url": "https://example.org/foo_bar-1.0-py3-none-any.whl",
+        },
+    ]
+    poetry.pool.repository("PyPI").add_package(foo_bar)
+
+    exporter = Exporter(poetry, NullIO())
+
+    exporter.export("pylock.toml", tmp_path, "pylock.toml")
+
+    with (tmp_path / "pylock.toml").open(encoding="utf-8") as f:
+        content = f.read()
+
+    expected = """\
+lock-version = "1.0"
+created-by = "poetry-plugin-export"
+
+[[packages]]
+name = "foo-bar"
+version = "1.0"
+index = "https://pypi.org/simple"
+sdist = {name = "foo.bar-1.0.tar.gz", url = "https://example.org/foo.bar-1.0.tar.gz", hashes = {sha256 = "0123456789abcdef"}}
+wheels = [
+    {name = "foo.bar-1.0-py2-none-any.whl", url = "https://example.org/foo.bar-1.0-py2-none-any.whl", hashes = {sha256 = "abcdef1234567891"}},
+    {name = "foo_bar-1.0-py3-none-any.whl", url = "https://example.org/foo_bar-1.0-py3-none-any.whl", hashes = {sha256 = "abcdef1234567890"}},
+]
+
+[tool.poetry-plugin-export]
+groups = ["main"]
+extras = []
+"""
+
+    assert content == expected
+
+
 def test_export_legacy_repo_dependencies(tmp_path: Path, poetry: Poetry) -> None:
     lock_data = {
         "package": [
