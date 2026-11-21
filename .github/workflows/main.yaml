@@ -24,9 +24,9 @@ jobs:
           - os: Ubuntu
             image: ubuntu-latest
           - os: Windows
-            image: windows-2022
+            image: windows-latest
           - os: macOS
-            image: macos-14
+            image: macos-latest
       fail-fast: false
     defaults:
       run:
