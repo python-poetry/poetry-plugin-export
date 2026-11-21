@@ -205,6 +205,7 @@ extras = ["extra1", "extra2"]
     ("python_versions", "expected_python", "expected_marker"),
     [
         (">=3.9", ">=3.9", 'python_version >= "3.9"'),
+        ("==3.13.12", "==3.13.12", 'python_full_version == "3.13.12"'),
         ("~3.9", ">=3.9,<3.10", 'python_version == "3.9"'),
         ("^3.9", ">=3.9,<4.0", 'python_version >= "3.9" and python_version < "4.0"'),
     ],
@@ -1038,6 +1039,7 @@ def test_export_markers(
     ("python_versions", "expected"),
     [
         (">=3.9", ">=3.9"),
+        ("==3.13.12", "==3.13.12"),
         ("*", None),
         ("~2.7 | ^3.9", "# >=2.7,<2.8 || >=3.9,<4.0"),
     ],
