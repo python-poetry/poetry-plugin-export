@@ -1,5 +1,14 @@
 # Change Log
 
+## [1.10.2] - 2026-11-21
+
+### Fixed
+
+- Fix an issue where wheels were dropped from `pylock.toml` files if the sdist was sorted between wheels ([#379](https://github.com/python-poetry/poetry-plugin-export/pull/379)).
+- Fix an issue where exact Python version pins were exported without `==` in `requires-python` of `pylock.toml` files ([#375](https://github.com/python-poetry/poetry-plugin-export/pull/375)).
+- Fix an issue where extras of VCS dependencies were not stripped when exporting `constraints.txt` files from legacy lock files ([#376](https://github.com/python-poetry/poetry-plugin-export/pull/376)).
+
+
 ## [1.10.1] - 2026-09-19
 
 ### Fixed
@@ -252,7 +261,8 @@ This release fixes test suite compatibility with upcoming Poetry releases. No fu
 - Added support for dependency groups. [#6](https://github.com/python-poetry/poetry-plugin-export/pull/6)
 
 
-[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.10.1...main
+[Unreleased]: https://github.com/python-poetry/poetry-plugin-export/compare/1.10.2...main
+[1.10.2]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.10.2
 [1.10.1]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.10.1
 [1.10.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.10.0
 [1.9.0]: https://github.com/python-poetry/poetry-plugin-export/releases/tag/1.9.0
