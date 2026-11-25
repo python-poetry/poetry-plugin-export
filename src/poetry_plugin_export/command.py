@@ -86,7 +86,10 @@ class ExportCommand(GroupCommand):
         fmt = self.option("format")
 
         if not Exporter.is_format_supported(fmt):
-            raise ValueError(f"Invalid export format: {fmt}")
+            raise ValueError(
+                f"Invalid export format: {fmt}. "
+                f"Supported formats: {', '.join(sorted(Exporter.EXPORT_METHODS))}"
+            )
 
         output = self.option("output")
 
