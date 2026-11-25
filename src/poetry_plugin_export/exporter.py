@@ -91,7 +91,10 @@ class Exporter:
 
     def export(self, fmt: str, cwd: Path, output: IO | str) -> None:
         if not self.is_format_supported(fmt):
-            raise ValueError(f"Invalid export format: {fmt}")
+            raise ValueError(
+                f"Invalid export format: {fmt}. "
+                f"Supported formats: {', '.join(sorted(self.EXPORT_METHODS))}"
+            )
 
         out_dir = cwd
         if isinstance(output, str):

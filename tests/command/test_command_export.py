@@ -131,7 +131,13 @@ def test_export_exports_requirements_txt_uses_lock_file(
 
 
 def test_export_fails_on_invalid_format(tester: CommandTester, do_lock: None) -> None:
-    with pytest.raises(ValueError):
+    with pytest.raises(
+        ValueError,
+        match=(
+            r"Invalid export format: invalid\. Supported formats: "
+            r"constraints\.txt, pylock\.toml, requirements\.txt"
+        ),
+    ):
         tester.execute("--format invalid")
 
 
